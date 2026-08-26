@@ -22,6 +22,13 @@
             href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
             rel="stylesheet"
         />
+        <!-- Archivo Black: reservada SOLO para el H1 del hero y los números
+             de stats (ver .font-slab en styles.css §4.0) — el resto de la
+             página sigue en Syne/Inter. -->
+        <link
+            href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
+            rel="stylesheet"
+        />
         <link rel="stylesheet" href="/src/css/styles.css" />
         <link rel="stylesheet" href="/src/css/animations.css" />
         <script src="/src/js/experience.js"></script>
@@ -61,7 +68,10 @@
             <section class="hero">
                 <div class="hero-bg"></div>
                 <div class="hero-inner">
-                    <h1 class="hero-title anim-page-enter">
+                    <span class="eyebrow eyebrow--primary hero-eyebrow anim-page-enter" data-i18n="home.hero_eyebrow"
+                        >Directorio Erasmus verificado</span
+                    >
+                    <h1 class="hero-title font-slab anim-page-enter">
                         <span data-i18n="home.hero_title_line1">Vive Europa</span> <br />
                         <em data-i18n="home.hero_title_line2">Sin Límites.</em>
                     </h1>
@@ -82,14 +92,33 @@
                                 id="citySearch"
                             />
                         </div>
-                        <button class="search-bar-btn">
+                        <button class="search-bar-btn" id="searchExploreBtn">
                             <span class="btn-text" data-i18n="home.search_cta">Explorar</span>
                             <span class="material-symbols-outlined">arrow_forward</span>
                         </button>
                     </div>
 
+                    <!-- Chip de la ciudad activa — la rellena/oculta selectCity() en index.js -->
+                    <div class="city-chip anim-page-enter" id="cityChip" hidden></div>
+
+                    <!-- Stats — contador animado desde 0 hasta el valor real (initStatsCounters en index.js) -->
+                    <div class="home-stats anim-page-enter">
+                        <div class="home-stat">
+                            <span class="home-stat-num font-slab" id="statCiudades">0</span>
+                            <span class="home-stat-label" data-i18n="home.stats_cities_label">Ciudades activas</span>
+                        </div>
+                        <div class="home-stat">
+                            <span class="home-stat-num font-slab" id="statPartners">0</span>
+                            <span class="home-stat-label" id="statPartnersLabel"></span>
+                        </div>
+                    </div>
                 </div>
             </section>
+
+            <!-- ── TICKER ───────────────────────────────────────────── -->
+            <div class="ticker" aria-hidden="true">
+                <div class="ticker-track" id="tickerTrack"></div>
+            </div>
 
             <!-- ── TOP CITIES BENTO ──────────────────────────────────── -->
             <section class="section cities-section" id="ciudades">
@@ -113,6 +142,24 @@
                 </div>
 
                 <div class="bento-grid" id="bentoGrid"></div>
+            </section>
+
+            <!-- ── PARTNERS DE LA CIUDAD ACTIVA ──────────────────────── -->
+            <section class="section partners-section" id="partners">
+                <div class="nights-header">
+                    <span class="eyebrow eyebrow--primary" id="partnersEyebrow">Tu ciudad</span>
+                    <h2 class="section-title" id="partnersTitle">Descubre partners</h2>
+
+                    <!-- Pills de categoría — Verified: Todo/Alojamiento/Servicios.
+                         Parties: Todo/Fiestas. "Comunidad"/"Grupos" y "Viajes" se
+                         omiten en esta pasada: no hay categoría/datos que los
+                         respalden en Supabase todavía (partners.category solo
+                         admite housing/nightlife/services con datos reales). -->
+                    <div class="category-pills" id="categoryPills"></div>
+                </div>
+
+                <div class="partner-grid" id="partnerGrid"></div>
+                <p class="partners-empty" id="partnersEmpty" hidden></p>
             </section>
 
             <!-- ── TRENDING NIGHTS ───────────────────────────────────── -->

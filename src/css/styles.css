@@ -780,11 +780,17 @@ a.btn-primary-pill {
     display: flex;
     align-items: center;
     gap: 12px;
+    width: 100%;
     padding: 12px 18px;
     text-decoration: none;
     color: var(--on-surface);
     transition: background 0.12s;
+    border: none;
     border-bottom: 1px solid var(--outline-variant);
+    background: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
 }
 
 .search-dropdown-item:last-child {
@@ -1818,6 +1824,358 @@ header.topbar {
 /* ═══════════════════════════════════════════════════════════
    4. INDEX.HTML
    ─────────────────────────────────────────────────────── */
+
+/* ── 4.0 Hero extras: tipografía slab, ticker, chip, stats,
+        pills de categoría y grid de partners (rediseño home) ──── */
+
+/* Placeholder genérico para bento-card / event-img-wrap / partner-card-img-wrap
+   cuando el partner/ciudad no tiene image_url — los tres contenedores son
+   position:relative con altura definida, así que un inset:0 absoluto
+   siempre encaja. (Existía como clase referenciada en JS desde antes de
+   esta rama sin ninguna regla CSS detrás — quedaba invisible en vez de
+   mostrar un placeholder.) */
+.bento-card-placeholder {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--surface-container-low), var(--outline-variant));
+}
+
+/* Archivo Black — SOLO H1 del hero y números de stats (ver
+   comentario en index.html sobre por qué no se extiende al resto
+   de la tipografía todavía). */
+.font-slab {
+    font-family: 'Archivo Black', var(--font-display), sans-serif;
+}
+
+.hero-eyebrow {
+    text-align: center;
+}
+
+/* Envoltorio de palabra individual del H1 — creado en runtime por
+   initHeroTitleAnim() (index.js), nunca en el HTML estático. */
+.word-anim {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+        opacity var(--anim-duration-base) var(--anim-easing-enter),
+        transform var(--anim-duration-base) var(--anim-easing-enter);
+}
+.word-anim.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Chip de ciudad activa, debajo del buscador */
+.city-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px auto 0;
+    padding: 8px 8px 8px 18px;
+    background: var(--surface-container-low);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--on-surface);
+}
+
+.city-chip[hidden] {
+    display: none;
+}
+
+.city-chip-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    background: var(--surface);
+}
+
+.city-chip-view:hover {
+    background: var(--primary-fixed);
+}
+
+.city-chip-clear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface);
+    color: var(--on-surface-variant);
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.city-chip-clear:hover {
+    background: var(--outline-variant);
+    color: var(--on-surface);
+}
+
+/* Stats del hero (contador animado, ver initStatsCounters en index.js) */
+.home-stats {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin-top: 40px;
+}
+
+.home-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.home-stat-num {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.01em;
+}
+
+.home-stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--on-surface-variant);
+}
+
+/* Ticker — franja de marquee CSS puro, contenido duplicado en el
+   propio track (ver initTicker en index.js) para loop continuo sin
+   salto. TODO: sustituir el contenido estático por datos reales
+   (recuento de cta_clicks, nº de partners activos…) en una fase
+   posterior. */
+.ticker {
+    overflow: hidden;
+    background: var(--surface-container-low);
+    border-top: 1px solid var(--outline-variant);
+    border-bottom: 1px solid var(--outline-variant);
+    padding: 14px 0;
+}
+
+.ticker-track {
+    display: flex;
+    width: max-content;
+    animation: ticker-scroll 26s linear infinite;
+}
+
+.ticker-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 28px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--on-surface-variant);
+    white-space: nowrap;
+}
+
+.ticker-item::after {
+    content: '•';
+    margin-left: 28px;
+    color: var(--outline);
+}
+
+@keyframes ticker-scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        /* -50% porque el contenido está duplicado una vez en el track */
+        transform: translateX(-50%);
+    }
+}
+
+/* Pills de categoría del grid de partners */
+.category-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.category-pill {
+    min-height: 40px;
+    padding: 8px 20px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--outline-variant);
+    background: var(--surface);
+    color: var(--on-surface-variant);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background var(--anim-duration-fast) var(--anim-easing-standard),
+        color var(--anim-duration-fast) var(--anim-easing-standard),
+        border-color var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.category-pill:hover {
+    border-color: var(--primary);
+}
+
+.category-pill.is-active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--on-primary);
+}
+
+/* Grid de partners — sin borde/sombra en reposo; en hover eleva,
+   la imagen hace zoom y el CTA aparece con fade+slide. */
+.partners-section {
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
+}
+
+.partner-grid {
+    max-width: var(--container-max);
+    margin: 40px auto 0;
+    padding: 0 var(--margin-desktop);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+/* La regla de clase de arriba (display:grid) empataría en especificidad
+   con el [hidden] del stylesheet del navegador y ganaría por venir de
+   una hoja de autor — hay que ocultarlo explícitamente. */
+.partner-grid[hidden] {
+    display: none;
+}
+
+.partners-empty {
+    max-width: var(--container-max);
+    margin: 40px auto 0;
+    padding: 0 var(--margin-desktop) 8px;
+    color: var(--on-surface-variant);
+    font-size: 15px;
+}
+
+.partners-empty[hidden] {
+    display: none;
+}
+
+.partner-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--surface);
+    text-decoration: none;
+    transition:
+        transform var(--anim-duration-fast) var(--anim-easing-standard),
+        box-shadow var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.partner-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--anim-shadow-hover);
+}
+
+.partner-card-img-wrap {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--surface-container-low);
+}
+
+.partner-card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--anim-duration-slow) var(--anim-easing-standard);
+}
+
+.partner-card:hover .partner-card-img-wrap img {
+    transform: scale(1.06);
+}
+
+.partner-card-category {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    background: rgba(19, 27, 46, 0.72);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.partner-card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.partner-card-name {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--on-surface);
+}
+
+.partner-card-desc {
+    font-size: 13px;
+    color: var(--on-surface-variant);
+    line-height: 1.5;
+}
+
+/* CTA oculto en reposo — fade+slide al hacer hover/focus de la tarjeta */
+.partner-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+        opacity var(--anim-duration-fast) var(--anim-easing-standard),
+        transform var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.partner-card:hover .partner-card-cta,
+.partner-card:focus-within .partner-card-cta {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (max-width: 900px) {
+    .partner-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .home-stats {
+        gap: 32px;
+    }
+}
+
+@media (max-width: 600px) {
+    .partner-grid {
+        grid-template-columns: 1fr;
+    }
+    .city-chip {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
 
 /* ── 4.1 Bento grid ─────────────────────────────────────────── */
 
