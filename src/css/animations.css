@@ -72,6 +72,27 @@
     transition-delay: 480ms;
 }
 
+/* ── Entrada "slam" (partner-grid, home rediseñada) ──────────
+   translateY + rotate leve + overshoot vía cubic-bezier con
+   back-out propio (no un token --anim-easing-*, es un efecto
+   deliberadamente más marcado que el resto de entradas de la
+   página). Revelada por el mismo initScrollReveal/IntersectionObserver
+   que .anim-fade-up — ver src/js/utils/animations.js. */
+
+.anim-slam {
+    opacity: 0;
+    transform: translateY(28px) rotate(-2deg) scale(0.96);
+    transition:
+        opacity var(--anim-duration-base) var(--anim-easing-enter),
+        transform var(--anim-duration-slow) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.anim-slam.is-visible {
+    opacity: 1;
+}
+.anim-slam.is-visible:not(:hover) {
+    transform: translateY(0) rotate(0) scale(1);
+}
+
 /* ── Hover en tarjetas ────────────────────────────────────────
    Solo para componentes sin hover propio ya afinado (event-card,
    bento-card). .city-card/.city-item ya tienen su propia elevación
@@ -138,6 +159,8 @@
     *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
+        animation-delay: 0ms !important;
         transition-duration: 0.01ms !important;
+        transition-delay: 0ms !important;
     }
 }

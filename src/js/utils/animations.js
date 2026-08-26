@@ -16,10 +16,18 @@
 // ─────────────────────────────────────────────────────────────
 
 function initScrollReveal() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    const targets = document.querySelectorAll('.anim-fade-up:not(.is-visible), .anim-fade-in:not(.is-visible)');
+    const targets = document.querySelectorAll(
+        '.anim-fade-up:not(.is-visible), .anim-fade-in:not(.is-visible), .anim-slam:not(.is-visible)'
+    );
     if (!targets.length) return;
+
+    // Sin scroll-driven reveal bajo reduced-motion: todo el contenido debe
+    // aparecer directamente, no quedarse en opacity:0 para siempre por
+    // falta de IntersectionObserver.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        targets.forEach((el) => el.classList.add('is-visible'));
+        return;
+    }
 
     const observer = new IntersectionObserver(
         (entries, obs) => {
