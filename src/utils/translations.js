@@ -34,9 +34,8 @@ window.I18n.translations = {
             contact_cta: 'Contactar',
         },
         home: {
-            hero_eyebrow: 'Directorio Erasmus verificado',
-            hero_title_line1: 'Vive Europa',
-            hero_title_line2: 'Sin Límites.',
+            hero_title_line1: 'Encuentra todo lo que necesitas',
+            hero_title_line2: 'en tu Erasmus',
             hero_subtitle:
                 'Conéctate con alojamiento premium para estudiantes, eventos nocturnos exclusivos y una comunidad vibrante en más de 50 centros universitarios europeos.',
             search_placeholder_long: '¿A dónde vas en tu próxima aventura?',
@@ -87,8 +86,6 @@ window.I18n.translations = {
             filter_housing: 'Alojamiento',
             filter_services: 'Servicios',
             filter_nightlife: 'Fiestas',
-            city_chip_clear_aria: 'Quitar ciudad seleccionada',
-            city_chip_view_cta: 'Ver ciudad',
             partners_eyebrow_default: 'Tu ciudad',
             partners_eyebrow_housing: 'Alojamiento',
             partners_eyebrow_services: 'Servicios',
@@ -102,6 +99,7 @@ window.I18n.translations = {
             partners_cta_default: 'Ver más',
             stats_cities_label: 'Ciudades activas',
             stats_partners_prefix: 'Partners en',
+            stats_students_label: 'Estudiantes',
         },
         nights: {
             eyebrow: 'Vida nocturna',
@@ -271,9 +269,8 @@ window.I18n.translations = {
             contact_cta: 'Contact us',
         },
         home: {
-            hero_eyebrow: 'Verified Erasmus directory',
-            hero_title_line1: 'Live Europe',
-            hero_title_line2: 'Without Limits.',
+            hero_title_line1: 'Find everything you need',
+            hero_title_line2: 'for your Erasmus',
             hero_subtitle:
                 'Connect with premium student housing, exclusive nightlife events and a vibrant community in more than 50 European university cities.',
             search_placeholder_long: "Where's your next adventure?",
@@ -324,8 +321,6 @@ window.I18n.translations = {
             filter_housing: 'Housing',
             filter_services: 'Services',
             filter_nightlife: 'Nightlife',
-            city_chip_clear_aria: 'Remove selected city',
-            city_chip_view_cta: 'View city',
             partners_eyebrow_default: 'Your city',
             partners_eyebrow_housing: 'Housing',
             partners_eyebrow_services: 'Services',
@@ -339,6 +334,7 @@ window.I18n.translations = {
             partners_cta_default: 'View more',
             stats_cities_label: 'Active cities',
             stats_partners_prefix: 'Partners in',
+            stats_students_label: 'Students',
         },
         nights: {
             eyebrow: 'Nightlife',

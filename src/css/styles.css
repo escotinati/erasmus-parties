@@ -3,6 +3,27 @@
    Tokens, variables, reset, utilidades, tipografía base
    ─────────────────────────────────────────────────────── */
 
+/* Custom property registrada — necesario para que el navegador pueda
+   transicionarla como un <percentage> real. Usada por .search-bar-btn
+   (§2.4) para animar el stop de var(--burgundy) dentro del degradado.
+   Sin soporte de @property (navegadores muy antiguos) simplemente no
+   anima: salta directo al valor final, degradación aceptable. */
+@property --burgundy-stop {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 0%;
+}
+
+/* Intensidad del burgundy en ese mismo degradado: al empezar el hover
+   (stop en 0%, burgundy cubriendo todo el botón) se mezcla con indigo
+   para que no entre a plena saturación de golpe; al llegar a su
+   posición final (stop en 100%) ya es burgundy puro. */
+@property --burgundy-mix {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 45%;
+}
+
 *,
 *::before,
 *::after {
@@ -38,6 +59,11 @@
     --on-background: #131b2e;
     --outline: #767586;
     --outline-variant: #c7c4d7;
+    /* Nombres fijos (no reactivos a tema) para el degradado de texto del
+       hero — mismos hex que --primary/--secondary base, pero con nombre
+       propio porque no deben cambiar si el tema activo es Parties. */
+    --indigo: #4648d4;
+    --burgundy: #a93349;
     /* Tipografía */
     --font-display: 'Syne', system-ui, sans-serif;
     --font-body: 'Inter', system-ui, sans-serif;
@@ -687,6 +713,14 @@ a.btn-primary-pill {
     align-items: center;
     box-shadow: 0 4px 24px rgba(70, 72, 212, 0.08);
     transition: box-shadow 0.2s;
+    /* .search-bar es position:relative (lo pone initAutocomplete() en
+       index.js) y lleva .anim-page-enter — una vez esa animación
+       termina, el transform:translateY(0) que deja el fill-mode:both
+       sigue creando su propio stacking context. Sin z-index aquí,
+       .home-stats (sibling posterior, con el mismo anim-page-enter)
+       pintaría por encima del dropdown del buscador sin importar el
+       z-index que tenga .search-dropdown. */
+    z-index: 20;
 }
 
 .search-bar:focus-within {
@@ -735,21 +769,33 @@ a.btn-primary-pill {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition:
-        background var(--anim-duration-fast) var(--anim-easing-standard),
-        opacity var(--anim-duration-fast) var(--anim-easing-standard),
-        transform var(--anim-duration-fast) var(--anim-easing-standard);
     white-space: nowrap;
+    --burgundy-stop: 0%;
+    --burgundy-mix: 45%;
+    /* background-image (el gradiente en sí) no es interpolable en CSS,
+       por eso su transición dura casi nada (aparece de golpe). Lo que
+       SÍ se anima de verdad son --burgundy-stop y --burgundy-mix
+       (registradas con @property más arriba, única forma de que un
+       custom property sea interpolable): el stop recorre 0% → 100%
+       nada más entrar en :hover, sin delay, y el mix hace que ese
+       burgundy no entre a plena intensidad desde el primer frame
+       (mezclado con indigo al empezar) sino que la alcanza según
+       avanza el recorrido. */
+    transition:
+        background 0.01s linear,
+        --burgundy-stop var(--anim-duration-base) var(--anim-easing-standard),
+        --burgundy-mix var(--anim-duration-base) var(--anim-easing-standard);
 }
 
 .search-bar-btn:hover {
-    background: var(--primary-container);
-    opacity: 0.88;
-    transform: translateY(-2px);
-}
-
-.search-bar-btn:active {
-    transform: translateY(0);
+    background: linear-gradient(
+        90deg,
+        var(--indigo),
+        color-mix(in srgb, var(--burgundy) var(--burgundy-mix), var(--indigo)) var(--burgundy-stop)
+    );
+    color: var(--on-primary);
+    --burgundy-stop: 100%;
+    --burgundy-mix: 100%;
 }
 
 /* Autocomplete dropdown */
@@ -766,7 +812,7 @@ a.btn-primary-pill {
     box-shadow:
         0 8px 32px rgba(70, 72, 212, 0.12),
         0 2px 8px rgba(0, 0, 0, 0.06);
-    z-index: 100;
+    z-index: 1000;
     overflow: hidden;
     max-height: 360px;
     overflow-y: auto;
@@ -1606,9 +1652,20 @@ header.topbar {
     margin-bottom: 28px;
 }
 
-.hero-title em {
-    font-style: italic;
-    color: var(--primary);
+/* Degradado también repetido en los .word-anim anidados: el texto se
+   trocea en un span por palabra (initHeroTitleAnim, index.js), y
+   background/background-clip no se heredan — cada palabra necesita su
+   propio degradado para quedar coloreada tras la animación. El mismo
+   JS ajusta luego background-size/background-position de cada palabra
+   (inline) para que las rebanadas encajen y se vea un único degradado
+   continuo en todo "hero-title-gradient", no uno repetido por palabra. */
+.hero-title-gradient,
+.hero-title-gradient .word-anim {
+    background: linear-gradient(90deg, var(--indigo), var(--burgundy));
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 .hero-sub {
@@ -1847,82 +1904,28 @@ header.topbar {
     font-family: 'Archivo Black', var(--font-display), sans-serif;
 }
 
-.hero-eyebrow {
-    text-align: center;
-}
-
 /* Envoltorio de palabra individual del H1 — creado en runtime por
    initHeroTitleAnim() (index.js), nunca en el HTML estático. */
 .word-anim {
     display: inline-block;
     opacity: 0;
     transform: translateY(16px);
+    filter: blur(6px);
     transition:
         opacity var(--anim-duration-base) var(--anim-easing-enter),
-        transform var(--anim-duration-base) var(--anim-easing-enter);
+        transform var(--anim-duration-base) var(--anim-easing-enter),
+        filter var(--anim-duration-base) var(--anim-easing-enter);
 }
 .word-anim.is-visible {
     opacity: 1;
     transform: translateY(0);
-}
-
-/* Chip de ciudad activa, debajo del buscador */
-.city-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin: 20px auto 0;
-    padding: 8px 8px 8px 18px;
-    background: var(--surface-container-low);
-    border: 1px solid var(--outline-variant);
-    border-radius: var(--radius-full);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--on-surface);
-}
-
-.city-chip[hidden] {
-    display: none;
-}
-
-.city-chip-view {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 600;
-    padding: 6px 12px;
-    border-radius: var(--radius-full);
-    background: var(--surface);
-}
-
-.city-chip-view:hover {
-    background: var(--primary-fixed);
-}
-
-.city-chip-clear {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: none;
-    background: var(--surface);
-    color: var(--on-surface-variant);
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.city-chip-clear:hover {
-    background: var(--outline-variant);
-    color: var(--on-surface);
+    filter: blur(0);
 }
 
 /* Stats del hero (contador animado, ver initStatsCounters en index.js) */
 .home-stats {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     gap: 48px;
     margin-top: 40px;
@@ -2039,10 +2042,19 @@ header.topbar {
     padding-bottom: var(--space-16);
 }
 
+/* .nights-header trae su propio max-width/padding pensado para secciones
+   full-bleed (nights-section, sin la clase .section) — aquí ya estamos
+   dentro de .section, que ya centra y da el padding lateral, así que se
+   anula para que "Tu ciudad" quede al mismo ancho que "Destinos"
+   (.section-head, sin padding propio). */
+.partners-section .nights-header {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .partner-grid {
-    max-width: var(--container-max);
-    margin: 40px auto 0;
-    padding: 0 var(--margin-desktop);
+    margin: 40px 0 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
@@ -2056,9 +2068,8 @@ header.topbar {
 }
 
 .partners-empty {
-    max-width: var(--container-max);
-    margin: 40px auto 0;
-    padding: 0 var(--margin-desktop) 8px;
+    margin: 40px 0 0;
+    padding-bottom: 8px;
     color: var(--on-surface-variant);
     font-size: 15px;
 }
@@ -2167,17 +2178,28 @@ header.topbar {
     }
 }
 
+@media (max-width: 768px) {
+    .home-stats {
+        flex-direction: column;
+    }
+}
+
 @media (max-width: 600px) {
     .partner-grid {
         grid-template-columns: 1fr;
     }
-    .city-chip {
-        flex-wrap: wrap;
-        justify-content: center;
+    .home-stats {
+        gap: 24px 32px;
     }
 }
 
 /* ── 4.1 Bento grid ─────────────────────────────────────────── */
+
+/* Mismo padding que .hero, a petición — sustituye al de .section
+   (var(--space-16) var(--margin-desktop)) que traía por defecto. */
+.cities-section {
+    padding: 100px var(--margin-mobile) 80px;
+}
 
 /*
   Grid 4 cols × 2 rows — 4 cards sin huecos:
@@ -3556,6 +3578,7 @@ body.alojamiento-page {
     }
     .hero-title {
         font-size: clamp(32px, 9vw, 48px);
+        margin-top: 60px;
     }
     .hero-sub {
         font-size: 16px;

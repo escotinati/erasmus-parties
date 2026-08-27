@@ -68,12 +68,9 @@
             <section class="hero">
                 <div class="hero-bg"></div>
                 <div class="hero-inner">
-                    <span class="eyebrow eyebrow--primary hero-eyebrow anim-page-enter" data-i18n="home.hero_eyebrow"
-                        >Directorio Erasmus verificado</span
-                    >
                     <h1 class="hero-title font-slab anim-page-enter">
-                        <span data-i18n="home.hero_title_line1">Vive Europa</span> <br />
-                        <em data-i18n="home.hero_title_line2">Sin Límites.</em>
+                        <span data-i18n="home.hero_title_line1">Encuentra todo lo que necesitas</span> <br />
+                        <span class="hero-title-gradient" data-i18n="home.hero_title_line2">en tu Erasmus</span>
                     </h1>
                     <p class="hero-sub anim-page-enter" data-i18n="home.hero_subtitle">
                         Conéctate con alojamiento premium para estudiantes, eventos nocturnos
@@ -98,9 +95,6 @@
                         </button>
                     </div>
 
-                    <!-- Chip de la ciudad activa — la rellena/oculta selectCity() en index.js -->
-                    <div class="city-chip anim-page-enter" id="cityChip" hidden></div>
-
                     <!-- Stats — contador animado desde 0 hasta el valor real (initStatsCounters en index.js) -->
                     <div class="home-stats anim-page-enter">
                         <div class="home-stat">
@@ -110,6 +104,10 @@
                         <div class="home-stat">
                             <span class="home-stat-num font-slab" id="statPartners">0</span>
                             <span class="home-stat-label" id="statPartnersLabel"></span>
+                        </div>
+                        <div class="home-stat">
+                            <span class="home-stat-num font-slab" id="statStudents">0</span>
+                            <span class="home-stat-label" data-i18n="home.stats_students_label">Estudiantes</span>
                         </div>
                     </div>
                 </div>

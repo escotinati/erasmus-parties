@@ -113,10 +113,7 @@ async function initAutocomplete(index) {
         </span>
         <span class="sdi-type">${I18n.t('home.search_result_type_city')}</span>`;
             el.addEventListener('click', () => {
-                const city = allCitiesCache.find((c) => c.id === item.id);
-                if (city) selectCity(city);
-                input.value = item.name;
-                dropdown.classList.remove('is-open');
+                window.location.href = item.url;
             });
             dropdown.appendChild(el);
         });
@@ -179,12 +176,6 @@ async function initAutocomplete(index) {
     const exploreBtn = document.getElementById('searchExploreBtn');
     if (exploreBtn) {
         exploreBtn.addEventListener('click', () => {
-            // Con ciudad ya seleccionada (chip activo), "Explorar" lleva a
-            // su ficha completa; si no, intenta resolver el texto escrito.
-            if (selectedCity) {
-                window.location.href = `ciudad.html?ciudad=${encodeURIComponent(selectedCity.id)}`;
-                return;
-            }
             goToBestMatch(index, input.value.trim());
         });
     }
@@ -201,32 +192,7 @@ async function initAutocomplete(index) {
     }
 }
 
-// ── 2. CHIP DE CIUDAD ACTIVA + CAMBIO DE CIUDAD ─────────────
-
-function renderCityChip(city) {
-    const chip = document.getElementById('cityChip');
-    if (!chip) return;
-
-    chip.innerHTML = `
-        <span>${escapeHtml(city.flag || '')} ${escapeHtml(city.name)}</span>
-        <a class="city-chip-view" href="ciudad.html?ciudad=${encodeURIComponent(city.id)}">
-            <span data-i18n-skip>${escapeHtml(I18n.t('home.city_chip_view_cta'))}</span>
-            <span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span>
-        </a>
-        <button type="button" class="city-chip-clear" id="cityChipClear" aria-label="${escapeHtml(I18n.t('home.city_chip_clear_aria'))}">
-            <span class="material-symbols-outlined" style="font-size:16px">close</span>
-        </button>
-    `;
-    chip.hidden = false;
-
-    const clearBtn = document.getElementById('cityChipClear');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            const fallback = allCitiesCache.find((c) => c.active) || allCitiesCache[0];
-            if (fallback) selectCity(fallback);
-        });
-    }
-}
+// ── 2. CAMBIO DE CIUDAD ACTIVA ──────────────────────────────
 
 async function getPartnersForCity(cityId) {
     if (cityPartnersCache.has(cityId)) return cityPartnersCache.get(cityId);
@@ -235,12 +201,13 @@ async function getPartnersForCity(cityId) {
     return partners;
 }
 
-async function selectCity(city) {
+async function selectCity(city, { fillInput = true } = {}) {
     selectedCity = city;
-    renderCityChip(city);
 
-    const input = document.getElementById('citySearch');
-    if (input) input.value = '';
+    if (fillInput) {
+        const input = document.getElementById('citySearch');
+        if (input) input.value = city.name;
+    }
 
     const partners = await getPartnersForCity(city.id);
     renderCategoryPills();
@@ -404,10 +371,15 @@ function initTicker() {
 
 // ── 6. STATS ANIMADOS ───────────────────────────────────────
 
-function animateCount(el, target, duration = 1200) {
+// Cifra de marca, no viene de Supabase (no hay tabla de estudiantes) —
+// mismo criterio que el contenido estático del ticker. TODO: sustituir
+// por un recuento real si en algún momento se registra en BD.
+const HOME_STUDENTS_COUNT = 30000;
+
+function animateCount(el, target, duration = 1200, format = (n) => String(n)) {
     if (!el) return;
     if (prefersReducedMotion() || target === 0) {
-        el.textContent = target;
+        el.textContent = format(target);
         return;
     }
 
@@ -415,7 +387,7 @@ function animateCount(el, target, duration = 1200) {
     function tick(now) {
         const progress = Math.min((now - start) / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-        el.textContent = Math.round(eased * target);
+        el.textContent = format(Math.round(eased * target));
         if (progress < 1) requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
@@ -423,6 +395,13 @@ function animateCount(el, target, duration = 1200) {
 
 function initCitiesStat(activeCities) {
     animateCount(document.getElementById('statCiudades'), activeCities.length);
+}
+
+function initStudentsStat() {
+    const locale = I18n.getLang() === 'es' ? 'es-ES' : 'en-GB';
+    animateCount(document.getElementById('statStudents'), HOME_STUDENTS_COUNT, 1200, (n) =>
+        n === 0 ? '0' : `+${n.toLocaleString(locale)}`
+    );
 }
 
 function updatePartnersStat(city, allPartnersForCity) {
@@ -460,6 +439,21 @@ function initHeroTitleAnim() {
                 return `<span class="word-anim"${delay}>${escapeHtml(word)}</span>`;
             })
             .join(' ');
+
+        // .hero-title-gradient recorta su fondo al texto (ver CSS), pero
+        // cada palabra es un span independiente — sin esto, cada una
+        // repetiría el degradado desde cero en vez de verse como un único
+        // degradado continuo a lo largo de toda la frase. Se alinea el
+        // fondo de cada palabra como una "rebanada" de un degradado del
+        // ancho total del contenedor, desplazada según su posición real.
+        if (el.classList.contains('hero-title-gradient')) {
+            const containerRect = el.getBoundingClientRect();
+            el.querySelectorAll('.word-anim').forEach((word) => {
+                const wordRect = word.getBoundingClientRect();
+                word.style.backgroundSize = `${containerRect.width}px 100%`;
+                word.style.backgroundPosition = `${-(wordRect.left - containerRect.left)}px 0`;
+            });
+        }
     });
 
     const words = document.querySelectorAll('.hero-title .word-anim');
@@ -615,6 +609,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initTicker();
     initNavScroll();
     initBottomNav();
+    initStudentsStat();
 
     const [activeCities, searchIndex] = await Promise.all([fetchActiveCities(), buildSearchIndex()]);
 
@@ -623,7 +618,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Ciudad activa por defecto: la de mayor prioridad entre las activas
     // (mismo orden que ya usa el bento grid) — así la sección de
-    // partners y los stats no arrancan vacíos.
+    // partners y los stats no arrancan vacíos. fillInput:false para que
+    // el input del hero se quede vacío (placeholder) en vez de mostrar
+    // ya el nombre de esa ciudad sin que el usuario haya buscado nada.
     const defaultCity = activeCities[0] || allCitiesCache[0];
-    if (defaultCity) await selectCity(defaultCity);
+    if (defaultCity) await selectCity(defaultCity, { fillInput: false });
 });
