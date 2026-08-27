@@ -35,22 +35,18 @@ function buildNightCard(event, index = 0) {
       ${
           safeImageUrl
               ? `<img src="${safeImageUrl}" alt="${escapeHtml(I18n.tField(event.title))}" loading="lazy" />`
-              : `<div class="bento-card-placeholder"></div>`
+              : `<div class="card-img-placeholder"></div>`
       }
       <span class="event-badge event-badge--primary"></span>
-      ${I18n.tField(event.price_label) ? '<span class="event-price"></span>' : ''}
     </div>
     <div class="event-body">
-      <div class="event-row">
-        <div>
-          <h4 class="event-name"></h4>
-          <p class="event-venue">
-            <span class="material-symbols-outlined">location_on</span>
-            <span class="event-venue-text"></span>
-          </p>
-        </div>
-      </div>
+      <h4 class="event-name"></h4>
+      <p class="event-venue">
+        <span class="material-symbols-outlined">location_on</span>
+        <span class="event-venue-text"></span>
+      </p>
       <p class="event-date"></p>
+      ${I18n.tField(event.price_label) ? '<p class="event-price"></p>' : ''}
       <p class="event-desc"></p>
       <div class="event-footer"></div>
     </div>
@@ -61,19 +57,27 @@ function buildNightCard(event, index = 0) {
     card.querySelector('.event-name').textContent = I18n.tField(event.title);
     card.querySelector('.event-venue-text').textContent = locationLabel;
     card.querySelector('.event-date').textContent = formatEventDate(event.starts_at);
-    card.querySelector('.event-desc').textContent = I18n.tField(event.description) || '';
 
     const priceEl = card.querySelector('.event-price');
     if (priceEl) priceEl.textContent = I18n.tField(event.price_label);
 
+    card.querySelector('.event-desc').textContent = I18n.tField(event.description) || '';
+
+    // El CTA de compra es la acción principal de un evento (a diferencia
+    // del partner-card, aquí no se oculta hasta el hover — en táctil no
+    // hay hover, y esconder "comprar entrada" tras un gesto que en móvil
+    // no existe sería empeorar la conversión, no una mejora de UX). Enlace
+    // de texto en vez de botón lleno: visible siempre, sin el peso de un
+    // bloque de color a ancho completo.
     const safeTicketUrl = sanitizeUrl(event.ticket_url);
     if (safeTicketUrl) {
         const btn = document.createElement('a');
-        btn.className = 'link-btn';
+        btn.className = 'event-cta-btn';
         btn.href = safeTicketUrl;
         btn.target = '_blank';
         btn.rel = 'noopener noreferrer';
-        btn.textContent = I18n.t('nights.view_event_cta');
+        btn.innerHTML = `<span></span><span class="material-symbols-outlined">arrow_forward</span>`;
+        btn.querySelector('span:first-child').textContent = I18n.t('nights.view_event_cta');
         btn.addEventListener('click', () => {
             trackEvent('event_ticket_click', {
                 eventId: event.id,

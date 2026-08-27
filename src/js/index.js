@@ -2,7 +2,8 @@
 //  INDEX.JS — Erasmus Verified · Home
 //  - Autocomplete en search bar (ciudades desde Supabase) + chip
 //    de ciudad activa
-//  - Bento grid con rotación aleatoria cada 30s
+//  - Accordion grid de ciudades destacadas, con rotación aleatoria
+//    cada 30s (pausada mientras el usuario tiene el ratón encima)
 //  - Ticker de marca
 //  - Grid de partners de la ciudad activa, con pills de categoría
 //  - Stats animados (ciudades activas / partners de la ciudad activa)
@@ -67,7 +68,7 @@ function normalize(str) {
 async function buildSearchIndex() {
     // fetchAllCities() (sin filtro active) para que el buscador sugiera
     // también ciudades sin grupo activo todavía — el resto de la home
-    // (bento, stats de ciudades) sigue usando solo activas.
+    // (accordion, stats de ciudades) sigue usando solo activas.
     allCitiesCache = await fetchAllCities();
     return allCitiesCache.map((city) => ({
         id: city.id,
@@ -267,7 +268,7 @@ function buildPartnerCard(partner, index) {
             ${
                 safeImageUrl
                     ? `<img src="${safeImageUrl}" alt="" loading="lazy" />`
-                    : `<div class="bento-card-placeholder"></div>`
+                    : `<div class="card-img-placeholder"></div>`
             }
             ${catMeta ? `<span class="partner-card-category">${escapeHtml(I18n.t(catMeta.pillKey))}</span>` : ''}
         </div>
@@ -466,31 +467,14 @@ function initHeroTitleAnim() {
     }
 }
 
-// ── 8. BENTO GRID ROTATIVO ───────────────────────────────────
+// ── 8. ACCORDION GRID ROTATIVO ───────────────────────────────
+// Fila con una card protagonista (posición 0, con descripción) + 3
+// que se estrechan y muestran solo bandera+nombre, y se ensanchan al
+// pasar el ratón por encima — patrón tomado de "la web de ejemplo"
+// (ver conversación), no un grid 2×2 con la protagonista rotando de
+// sitio como tenía antes.
 
-const BENTO_LAYOUTS = [
-    // Layout A: main=0, wide=3
-    (pool) => [
-        { ...pool[0], main: true, wide: false },
-        { ...pool[1], main: false, wide: false },
-        { ...pool[2], main: false, wide: false },
-        { ...pool[3], main: false, wide: true },
-    ],
-    // Layout B: main=0, wide=2
-    (pool) => [
-        { ...pool[0], main: true, wide: false },
-        { ...pool[1], main: false, wide: false },
-        { ...pool[2], main: false, wide: true },
-        { ...pool[3], main: false, wide: false },
-    ],
-    // Layout C: main=1, wide=0
-    (pool) => [
-        { ...pool[0], main: false, wide: true },
-        { ...pool[1], main: true, wide: false },
-        { ...pool[2], main: false, wide: false },
-        { ...pool[3], main: false, wide: false },
-    ],
-];
+const ACCORDION_ROTATION_MS = 30000;
 
 function shuffle(arr) {
     const a = [...arr];
@@ -501,35 +485,31 @@ function shuffle(arr) {
     return a;
 }
 
-function pickBentoSet(cities) {
-    const shuffled = shuffle(cities);
-    const pool = shuffled.slice(0, 4);
-    const layout = BENTO_LAYOUTS[Math.floor(Math.random() * BENTO_LAYOUTS.length)];
-    return layout(pool);
+function pickAccordionSet(cities) {
+    return shuffle(cities).slice(0, 4);
 }
 
-function renderBento(grid, cards, animate = false) {
-    if (animate) grid.classList.add('bento-exit');
+function renderAccordion(grid, cities, animate = false) {
+    if (animate) grid.classList.add('accordion-exit');
 
     setTimeout(
         () => {
-            grid.innerHTML = cards
+            grid.innerHTML = cities
                 .map((item, i) => {
-                    const mainCls = item.main ? 'bento-card--main' : '';
-                    const wideCls = item.wide ? 'bento-card--wide' : '';
+                    const isMain = i === 0;
                     const href = `ciudad.html?ciudad=${encodeURIComponent(item.id)}`;
                     const delayCls = `anim-delay-${(i % 8) + 1}`;
                     const safeImageUrl = sanitizeUrl(item.image_url);
 
                     return `
-        <a class="bento-card ${mainCls} ${wideCls} anim-fade-up card-hoverable ${delayCls}" href="${href}">
+        <a class="accordion-card ${isMain ? 'accordion-card--main' : ''} anim-fade-up ${delayCls}" href="${href}">
           ${
               safeImageUrl
                   ? `<img src="${safeImageUrl}" alt="${escapeHtml(item.name)}" loading="lazy"/>`
-                  : `<div class="bento-card-placeholder"></div>`
+                  : `<div class="card-img-placeholder"></div>`
           }
-          <div class="bento-card-overlay"></div>
-          <div class="bento-card-body">
+          <div class="accordion-card-overlay"></div>
+          <div class="accordion-card-body">
             <h3>${escapeHtml(item.flag)} ${escapeHtml(item.name)}</h3>
             ${I18n.tField(item.description) ? `<p>${escapeHtml(I18n.tField(item.description))}</p>` : ''}
           </div>
@@ -537,10 +517,10 @@ function renderBento(grid, cards, animate = false) {
                 })
                 .join('');
 
-            grid.classList.remove('bento-exit');
-            grid.classList.add('bento-enter');
+            grid.classList.remove('accordion-exit');
+            grid.classList.add('accordion-enter');
             requestAnimationFrame(() => {
-                requestAnimationFrame(() => grid.classList.remove('bento-enter'));
+                requestAnimationFrame(() => grid.classList.remove('accordion-enter'));
             });
 
             // Las cards se regeneran por completo en cada rotación (cada 30s)
@@ -552,8 +532,8 @@ function renderBento(grid, cards, animate = false) {
     );
 }
 
-async function initBento(cities) {
-    const grid = document.getElementById('bentoGrid');
+async function initAccordion(cities) {
+    const grid = document.getElementById('citiesAccordion');
     if (!grid) return;
 
     grid.innerHTML = `<p style="color:var(--text-muted);padding:40px;text-align:center">${I18n.t('home.loading_cities')}</p>`;
@@ -569,12 +549,27 @@ async function initBento(cities) {
         pool = [...pool, ...cities];
     }
 
-    renderBento(grid, pickBentoSet(pool), false);
+    renderAccordion(grid, pickAccordionSet(pool), false);
 
     if (cities.length > 4) {
-        setInterval(() => {
-            renderBento(grid, pickBentoSet(pool), true);
-        }, 30000);
+        // Timeout recursivo (no setInterval) para poder pausar la rotación
+        // sin lidiar con "tiempo restante": al salir el ratón, se reprograma
+        // un ciclo completo de ACCORDION_ROTATION_MS, tal y como se pidió
+        // ("empieza a contar los segundos" desde cero, no reanuda el resto).
+        let rotationTimer = null;
+        const scheduleRotation = () => {
+            rotationTimer = setTimeout(() => {
+                renderAccordion(grid, pickAccordionSet(pool), true);
+                scheduleRotation();
+            }, ACCORDION_ROTATION_MS);
+        };
+        scheduleRotation();
+
+        const section = document.getElementById('ciudades');
+        if (section) {
+            section.addEventListener('mouseenter', () => clearTimeout(rotationTimer));
+            section.addEventListener('mouseleave', scheduleRotation);
+        }
     }
 }
 
@@ -613,11 +608,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const [activeCities, searchIndex] = await Promise.all([fetchActiveCities(), buildSearchIndex()]);
 
-    await Promise.all([initCitiesStat(activeCities), initBento(activeCities)]);
+    await Promise.all([initCitiesStat(activeCities), initAccordion(activeCities)]);
     await initAutocomplete(searchIndex);
 
     // Ciudad activa por defecto: la de mayor prioridad entre las activas
-    // (mismo orden que ya usa el bento grid) — así la sección de
+    // (mismo orden que ya usa el accordion grid) — así la sección de
     // partners y los stats no arrancan vacíos. fillInput:false para que
     // el input del hero se quede vacío (placeholder) en vez de mostrar
     // ya el nombre de esa ciudad sin que el usuario haya buscado nada.

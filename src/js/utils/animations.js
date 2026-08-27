@@ -10,7 +10,7 @@
 //  función global (window.initScrollReveal), no export/import.
 //
 //  Se puede (y se debe) volver a llamar tras cada re-render de una
-//  lista dinámica (ej. bento grid, filtro de ciudades) para que los
+//  lista dinámica (ej. accordion grid, filtro de ciudades) para que los
 //  elementos nuevos también se observen — si no, quedarían con
 //  opacity:0 para siempre al no haber ya nadie observándolos.
 // ─────────────────────────────────────────────────────────────

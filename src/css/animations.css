@@ -94,11 +94,11 @@
 }
 
 /* ── Hover en tarjetas ────────────────────────────────────────
-   Solo para componentes sin hover propio ya afinado (event-card,
-   bento-card). .city-card/.city-item ya tienen su propia elevación
-   (Sprint 2 / diseño original) y no llevan esta clase para evitar
-   dos sistemas de hover compitiendo por transform/box-shadow en la
-   misma cascada. */
+   Solo para componentes sin hover propio ya afinado (event-card).
+   .city-card/.city-item y .accordion-card ya tienen su propia
+   animación de hover (elevación o ensanchamiento) y no llevan esta
+   clase para evitar dos sistemas de hover compitiendo por
+   transform/box-shadow en la misma cascada. */
 
 .card-hoverable {
     transition:

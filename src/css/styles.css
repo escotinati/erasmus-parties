@@ -386,20 +386,6 @@ a.btn-primary-pill {
     flex-shrink: 0;
 }
 
-.bento-badge {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    background: rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: var(--radius-full);
-}
-
 .card-tag {
     display: inline-flex;
     align-items: center;
@@ -593,10 +579,15 @@ a.btn-primary-pill {
 
 /* Country / city cards — ciudades.html */
 
-.country-card,
-.city-card {
+/* Selector con tag (a.city-card) a propósito: sube la especificidad por
+   encima de .anim-fade-up (animations.css, cargado después de este archivo)
+   para que esta lista de transition gane siempre — `transition` es shorthand,
+   así que si .anim-fade-up ganara el empate de especificidad reemplazaría
+   toda la propiedad (incluido border-color), no solo se fusionaría con ella. */
+a.country-card,
+a.city-card {
     position: relative;
-    border-radius: var(--radius-xl);
+    border-radius: 20px;
     overflow: hidden;
     cursor: pointer;
     text-decoration: none;
@@ -604,17 +595,14 @@ a.btn-primary-pill {
     aspect-ratio: 3/4;
     background: var(--surface-container);
     border: 1px solid var(--outline-variant);
-    box-shadow: var(--shadow-md);
     transition:
-        transform var(--duration-base) var(--ease-out),
-        box-shadow var(--duration-base) var(--ease-out),
-        border-color var(--duration-base) var(--ease-out);
+        opacity var(--anim-duration-base) var(--anim-easing-enter),
+        transform var(--anim-duration-base) var(--anim-easing-enter),
+        border-color 700ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .country-card:hover,
 .city-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
     border-color: var(--primary);
 }
 
@@ -756,7 +744,10 @@ a.btn-primary-pill {
     color: var(--outline);
 }
 
-.search-bar-btn {
+/* .events-scroll .event-cta-btn (§4.2, CTA "Ver evento") comparte
+   estas mismas reglas a propósito — mismo botón, un único sitio. */
+.search-bar-btn,
+.events-scroll .event-cta-btn {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -770,6 +761,7 @@ a.btn-primary-pill {
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
+    text-decoration: none;
     --burgundy-stop: 0%;
     --burgundy-mix: 45%;
     /* background-image (el gradiente en sí) no es interpolable en CSS,
@@ -787,7 +779,8 @@ a.btn-primary-pill {
         --burgundy-mix var(--anim-duration-base) var(--anim-easing-standard);
 }
 
-.search-bar-btn:hover {
+.search-bar-btn:hover,
+.events-scroll .event-cta-btn:hover {
     background: linear-gradient(
         90deg,
         var(--indigo),
@@ -2054,13 +2047,13 @@ header.topbar {
 /* ── 4.0 Hero extras: tipografía slab, ticker, chip, stats,
         pills de categoría y grid de partners (rediseño home) ──── */
 
-/* Placeholder genérico para bento-card / event-img-wrap / partner-card-img-wrap
+/* Placeholder genérico para accordion-card / event-img-wrap / partner-card-img-wrap
    cuando el partner/ciudad no tiene image_url — los tres contenedores son
    position:relative con altura definida, así que un inset:0 absoluto
    siempre encaja. (Existía como clase referenciada en JS desde antes de
    esta rama sin ninguna regla CSS detrás — quedaba invisible en vez de
    mostrar un placeholder.) */
-.bento-card-placeholder {
+.card-img-placeholder {
     position: absolute;
     inset: 0;
     background: linear-gradient(135deg, var(--surface-container-low), var(--outline-variant));
@@ -2178,7 +2171,7 @@ header.topbar {
 }
 
 .category-pill {
-    min-height: 40px;
+    min-height: 44px;
     padding: 8px 20px;
     border-radius: var(--radius-full);
     border: 1px solid var(--outline-variant);
@@ -2316,7 +2309,11 @@ header.topbar {
     line-height: 1.5;
 }
 
-/* CTA oculto en reposo — fade+slide al hacer hover/focus de la tarjeta */
+/* Visible por defecto (móvil/táctil no tiene :hover — un CTA oculto
+   ahí sería un objetivo invisible pero tocable, peor que no animarlo).
+   El fade+slide-on-hover solo se activa en dispositivos con hover de
+   verdad y puntero fino (ratón/trackpad), dentro del media query de
+   abajo. */
 .partner-card-cta {
     display: inline-flex;
     align-items: center;
@@ -2325,17 +2322,22 @@ header.topbar {
     color: var(--primary);
     font-size: 13px;
     font-weight: 700;
-    opacity: 0;
-    transform: translateY(6px);
-    transition:
-        opacity var(--anim-duration-fast) var(--anim-easing-standard),
-        transform var(--anim-duration-fast) var(--anim-easing-standard);
 }
 
-.partner-card:hover .partner-card-cta,
-.partner-card:focus-within .partner-card-cta {
-    opacity: 1;
-    transform: translateY(0);
+@media (hover: hover) and (pointer: fine) {
+    .partner-card-cta {
+        opacity: 0;
+        transform: translateY(6px);
+        transition:
+            opacity var(--anim-duration-fast) var(--anim-easing-standard),
+            transform var(--anim-duration-fast) var(--anim-easing-standard);
+    }
+
+    .partner-card:hover .partner-card-cta,
+    .partner-card:focus-within .partner-card-cta {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 900px) {
@@ -2362,7 +2364,7 @@ header.topbar {
     }
 }
 
-/* ── 4.1 Bento grid ─────────────────────────────────────────── */
+/* ── 4.1 Accordion grid (ciudades destacadas, ensanchamiento en hover) ── */
 
 /* Mismo padding que .hero, a petición — sustituye al de .section
    (var(--space-16) var(--margin-desktop)) que traía por defecto. */
@@ -2370,37 +2372,39 @@ header.topbar {
     padding: 100px var(--margin-mobile) 80px;
 }
 
-/*
-  Grid 4 cols × 2 rows — 4 cards sin huecos:
-  main  (col-span-2, row-span-2) = 4 celdas
-  normal (col-span-1, row-span-1) = 1 celda × 2 = 2 celdas
-  wide  (col-span-2, row-span-1) = 2 celdas
-  Total = 4+2+2 = 8 = 4×2 ✓
-*/
+/* Fila con una card protagonista + 3 que se estrechan y muestran cada
+   vez menos información (imagen+flag+nombre+descripción en la
+   protagonista; solo imagen+flag+nombre en las demás) — patrón tomado
+   de "la web de ejemplo" (sección "AI Music Video Workflow": card
+   grande con texto completo + 3 card angostas solo con etiqueta). */
 
-.bento-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, 320px);
+.accordion-grid {
+    display: flex;
+    align-items: stretch;
     gap: 20px;
+    height: 440px;
     transition:
         opacity 0.35s ease,
         transform 0.35s ease;
 }
 
-.bento-grid.bento-exit {
+.accordion-grid.accordion-exit {
     opacity: 0;
     transform: translateY(6px);
 }
 
-.bento-grid.bento-enter {
+.accordion-grid.accordion-enter {
     opacity: 0;
     transform: translateY(-6px);
 }
 
-.bento-card {
+.accordion-card {
     position: relative;
-    border-radius: var(--radius-lg);
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    min-width: 0;
+    border-radius: 20px;
     overflow: hidden;
     cursor: pointer;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
@@ -2408,17 +2412,57 @@ header.topbar {
     display: block;
 }
 
-.bento-card--main {
-    grid-column: span 2;
-    grid-row: span 2;
+/* Proporción más cercana a la web de ejemplo (protagonista bastante
+   más ancha, no solo el doble) que el 2.2:1 del primer intento. */
+.accordion-card--main {
+    flex-grow: 2.6;
 }
 
-.bento-card--wide {
-    grid-column: span 2;
-    grid-row: span 1;
+/* Acordeón en hover — solo con hover real (en móvil ya es un
+   carrusel de ancho fijo, esto no aplica ni tiene sentido ahí):
+   cualquier card bajo el cursor "roba" el sitio a la protagonista y
+   crece a su tamaño; las demás (protagonista incluida) se encogen al
+   ancho angosto mientras dure el hover. flex-grow es un <number>,
+   así que sí se puede transicionar de verdad, a diferencia de un
+   grid-template-columns. */
+@media (hover: hover) and (pointer: fine) {
+    /* Selector descendiente (.accordion-grid .accordion-card, especificidad 0-2-0)
+       a propósito: .anim-fade-up (animations.css, cargado después de este
+       archivo) declara su propio `transition` (opacity + transform) con la
+       misma especificidad que un simple ".accordion-card" (0-1-0) — al ser
+       shorthand, quien gane el empate sustituye la propiedad entera, no se
+       fusiona con las demás. Sin este empujón de especificidad ganaba
+       .anim-fade-up y flex-grow no se animaba (salto brusco sin transición).
+       Sin lift en hover (se quitó .card-hoverable del markup, index.js): la
+       card solo cambia de ancho, no se eleva. */
+    .accordion-grid .accordion-card {
+        /* flex-grow: misma curva que la web de ejemplo, duración recortada
+           a propósito (más ágil que los 0.7s originales). */
+        transition:
+            opacity var(--anim-duration-base) var(--anim-easing-enter),
+            transform var(--anim-duration-base) var(--anim-easing-enter),
+            flex-grow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .accordion-grid:hover .accordion-card {
+        flex-grow: 1;
+    }
+
+    .accordion-grid:hover .accordion-card:hover {
+        flex-grow: 2.6;
+    }
+
+    /* Sin esto, al hacer hover deja de aplicar el guard
+       .anim-fade-up.is-visible:not(:hover) (animations.css) y la card
+       "cae" al valor base de .anim-fade-up (translateY(var(--anim-translate-md)))
+       durante el hover, en vez de quedarse fija — antes lo evitaba de rebote
+       el :hover de .card-hoverable, que ya no lleva esta card. */
+    .accordion-grid .accordion-card:hover {
+        transform: translateY(0);
+    }
 }
 
-.bento-card img {
+.accordion-card img {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -2427,11 +2471,11 @@ header.topbar {
     transition: transform 0.7s ease;
 }
 
-.bento-card:hover img {
+.accordion-card:hover img {
     transform: scale(1.08);
 }
 
-.bento-card-overlay {
+.accordion-card-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(
@@ -2442,7 +2486,15 @@ header.topbar {
     );
 }
 
-.bento-card-body {
+/* Las angostas solo llevan bandera+nombre (una línea) — un scrim tan
+   alto como el de la protagonista tapaba imagen sin necesidad. Igual
+   que en la web de ejemplo, donde las cards angostas dejan ver casi
+   toda la foto y el texto vive en una franja baja y ajustada. */
+.accordion-card:not(.accordion-card--main) .accordion-card-overlay {
+    background: linear-gradient(to top, rgba(19, 27, 46, 0.88) 0%, transparent 55%);
+}
+
+.accordion-card-body {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -2450,21 +2502,17 @@ header.topbar {
     padding: 20px 22px;
 }
 
-.bento-card-flag {
-    font-size: 1.6rem;
+.accordion-card-flag {
+    font-size: 1.3rem;
     display: block;
     margin-bottom: 6px;
     filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
     line-height: 1;
 }
 
-.bento-card--main .bento-card-flag {
-    font-size: 2.2rem;
-}
-
-.bento-card-body h3 {
+.accordion-card-body h3 {
     font-family: var(--font-display);
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 700;
     color: #fff;
     margin-bottom: 3px;
@@ -2472,48 +2520,102 @@ header.topbar {
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
-.bento-card--main .bento-card-body h3 {
+/* Tamaño "protagonista" de bandera/nombre: por defecto en
+   .accordion-card--main. En hover real, "viaja" a la card bajo el cursor
+   (igual que el ancho, más arriba) — y si el hover cae en OTRA card,
+   la protagonista real vuelve al tamaño angosto mientras dure. */
+.accordion-card--main .accordion-card-flag {
+    font-size: 2.2rem;
+}
+.accordion-card--main .accordion-card-body h3 {
     font-size: 26px;
 }
 
-.bento-card-body p {
+@media (hover: hover) and (pointer: fine) {
+    .accordion-card-flag,
+    .accordion-card-body h3 {
+        transition: font-size 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .accordion-grid:hover .accordion-card--main:not(:hover) .accordion-card-flag {
+        font-size: 1.3rem;
+    }
+    .accordion-grid:hover .accordion-card--main:not(:hover) .accordion-card-body h3 {
+        font-size: 15px;
+    }
+
+    .accordion-grid:hover .accordion-card:hover .accordion-card-flag {
+        font-size: 2.2rem;
+    }
+    .accordion-grid:hover .accordion-card:hover .accordion-card-body h3 {
+        font-size: 26px;
+    }
+
+    /* La descripción sigue la misma regla que el tamaño de bandera/nombre
+       de arriba: solo se ve en la card ancha del momento (la protagonista
+       en reposo, o la que tiene el cursor encima). display, no opacity,
+       para que al ocultarse no deje un hueco reservado bajo el título en
+       las cards angostas. */
+    .accordion-grid:hover .accordion-card--main:not(:hover) .accordion-card-body p {
+        display: none;
+    }
+    .accordion-grid:hover .accordion-card:hover .accordion-card-body p {
+        display: -webkit-box;
+    }
+}
+
+/* Oculta por defecto — cada ciudad puede tener descripción en Supabase,
+   pero solo se muestra en la card que está ancha (ver excepción de abajo
+   para la protagonista en reposo, y el bloque de hover más arriba). */
+.accordion-card-body p {
     font-size: 12px;
     color: rgba(255, 255, 255, 0.65);
     font-weight: 500;
+    display: none;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.accordion-card--main .accordion-card-body p {
+    display: -webkit-box;
 }
 
 @media (max-width: 900px) {
-    .bento-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: auto;
+    .accordion-grid {
+        height: auto;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding-right: 40px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
-    .bento-card--main,
-    .bento-card--wide {
-        grid-column: span 2;
-        grid-row: span 1;
+    .accordion-grid::-webkit-scrollbar {
+        display: none;
     }
-    .bento-card {
-        min-height: 220px;
+    .accordion-card {
+        flex: 0 0 70%;
+        min-height: 280px;
+        scroll-snap-align: start;
+    }
+    .accordion-card--main {
+        flex: 0 0 85%;
+        min-height: 320px;
     }
 }
 
 @media (max-width: 600px) {
-    .bento-grid {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto;
+    .accordion-grid {
         gap: 12px;
     }
-    .bento-card--main {
-        grid-column: span 2;
-        grid-row: span 1;
-        min-height: 200px;
+    .accordion-card {
+        flex-basis: 78%;
+        min-height: 220px;
     }
-    .bento-card--wide {
-        grid-column: span 2;
-        min-height: 160px;
-    }
-    .bento-card {
-        min-height: 140px;
+    .accordion-card--main {
+        flex-basis: 88%;
+        min-height: 260px;
     }
 }
 
@@ -2638,11 +2740,22 @@ header.topbar {
     gap: 16px;
 }
 
+/* Mismo grid que .partner-grid (2 → 3 columnas a partir de 900px, mismo
+   gap de 24px), para que las cards de eventos midan lo mismo que las
+   de partners en cada ancho. Por debajo de 768px sigue apilado en
+   columna, igual que el resto de la página cambia a móvil en ese
+   mismo punto. */
 @media (min-width: 768px) {
     .events-scroll {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
+        gap: 24px;
+    }
+}
+
+@media (min-width: 900px) {
+    .events-scroll {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
@@ -2668,15 +2781,74 @@ header.topbar {
 .events-scroll .event-card {
     width: 100%;
     min-width: 100%;
+    /* Mismo tratamiento que .partner-card (grid de la ciudad activa):
+       plana en reposo, eleva + sombra en hover — sustituye al lift
+       genérico de .card-hoverable (misma cascada, más específico por
+       venir de .events-scroll) para igualar el valor exacto. */
+    border-radius: 20px;
+    box-shadow: none;
+    transition:
+        transform var(--anim-duration-fast) var(--anim-easing-standard),
+        box-shadow var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.events-scroll .event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--anim-shadow-hover);
 }
 
 .events-scroll .event-img-wrap {
     height: auto;
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 4 / 3;
+}
+
+.events-scroll .event-img-wrap img {
+    transition: transform var(--anim-duration-slow) var(--anim-easing-standard);
+}
+
+.events-scroll .event-card:hover .event-img-wrap img {
+    transform: scale(1.06);
+}
+
+/* Badge de tema — mismo estilo oscuro translúcido que .partner-card-category */
+.events-scroll .event-badge--primary {
+    background: rgba(19, 27, 46, 0.72);
+    color: #fff;
+}
+
+.events-scroll .event-badge {
+    padding: 3px 10px;
+    font-size: 12px;
+    top: 12px;
+    left: 12px;
+}
+
+/* Fecha + precio en una sola línea de texto (sin icono, sin chip de
+   color) — antes eran una fila con icono de calendario y un chip de
+   precio aparte, dos piezas decorativas para un dato que es solo
+   texto. Misma información, un único elemento. */
+.events-scroll .event-date {
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Precio en su propia línea, debajo de la fecha — texto plano, no el
+   chip de color que traía la regla base (§2.2), para no reintroducir
+   una pieza decorativa más en la card. */
+.events-scroll .event-price {
+    margin-top: 2px;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--on-surface-variant);
 }
 
 .events-scroll .event-body {
-    padding: 16px;
+    padding: 20px;
 }
 
 .events-scroll .event-name {
@@ -2687,38 +2859,63 @@ header.topbar {
     font-size: 12px;
 }
 
-.events-scroll .event-date {
-    margin-top: 8px;
-    font-size: 12px;
-}
-
 .events-scroll .event-desc {
     margin-top: 8px;
     font-size: 13px;
 }
 
 .events-scroll .event-footer {
-    margin-top: 12px;
+    margin-top: 14px;
 }
 
-.events-scroll .event-badge,
-.events-scroll .event-price {
-    padding: 3px 10px;
-    font-size: 12px;
+/* CTA siempre visible (ver comentario en nightsSection.js) — mismo
+   botón exacto que .search-bar-btn del hero, ver §2.4 (se añade ahí
+   al selector para no duplicar la regla). Sin width:100%, así que se
+   ajusta a su contenido y queda alineado a la derecha del footer. */
+
+/* Móvil: carrusel horizontal con scroll-snap en vez de columna apilada
+   — esta sección se llama .events-scroll desde antes de esta rama
+   porque ya tuvo scroll horizontal alguna vez (se unificó con Verified
+   en una decisión de negocio anterior). Lo recupero solo aquí, solo
+   en móvil: el resto del rediseño (elevar+zoom en hover, CTA con
+   degradado) depende de :hover, que el táctil no tiene, así que sin
+   esto las cards se quedan indistinguibles de una lista plana. Cada
+   card ocupa el 82% del ancho — el 18% restante deja asomar la
+   siguiente, que es la señal visual de "hay más, desliza". */
+@media (max-width: 767px) {
+    .events-scroll {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 14px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding-right: 40px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .events-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    .events-scroll .event-card {
+        flex: 0 0 82%;
+        min-width: 82%;
+        scroll-snap-align: start;
+    }
 }
 
-.events-scroll .event-badge {
-    top: 12px;
-    left: 12px;
-}
-
-.events-scroll .event-img-wrap .event-price {
-    top: 12px;
-    right: 12px;
-}
-
-.events-scroll .link-btn {
-    font-size: 13px;
+/* El resto del rediseño (plano en reposo, sombra/zoom solo en :hover)
+   asume que hay hover de verdad — en táctil, donde nunca se dispara,
+   las cards se quedarían sin ninguna presencia visual en reposo. Un
+   único ajuste para touch: una sombra sutil permanente, sin necesidad
+   de replicar toda la lógica de :hover. Mismo criterio en .partner-card. */
+@media (hover: none) {
+    .events-scroll .event-card,
+    .partner-card {
+        box-shadow: 0 2px 14px rgba(19, 27, 46, 0.08);
+    }
 }
 
 @media (min-width: 768px) {
@@ -3641,7 +3838,7 @@ body.alojamiento-page {
         padding-left: var(--margin-mobile);
         padding-right: var(--margin-mobile);
     }
-    .bento-grid {
+    .accordion-grid {
         min-height: 560px;
     }
     .services-grid {
@@ -3659,16 +3856,16 @@ body.alojamiento-page {
     .cities-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-    .bento-grid {
+    .accordion-grid {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: auto;
         min-height: auto;
     }
-    .bento-card--main,
-    .bento-card--wide {
+    .accordion-card--main,
+    .accordion-card--wide {
         grid-column: span 2;
     }
-    .bento-card {
+    .accordion-card {
         aspect-ratio: 4/3;
     }
 }
@@ -3721,14 +3918,14 @@ body.alojamiento-page {
 }
 
 @media (max-width: 600px) {
-    .bento-grid {
+    .accordion-grid {
         grid-template-columns: 1fr;
     }
-    .bento-card--main,
-    .bento-card--wide {
+    .accordion-card--main,
+    .accordion-card--wide {
         grid-column: span 1;
     }
-    .bento-card {
+    .accordion-card {
         aspect-ratio: 4/3;
     }
     .countries-grid {
