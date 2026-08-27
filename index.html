@@ -2,7 +2,7 @@
 <html lang="es">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
         <title>Inicio — Erasmus Verified</title>
         <!-- Google Fonts: Syne (display) + Inter (body) -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -34,7 +34,7 @@
         <script src="/src/js/experience.js"></script>
     </head>
 
-    <body>
+    <body class="home-page">
         <!-- ── TOP NAV ─────────────────────────────────────────────── -->
         <nav class="topnav" id="topNav">
             <div class="topnav-inner">
@@ -454,12 +454,16 @@
         <!-- ── APP BOTTOM NAV (móvil) ────────────────────────────── -->
         <nav class="app-bottom-nav" id="appBottomNav" aria-label="Navegación principal">
             <a href="servicios.html" class="app-bottom-nav-item">
-                <span class="material-symbols-outlined">storefront</span>
-                <span data-i18n="nav.services">Servicios</span>
+                <span class="app-bottom-nav-icon"
+                    ><span class="material-symbols-outlined">storefront</span></span
+                >
+                <span class="app-bottom-nav-label" data-i18n="nav.services">Servicios</span>
             </a>
             <a href="viajes.html" class="app-bottom-nav-item">
-                <span class="material-symbols-outlined">flight</span>
-                <span data-i18n="nav.trips">Viajes</span>
+                <span class="app-bottom-nav-icon"
+                    ><span class="material-symbols-outlined">flight</span></span
+                >
+                <span class="app-bottom-nav-label" data-i18n="nav.trips">Viajes</span>
             </a>
             <a
                 href="https://erasmusparties.org"
@@ -467,8 +471,10 @@
                 rel="noopener noreferrer"
                 class="app-bottom-nav-item app-bottom-nav-item--parties"
             >
-                <span class="material-symbols-outlined">nightlife</span>
-                <span data-i18n="nav.parties_bottom">Fiestas</span>
+                <span class="app-bottom-nav-icon"
+                    ><span class="material-symbols-outlined">nightlife</span></span
+                >
+                <span class="app-bottom-nav-label" data-i18n="nav.parties_bottom">Fiestas</span>
             </a>
         </nav>
 

@@ -974,6 +974,13 @@ a.btn-primary-pill {
     body {
         padding-bottom: 68px;
     }
+
+    /* home-page: la barra ahora reserva también env(safe-area-inset-bottom)
+       (iOS, home indicator) — el body tiene que compensar esa misma
+       altura extra para no dejar contenido oculto detrás. */
+    body.home-page {
+        padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    }
 }
 
 /* Bottom nav legacy — mantenido oculto */
@@ -1881,6 +1888,168 @@ header.topbar {
 /* ═══════════════════════════════════════════════════════════
    4. INDEX.HTML
    ─────────────────────────────────────────────────────── */
+
+/* ── 4.-1 Nav desktop (rediseño, solo home-page) ──────────────
+   Todo escapado bajo .home-page (clase en <body>, solo index.html):
+   .topbar-nav a / .lang-switcher son selectores COMPARTIDOS con
+   header.topbar (ciudad.html, mapa.html, servicios.html, viajes.html,
+   alojamiento.html) y con el propio .topnav de ciudades-todas.html —
+   sin este scoping, cualquier regla tocaría esas páginas también. */
+
+.home-page .topnav::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--indigo), var(--burgundy));
+    opacity: 0.3;
+    transition: opacity var(--anim-duration-base) var(--anim-easing-standard);
+}
+
+.home-page .topnav.scrolled::after {
+    opacity: 0.65;
+}
+
+.home-page .topnav .brand {
+    transition: opacity var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.home-page .topnav .brand:hover {
+    opacity: 0.75;
+}
+
+/* Subrayado que crece desde el centro en hover/foco — mismo degradado
+   que el CTA y el titular del hero, para que el nav se sienta parte
+   del mismo sistema en vez de un componente genérico aparte. */
+.home-page .topnav .topbar-nav a,
+.home-page .topnav .lang-switcher {
+    position: relative;
+}
+
+.home-page .topnav .topbar-nav a::after,
+.home-page .topnav .lang-switcher::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -8px;
+    height: 2px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg, var(--indigo), var(--burgundy));
+    transform: scaleX(0);
+    transition: transform var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.home-page .topnav .lang-switcher::after {
+    bottom: -6px;
+}
+
+.home-page .topnav .topbar-nav a:hover::after,
+.home-page .topnav .topbar-nav a:focus-visible::after,
+.home-page .topnav .topbar-nav a.is-active::after,
+.home-page .topnav .lang-switcher:hover::after,
+.home-page .topnav .lang-switcher:focus-visible::after {
+    transform: scaleX(1);
+}
+
+/* "Fiestas ↗" (Verified) y "Verified ↗" (Parties, añadido por
+   experience.js) ya llevan su propio acento — el subrayado usa ese
+   mismo color en vez del degradado indigo/burgundy por defecto. */
+.home-page .topnav .topbar-nav a.nav-parties::after {
+    background: #e1147b;
+}
+
+.home-page .topnav .topbar-nav a.nav-verified::after {
+    background: #4648d4;
+}
+
+/* ── 4.-1b Bottom nav móvil (rediseño, solo home-page) ─────────
+   .app-bottom-nav / .app-bottom-nav-item son compartidos con el resto
+   de páginas públicas — todo escapado bajo .home-page. Estructura
+   intacta (mismos 3 ítems/enlaces), solo tratamiento visual: cristal
+   a juego con el nav de escritorio, píldora + icono relleno en el
+   ítem activo (Material Symbols soporta el eje FILL 0↔1, igual que el
+   "tab" que se rellena al seleccionarlo en apps como Instagram). */
+
+.home-page .app-bottom-nav {
+    background: rgba(var(--surface-rgb), 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(199, 196, 215, 0.35);
+    box-shadow: 0 -8px 24px rgba(19, 27, 46, 0.06);
+    /* iOS: reserva el hueco de la home indicator sin recortar los
+       ítems ni encogerlos — el padding vive DEBAJO de su altura
+       normal, así el contenido flex sigue centrado en los 60px. */
+    height: calc(60px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.home-page .app-bottom-nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    transition:
+        background var(--anim-duration-fast) var(--anim-easing-standard),
+        transform var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.home-page .app-bottom-nav-item:active .app-bottom-nav-icon {
+    transform: scale(0.9);
+}
+
+.home-page .app-bottom-nav-item .material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+    transition: font-variation-settings var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.home-page .app-bottom-nav-label {
+    transition: font-weight var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+/* Ítem activo (JS ya marca --active según la página, ver script inline) */
+.home-page .app-bottom-nav-item--active .app-bottom-nav-icon {
+    background: rgba(70, 72, 212, 0.12);
+}
+
+.home-page .app-bottom-nav-item--active .material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 500,
+        'GRAD' 0,
+        'opsz' 24;
+}
+
+.home-page .app-bottom-nav-item--active .app-bottom-nav-label {
+    font-weight: 700;
+}
+
+/* Fiestas: acento magenta ya era permanente (no depende de --active);
+   ahora también lleva píldora e icono relleno siempre, como el único
+   ítem "siempre encendido" de la barra. */
+.home-page .app-bottom-nav-item--parties .app-bottom-nav-icon {
+    background: rgba(225, 20, 123, 0.1);
+}
+
+.home-page .app-bottom-nav-item--parties .material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 500,
+        'GRAD' 0,
+        'opsz' 24;
+}
+
+.home-page .app-bottom-nav-item--parties .app-bottom-nav-label {
+    font-weight: 700;
+}
 
 /* ── 4.0 Hero extras: tipografía slab, ticker, chip, stats,
         pills de categoría y grid de partners (rediseño home) ──── */
