@@ -10,16 +10,24 @@
 //  función global (window.initScrollReveal), no export/import.
 //
 //  Se puede (y se debe) volver a llamar tras cada re-render de una
-//  lista dinámica (ej. bento grid, filtro de ciudades) para que los
+//  lista dinámica (ej. accordion grid, filtro de ciudades) para que los
 //  elementos nuevos también se observen — si no, quedarían con
 //  opacity:0 para siempre al no haber ya nadie observándolos.
 // ─────────────────────────────────────────────────────────────
 
 function initScrollReveal() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    const targets = document.querySelectorAll('.anim-fade-up:not(.is-visible), .anim-fade-in:not(.is-visible)');
+    const targets = document.querySelectorAll(
+        '.anim-fade-up:not(.is-visible), .anim-fade-in:not(.is-visible), .anim-slam:not(.is-visible)'
+    );
     if (!targets.length) return;
+
+    // Sin scroll-driven reveal bajo reduced-motion: todo el contenido debe
+    // aparecer directamente, no quedarse en opacity:0 para siempre por
+    // falta de IntersectionObserver.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        targets.forEach((el) => el.classList.add('is-visible'));
+        return;
+    }
 
     const observer = new IntersectionObserver(
         (entries, obs) => {
