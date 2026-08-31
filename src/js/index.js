@@ -579,19 +579,6 @@ async function initAccordion(cities) {
     }
 }
 
-// ── 9. NAV SCROLL SHADOW ─────────────────────────────────────
-function initNavScroll() {
-    const nav = document.getElementById('topNav');
-    if (!nav) return;
-    window.addEventListener(
-        'scroll',
-        () => {
-            nav.classList.toggle('scrolled', window.scrollY > 20);
-        },
-        { passive: true }
-    );
-}
-
 // ── 9b. CITIES SECTION — PIN & SCRUB (estilo Apple) ────────────
 // El título arranca grande y se encoge a su tamaño real, el grid de
 // ciudades aparece debajo — todo controlado por cuánto se ha
@@ -647,7 +634,6 @@ function initBottomNav() {
 document.addEventListener('DOMContentLoaded', async () => {
     initHeroTitleAnim();
     initTicker();
-    initNavScroll();
     initCitiesScrollEffect();
     initBottomNav();
     initStudentsStat();
