@@ -1065,26 +1065,39 @@ a.city-card {
     box-shadow: 0 1px 12px rgba(70, 72, 212, 0.08);
 }
 
+/* Grid de 3 columnas (no flex + justify-content:space-between) a
+   propósito: con pocos ítems de nav, .topbar-nav necesita quedar
+   centrado en TODO el ancho de la barra, no solo en el hueco que deja
+   .topnav-left. Las dos columnas 1fr siempre miden lo mismo entre sí
+   (por definición de fr), así que la columna central (auto) queda
+   centrada de verdad sin importar que .topnav-left/.topnav-right
+   tengan anchos de contenido distintos. */
 .topnav-inner {
     max-width: var(--container-max);
     margin: 0 auto;
     height: 100%;
     padding: 0 var(--gutter);
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
+    gap: 24px;
 }
 
 .topnav-left {
     display: flex;
     align-items: center;
-    gap: 48px;
+    justify-self: start;
+}
+
+.topnav-inner > .topbar-nav {
+    justify-self: center;
 }
 
 .topnav-right {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 20px;
+    justify-self: end;
 }
 
 .brand {
