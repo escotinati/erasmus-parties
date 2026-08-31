@@ -687,27 +687,40 @@ a.city-card {
 
 /* ── 2.4 Forms & inputs ─────────────────────────────────────── */
 
-/* Search bar — hero de index.html */
+/* Hero panel — hero de index.html. Agrupa la búsqueda de ciudad y las
+   stats como dos bloques independientes (cada uno con su propia
+   superficie/borde/sombra) bajo un mismo contenedor jerárquico: mismo
+   ancho, mismo gap, misma animación de entrada. No es una tarjeta
+   visible en sí mismo — solo posiciona a sus dos hijos como grupo. */
 
-.search-bar {
-    max-width: 760px;
+.hero-panel {
+    max-width: 780px;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+    position: relative;
+    z-index: 20;
+}
+
+/* Fila de búsqueda — bloque independiente, con su propia superficie. */
+.search-bar {
+    display: flex;
+    align-items: center;
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: var(--radius-full);
     padding: 8px;
-    display: flex;
-    align-items: center;
     box-shadow: 0 4px 24px rgba(70, 72, 212, 0.08);
     transition: box-shadow 0.2s;
     /* .search-bar es position:relative (lo pone initAutocomplete() en
-       index.js) y lleva .anim-page-enter — una vez esa animación
-       termina, el transform:translateY(0) que deja el fill-mode:both
-       sigue creando su propio stacking context. Sin z-index aquí,
-       .home-stats (sibling posterior, con el mismo anim-page-enter)
-       pintaría por encima del dropdown del buscador sin importar el
-       z-index que tenga .search-dropdown. */
+       index.js). .hero-panel (padre) lleva .anim-page-enter — una vez
+       esa animación termina, el transform:translateY(0) que deja el
+       fill-mode:both sigue creando su propio stacking context ahí. Sin
+       z-index aquí, .home-stats (sibling, bloque independiente con su
+       propio fondo) pintaría por encima del dropdown del buscador sin
+       importar el z-index que tenga .search-dropdown. */
     z-index: 20;
 }
 
@@ -722,7 +735,7 @@ a.city-card {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding-left: 20px;
+    padding-left: 12px;
 }
 
 .search-icon {
@@ -882,7 +895,6 @@ a.city-card {
 }
 
 /* Popular pills — hero de index.html */
-
 
 /* ── 2.5 Bottom nav (mobile) ────────────────────────────────── */
 
@@ -2084,13 +2096,19 @@ header.topbar {
     filter: blur(0);
 }
 
-/* Stats del hero (contador animado, ver initStatsCounters en index.js) */
+/* Stats del hero (contador animado, ver initStatsCounters en index.js) —
+   bloque independiente dentro de .hero-panel, con su propia superficie
+   (mismo trato que .search-bar, pero como tarjeta plana en vez de
+   píldora: es una fila ancha con 3 cifras, no un control de una línea). */
 .home-stats {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 48px;
-    margin-top: 40px;
+    justify-content: space-between;
+    gap: 32px;
+    padding: 24px;
+    background: var(--surface-container-low);
+    border-radius: 28px;
+    box-shadow: 0 4px 24px rgba(70, 72, 212, 0.06);
 }
 
 .home-stat {
@@ -2345,22 +2363,22 @@ header.topbar {
         grid-template-columns: repeat(2, 1fr);
     }
     .home-stats {
-        gap: 32px;
+        gap: 28px;
     }
 }
 
 @media (max-width: 768px) {
+    /* Antes se apilaban en columna; ahora viven dentro de .hero-panel
+       (más estrecho que el hero completo) y se quedan en fila para que
+       la tarjeta de stats no crezca en alto innecesariamente. */
     .home-stats {
-        flex-direction: column;
+        gap: 20px;
     }
 }
 
 @media (max-width: 600px) {
     .partner-grid {
         grid-template-columns: 1fr;
-    }
-    .home-stats {
-        gap: 24px 32px;
     }
 }
 
@@ -3950,12 +3968,13 @@ body.alojamiento-page {
         font-size: 16px;
     }
     .search-bar {
-        border-radius: var(--radius-full);
         flex-wrap: nowrap;
-        padding: 6px;
+        padding: 8px 8px 8px 16px;
     }
-    .search-bar-input {
-        padding-left: 14px;
+    .home-stats {
+        gap: 20px;
+        padding: 18px 16px;
+        border-radius: 22px;
     }
     .search-bar-input input {
         font-size: 15px;
@@ -3988,13 +4007,13 @@ body.alojamiento-page {
    Activo cuando <body data-brand="parties">
    ============================================== */
 
-[data-brand="parties"] {
+[data-brand='parties'] {
     background-color: var(--color-bg); /* ya sobreescrito en tokens.css */
     color: var(--color-text);
 }
 
-[data-brand="parties"] .city-card,
-[data-brand="parties"] .card {
+[data-brand='parties'] .city-card,
+[data-brand='parties'] .card {
     background-color: var(--color-surface);
     border-color: var(--color-border);
 }

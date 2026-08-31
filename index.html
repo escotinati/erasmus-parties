@@ -55,7 +55,9 @@
                     </nav>
                 </div>
                 <div class="topnav-right">
-                    <button id="lang-switcher" class="lang-switcher" aria-label="Cambiar idioma">EN</button>
+                    <button id="lang-switcher" class="lang-switcher" aria-label="Cambiar idioma">
+                        EN
+                    </button>
                     <button class="hamburger-btn" id="hamburgerBtn" aria-label="Abrir menú">
                         <span></span><span></span><span></span>
                     </button>
@@ -69,8 +71,13 @@
                 <div class="hero-bg"></div>
                 <div class="hero-inner">
                     <h1 class="hero-title font-slab anim-page-enter">
-                        <span data-i18n="home.hero_title_line1">Encuentra todo lo que necesitas</span> <br />
-                        <span class="hero-title-gradient" data-i18n="home.hero_title_line2">en tu Erasmus</span>
+                        <span data-i18n="home.hero_title_line1"
+                            >Encuentra todo lo que necesitas</span
+                        >
+                        <br />
+                        <span class="hero-title-gradient" data-i18n="home.hero_title_line2"
+                            >en tu Erasmus</span
+                        >
                     </h1>
                     <p class="hero-sub anim-page-enter" data-i18n="home.hero_subtitle">
                         Conéctate con alojamiento premium para estudiantes, eventos nocturnos
@@ -78,36 +85,46 @@
                         europeos.
                     </p>
 
-                    <!-- Search bar -->
-                    <div class="search-bar anim-page-enter">
-                        <div class="search-bar-input">
-                            <span class="material-symbols-outlined search-icon">location_on</span>
-                            <input
-                                type="text"
-                                placeholder="¿A dónde vas en tu próxima aventura?"
-                                data-i18n="home.search_placeholder_long"
-                                id="citySearch"
-                            />
+                    <!-- Panel único (búsqueda + stats): la separación entre la acción
+                         (buscar ciudad) y la prueba social (cifras) es un cambio de
+                         superficie + un hairline, no un divisor decorativo. -->
+                    <div class="hero-panel anim-page-enter">
+                        <div class="search-bar">
+                            <div class="search-bar-input">
+                                <span class="material-symbols-outlined search-icon"
+                                    >location_on</span
+                                >
+                                <input
+                                    type="text"
+                                    placeholder="¿A dónde vas en tu próxima aventura?"
+                                    data-i18n="home.search_placeholder_long"
+                                    id="citySearch"
+                                />
+                            </div>
+                            <button class="search-bar-btn" id="searchExploreBtn">
+                                <span class="btn-text" data-i18n="home.search_cta">Explorar</span>
+                                <span class="material-symbols-outlined">arrow_forward</span>
+                            </button>
                         </div>
-                        <button class="search-bar-btn" id="searchExploreBtn">
-                            <span class="btn-text" data-i18n="home.search_cta">Explorar</span>
-                            <span class="material-symbols-outlined">arrow_forward</span>
-                        </button>
-                    </div>
 
-                    <!-- Stats — contador animado desde 0 hasta el valor real (initStatsCounters en index.js) -->
-                    <div class="home-stats anim-page-enter">
-                        <div class="home-stat">
-                            <span class="home-stat-num font-slab" id="statCiudades">0</span>
-                            <span class="home-stat-label" data-i18n="home.stats_cities_label">Ciudades activas</span>
-                        </div>
-                        <div class="home-stat">
-                            <span class="home-stat-num font-slab" id="statPartners">0</span>
-                            <span class="home-stat-label" id="statPartnersLabel"></span>
-                        </div>
-                        <div class="home-stat">
-                            <span class="home-stat-num font-slab" id="statStudents">0</span>
-                            <span class="home-stat-label" data-i18n="home.stats_students_label">Estudiantes</span>
+                        <!-- Stats — contador animado desde 0 hasta el valor real (initStatsCounters en index.js) -->
+                        <div class="home-stats">
+                            <div class="home-stat">
+                                <span class="home-stat-num font-slab" id="statCiudades">0</span>
+                                <span class="home-stat-label" data-i18n="home.stats_cities_label"
+                                    >Ciudades activas</span
+                                >
+                            </div>
+                            <div class="home-stat">
+                                <span class="home-stat-num font-slab" id="statPartners">0</span>
+                                <span class="home-stat-label" id="statPartnersLabel"></span>
+                            </div>
+                            <div class="home-stat">
+                                <span class="home-stat-num font-slab" id="statStudents">0</span>
+                                <span class="home-stat-label" data-i18n="home.stats_students_label"
+                                    >Estudiantes</span
+                                >
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -122,7 +139,9 @@
             <section class="section cities-section" id="ciudades">
                 <div class="section-head">
                     <div>
-                        <span class="eyebrow eyebrow--secondary" data-i18n="home.destinations_eyebrow"
+                        <span
+                            class="eyebrow eyebrow--secondary"
+                            data-i18n="home.destinations_eyebrow"
                             >DESTINOS</span
                         >
                         <h2 class="section-title" data-i18n="home.cities_title">
@@ -163,8 +182,12 @@
             <!-- ── TRENDING NIGHTS ───────────────────────────────────── -->
             <section class="section nights-section" id="noches">
                 <div class="nights-header">
-                    <span class="eyebrow eyebrow--secondary" data-i18n="nights.eyebrow">VIDA NOCTURNA</span>
-                    <h2 class="section-title" data-i18n="nights.section_title">Noches en tendencia</h2>
+                    <span class="eyebrow eyebrow--secondary" data-i18n="nights.eyebrow"
+                        >VIDA NOCTURNA</span
+                    >
+                    <h2 class="section-title" data-i18n="nights.section_title">
+                        Noches en tendencia
+                    </h2>
                     <p class="section-sub" data-i18n="nights.section_subtitle">
                         Desde techno underground en Berlín hasta veladas en azoteas de Madrid. Obtén
                         acceso exclusivo a los mejores eventos en tu ciudad con Erasmus Verified.
@@ -172,8 +195,10 @@
                 </div>
 
                 <div class="events-scroll">
-                   <!-- JS (nightsSection.js) renderiza aquí los eventos reales de partner_events desde Supabase. Ver fetchUpcomingEvents() en services/partnersService.js. -->
-                    <p class="events-loading" id="nightsLoading" data-i18n="nights.loading">Cargando fiestas…</p>
+                    <!-- JS (nightsSection.js) renderiza aquí los eventos reales de partner_events desde Supabase. Ver fetchUpcomingEvents() en services/partnersService.js. -->
+                    <p class="events-loading" id="nightsLoading" data-i18n="nights.loading">
+                        Cargando fiestas…
+                    </p>
                 </div>
             </section>
 
@@ -241,7 +266,9 @@
 
                 <div class="alojamiento-section-footer">
                     <a href="alojamiento.html" class="section-link">
-                        <span data-i18n="home.view_all_collaborators">Ver todos los colaboradores</span>
+                        <span data-i18n="home.view_all_collaborators"
+                            >Ver todos los colaboradores</span
+                        >
                         <span class="material-symbols-outlined">arrow_forward</span>
                     </a>
                 </div>
@@ -253,7 +280,9 @@
                     <span class="eyebrow eyebrow--primary" data-i18n="home.services_eyebrow"
                         >TRANSICIÓN SIN COMPLICACIONES</span
                     >
-                    <h2 class="section-title" data-i18n="home.services_title">Servicios esenciales</h2>
+                    <h2 class="section-title" data-i18n="home.services_title">
+                        Servicios esenciales
+                    </h2>
                     <p class="section-sub section-sub--centered" data-i18n="home.services_subtitle">
                         Nosotros nos encargamos de lo aburrido para que tú te centres en los
                         recuerdos. Socios verificados para todo lo que necesites al llegar.
@@ -289,7 +318,9 @@
                             universitarios.
                         </p>
                         <a href="#" class="service-link"
-                            ><span data-i18n="home.service_insurance_cta">Solicitar presupuesto</span>
+                            ><span data-i18n="home.service_insurance_cta"
+                                >Solicitar presupuesto</span
+                            >
                             <span class="material-symbols-outlined">chevron_right</span></a
                         >
                     </div>
@@ -297,7 +328,9 @@
                         <div class="service-icon">
                             <span class="material-symbols-outlined">language</span>
                         </div>
-                        <h3 class="service-name" data-i18n="home.service_sim_title">SIM local y banca</h3>
+                        <h3 class="service-name" data-i18n="home.service_sim_title">
+                            SIM local y banca
+                        </h3>
                         <p class="service-desc" data-i18n="home.service_sim_desc">
                             Consigue tu número europeo y cuenta bancaria antes de aterrizar. Sin
                             papeleos, todo digital y sencillo.
@@ -314,7 +347,9 @@
             <section class="section cta-section" id="comunidad">
                 <div class="cta-card">
                     <div class="cta-text">
-                        <h2 class="cta-title" data-i18n="home.cta_title">Únete a Erasmus Verified.</h2>
+                        <h2 class="cta-title" data-i18n="home.cta_title">
+                            Únete a Erasmus Verified.
+                        </h2>
                         <p class="cta-sub" data-i18n="home.cta_subtitle">
                             Conéctate con miles de estudiantes que emprenden el mismo viaje.
                             Consejos compartidos, compañeros de piso y recuerdos inolvidables.
@@ -374,8 +409,8 @@
                 <div class="footer-brand">
                     <span class="footer-logo">Erasmus Verified</span>
                     <p class="footer-tagline" data-i18n="footer.tagline_long">
-                        Experiencias premium para estudiantes de intercambio en más de 50
-                        ciudades europeas.
+                        Experiencias premium para estudiantes de intercambio en más de 50 ciudades
+                        europeas.
                     </p>
                 </div>
 
@@ -388,9 +423,7 @@
                             >
                         </li>
                         <li>
-                            <a href="alojamiento.html" data-i18n="nav.accommodation"
-                                >Alojamiento</a
-                            >
+                            <a href="alojamiento.html" data-i18n="nav.accommodation">Alojamiento</a>
                         </li>
                         <li>
                             <a
@@ -413,9 +446,7 @@
                             <a href="#" data-i18n="footer.local_partners">Socios locales</a>
                         </li>
                         <li>
-                            <a href="#" data-i18n="footer.insurance_policy"
-                                >Política de seguros</a
-                            >
+                            <a href="#" data-i18n="footer.insurance_policy">Política de seguros</a>
                         </li>
                         <li><a href="#" data-i18n="footer.privacy">Privacidad</a></li>
                         <li><a href="#" data-i18n="footer.terms">Términos</a></li>
