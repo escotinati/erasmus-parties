@@ -90,9 +90,8 @@
                         >
                     </h1>
                     <p class="hero-sub anim-page-enter" data-i18n="home.hero_subtitle">
-                        Conéctate con alojamiento premium para estudiantes, eventos nocturnos
-                        exclusivos y una comunidad vibrante en más de 50 centros universitarios
-                        europeos.
+                        Conéctate con alojamiento para estudiantes, eventos exclusivos y una
+                        comunidad vibrante.
                     </p>
 
                     <!-- Panel único (búsqueda + stats): la separación entre la acción
@@ -146,29 +145,37 @@
             </div>
 
             <!-- ── TOP CITIES ACCORDION ─────────────────────────────── -->
+            <!-- Efecto "pin & scrub" solo en desktop (>=1000px) y solo con
+                 movimiento real (ver CSS §4.1 y initCitiesScrollEffect en
+                 index.js): .cities-scroll-stage da 200vh de scroll "extra";
+                 mientras se recorre, .cities-pin se queda fijo en pantalla
+                 (position:sticky) y ese scroll controla la animación en vez
+                 de desplazar la sección sin más — título grande que se
+                 encoge a su tamaño real, grid que aparece debajo. En móvil
+                 (apilado) y con prefers-reduced-motion no hay stage/pin: es
+                 el .section-head + .accordion-grid de siempre, estáticos. -->
             <section class="section cities-section" id="ciudades">
-                <div class="section-head">
-                    <div>
-                        <span
-                            class="eyebrow eyebrow--secondary"
-                            data-i18n="home.destinations_eyebrow"
-                            >DESTINOS</span
-                        >
-                        <h2 class="section-title" data-i18n="home.cities_title">
-                            Mejores ciudades para tu intercambio
-                        </h2>
-                    </div>
-                    <!-- Oculto para la demo (ciudades-todas.html aún no migrado a Supabase).
-                         Reactivar cuando esa página lea de la tabla cities. -->
-                    <!--
-                    <a href="ciudades-todas.html" class="section-link">
-                        Ver las más de 50 ciudades
-                        <span class="material-symbols-outlined">arrow_forward</span>
-                    </a>
-                    -->
-                </div>
+                <div class="cities-scroll-stage">
+                    <div class="cities-pin">
+                        <div class="section-head">
+                            <div>
+                                <h2 class="section-title" data-i18n="home.cities_title">
+                                    Mejores ciudades para tu intercambio
+                                </h2>
+                            </div>
+                            <!-- Oculto para la demo (ciudades-todas.html aún no migrado a Supabase).
+                                 Reactivar cuando esa página lea de la tabla cities. -->
+                            <!--
+                            <a href="ciudades-todas.html" class="section-link">
+                                Ver las más de 50 ciudades
+                                <span class="material-symbols-outlined">arrow_forward</span>
+                            </a>
+                            -->
+                        </div>
 
-                <div class="accordion-grid" id="citiesAccordion"></div>
+                        <div class="accordion-grid" id="citiesAccordion"></div>
+                    </div>
+                </div>
             </section>
 
             <!-- ── PARTNERS DE LA CIUDAD ACTIVA ──────────────────────── -->

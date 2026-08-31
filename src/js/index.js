@@ -332,7 +332,9 @@ function renderPartnersSection(allPartnersForCity) {
 
     const availableKeys = getHomeCategories().map((c) => c.key);
     const inScope = allPartnersForCity.filter((p) => availableKeys.includes(p.category));
-    const filtered = activeCategory ? inScope.filter((p) => p.category === activeCategory) : inScope;
+    const filtered = activeCategory
+        ? inScope.filter((p) => p.category === activeCategory)
+        : inScope;
 
     grid.innerHTML = '';
 
@@ -340,7 +342,9 @@ function renderPartnersSection(allPartnersForCity) {
         grid.hidden = true;
         empty.hidden = false;
         empty.textContent =
-            inScope.length === 0 ? I18n.t('home.partners_empty_city') : I18n.t('home.partners_empty_category');
+            inScope.length === 0
+                ? I18n.t('home.partners_empty_city')
+                : I18n.t('home.partners_empty_category');
         return;
     }
 
@@ -363,7 +367,9 @@ function initTicker() {
         I18n.t('home.ticker_3'),
         I18n.t('home.ticker_4'),
     ];
-    const html = items.map((text) => `<span class="ticker-item">${escapeHtml(text)}</span>`).join('');
+    const html = items
+        .map((text) => `<span class="ticker-item">${escapeHtml(text)}</span>`)
+        .join('');
     // Contenido duplicado una vez: @keyframes ticker-scroll anima hasta
     // -50%, momento en el que la segunda copia ya ocupa exactamente el
     // sitio de la primera → loop sin salto visible.
@@ -586,6 +592,45 @@ function initNavScroll() {
     );
 }
 
+// ── 9b. CITIES SECTION — PIN & SCRUB (estilo Apple) ────────────
+// El título arranca grande y se encoge a su tamaño real, el grid de
+// ciudades aparece debajo — todo controlado por cuánto se ha
+// recorrido de .cities-scroll-stage (ver CSS §4.1), no por un
+// timeline propio: al ser una función directa de la posición de
+// scroll, es interrumpible/reversible gratis (scroll hacia arriba =
+// la animación retrocede sola, sin estado que reconciliar). Una sola
+// custom property por frame (--cities-progress), nunca se toca el
+// estilo de título/grid por separado.
+function initCitiesScrollEffect() {
+    const stage = document.querySelector('.cities-scroll-stage');
+    if (!stage) return;
+    if (prefersReducedMotion()) return;
+
+    let ticking = false;
+
+    function update() {
+        ticking = false;
+        // <1000px el accordion se apila en vertical (ver CSS) y ya no
+        // cabe entero en un pin de 1 pantalla — el efecto no aplica.
+        if (window.innerWidth < 1000) return;
+        const scrollable = stage.offsetHeight - window.innerHeight;
+        if (scrollable <= 0) return;
+        const scrolled = -stage.getBoundingClientRect().top;
+        const progress = Math.min(1, Math.max(0, scrolled / scrollable));
+        stage.style.setProperty('--cities-progress', progress);
+    }
+
+    function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+}
+
 // ── 10. BOTTOM NAV ────────────────────────────────────────────
 function initBottomNav() {
     document.querySelectorAll('.bottom-nav-item').forEach((item) => {
@@ -603,10 +648,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     initHeroTitleAnim();
     initTicker();
     initNavScroll();
+    initCitiesScrollEffect();
     initBottomNav();
     initStudentsStat();
 
-    const [activeCities, searchIndex] = await Promise.all([fetchActiveCities(), buildSearchIndex()]);
+    const [activeCities, searchIndex] = await Promise.all([
+        fetchActiveCities(),
+        buildSearchIndex(),
+    ]);
 
     await Promise.all([initCitiesStat(activeCities), initAccordion(activeCities)]);
     await initAutocomplete(searchIndex);
