@@ -2428,6 +2428,105 @@ header.topbar {
     padding: 100px var(--margin-mobile) 80px;
 }
 
+/* Efecto "pin & scrub" al estilo Apple — solo desktop (>=1000px, el
+   mismo corte que el accordion en fila) y solo con movimiento real.
+   .cities-scroll-stage da scroll "extra" (200vh); mientras se
+   recorre, .cities-pin se queda fijo en pantalla (sticky) y ese
+   scroll — no un timeline propio — controla la animación vía una
+   única custom property (--cities-progress, la escribe
+   initCitiesScrollEffect en index.js sobre .cities-scroll-stage y
+   hereda a sus hijos). Solo transform/opacity: nunca se anima layout,
+   todo va por compositor. En móvil y con prefers-reduced-motion no se
+   define stage/pin como sticky — la sección es el .section-head +
+   .accordion-grid de siempre, estáticos. */
+.cities-scroll-stage {
+    --cities-progress: 0;
+}
+
+@media (min-width: 1000px) {
+    .cities-scroll-stage {
+        position: relative;
+        /* Alto del pin (~100vh) + margen de scroll real para el scrub.
+           Antes 200vh (100vh de scrub) se notaba largo hasta que
+           aparecían las cards; 150vh deja 50vh de scrub, la mitad. */
+        height: 150vh;
+    }
+
+    .cities-pin {
+        position: sticky;
+        /* 80px = alto de .topnav (fixed) — si no, el contenido se
+           metería debajo de la cabecera al fijarse. */
+        top: 80px;
+        height: calc(100vh - 80px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    /* El título arranca más grande y se encoge a su tamaño real
+       (scale(1) = la posición/tamaño natural del layout, sin offset
+       ninguno, cualquiera que sea el pico) — "queda como está" de
+       verdad, no una aproximación. El pico es RESPONSIVE, no un
+       número fijo: es una frase larga (no una palabra suelta como en
+       las páginas de producto de Apple) y a 1000px (el límite
+       estrecho de este breakpoint) el margen hasta desbordar el
+       contenedor es de apenas ~15% — comprobado empujando el
+       escalado hasta desbordar y retrocediendo. A partir de 1000px
+       hay cada vez más aire (contenedor más ancho, mismo texto), así
+       que el pico crece con el viewport hasta un tope en 1500px+
+       (1.12 a 1000px → 1.5 a 1500px+), en vez de dejar la misma
+       cantidad fija de "aire" desperdiciado en pantallas anchas o
+       arriesgar el corte en las estrechas. transform-origin a la
+       izquierda: se encoge hacia donde ya vive el texto (alineado a
+       la izquierda), no hacia el centro del bloque. */
+    .cities-pin .section-title {
+        --cities-title-peak: clamp(1.12, calc(1.12 + (100vw - 1000px) * 0.00076 / 1px), 1.5);
+        transform-origin: left center;
+        transform: scale(
+            calc(var(--cities-title-peak) - (var(--cities-title-peak) - 1) * var(--cities-progress))
+        );
+        will-change: transform;
+    }
+
+    /* El grid ya ocupa su sitio en el layout desde el principio (nunca
+       se anima su altura/reflow) — solo aparece: opacity + un ligero
+       translateY/scale de "materializarse" en vez de un fundido plano. */
+    .cities-pin .accordion-grid {
+        opacity: var(--cities-progress);
+        transform: translateY(calc((1 - var(--cities-progress)) * 40px))
+            scale(calc(0.96 + 0.04 * var(--cities-progress)));
+        will-change: transform, opacity;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    /* No basta con anular transform/opacity del título y el grid: si
+       el sticky+200vh de arriba siguiera activo, quedaría una "zona de
+       scroll muerta" — la página no avanza visualmente un buen tramo,
+       pero tampoco pasa nada, que es justo la clase de desorientación
+       que prefers-reduced-motion pide evitar. Se anula el pin entero,
+       igual que en el layout apilado (<1000px, ver arriba). */
+    .cities-scroll-stage {
+        height: auto;
+    }
+
+    .cities-pin {
+        position: static;
+        height: auto;
+        overflow: visible;
+    }
+
+    .cities-pin .section-title {
+        transform: none;
+    }
+
+    .cities-pin .accordion-grid {
+        opacity: 1;
+        transform: none;
+    }
+}
+
 /* Fila con una card protagonista + 3 que se estrechan y muestran cada
    vez menos información (imagen+flag+nombre+descripción en la
    protagonista; solo imagen+flag+nombre en las demás) — patrón tomado
