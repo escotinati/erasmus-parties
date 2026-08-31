@@ -13,6 +13,7 @@ La misma web sirve **dos marcas** desde un solo código: "Erasmus Verified" (la 
 **Stack**: HTML + CSS + JS vanilla (sin ES Modules, todo con `<script>` clásicos y funciones/objetos globales), más:
 - **Vite** como build tool — ya no se abre `index.html` directamente, se usa `npm run dev` para desarrollar y `npm run build` para generar la carpeta `dist/` que se despliega.
 - **Supabase** como backend — base de datos (Postgres) + login de administrador. Sustituye poco a poco a los datos estáticos de `data.js` (ver sección de Backend).
+- **React** (`src/react/*`, vía `@vitejs/plugin-react`) — **única excepción** a "sin ES Modules": el menú compartido de las 8 páginas públicas está montado como isla de React dentro de HTML/scripts clásicos. Ver [Navegación](#navegación) para el detalle completo; no se ha migrado nada más del proyecto a React, es deliberadamente una pieza aislada.
 
 **Herramientas de desarrollo**: Prettier instalado como devDependency (`npm install` para instalar). Configuración en `.prettierrc`: 4 espacios, comillas simples, semi. Un hook de Claude Code formatea automáticamente JS/CSS/HTML tras cada edición — no hace falta ejecutarlo manualmente.
 
@@ -26,13 +27,13 @@ La misma web sirve **dos marcas** desde un solo código: "Erasmus Verified" (la 
 
 ## Arquitectura
 
-Todo el JS de páginas y módulos compartidos vive ahora en `src/js/` (antes era `js/`). El CSS vive en `src/css/`. Sigue sin haber ES Modules: todo son `<script>` clásicos con funciones y objetos globales, para mantener coherencia entre archivos.
+Todo el JS de páginas y módulos compartidos vive ahora en `src/js/` (antes era `js/`). El CSS vive en `src/css/`. Sigue sin haber ES Modules: todo son `<script>` clásicos con funciones y objetos globales, para mantener coherencia entre archivos — salvo `src/react/` (el menú, ver Stack arriba y [Navegación](#navegación)), la única carpeta con JSX/ES Modules de verdad.
 
 ### Páginas y sus scripts
 
 | Página | Script | Propósito |
 |--------|--------|-----------|
-| `index.html` | `src/js/index.js` | Autocomplete de búsqueda, bento grid de países |
+| `index.html` | `src/js/index.js` | Autocomplete de búsqueda, hero con stats animadas, accordion grid de ciudades (con efecto pin & scrub al hacer scroll) |
 | `ciudades-todas.html` | inline | Listado completo de ciudades con filtro alfabético |
 | `ciudades.html` | `src/js/ciudades.js` | Grid de ciudades de un país (hero con foto) |
 | `ciudad.html` | `src/js/ciudad.js` | Detalle de ciudad, botones WhatsApp/Telegram, mapa embebido |
@@ -54,6 +55,7 @@ Todo el JS de páginas y módulos compartidos vive ahora en `src/js/` (antes era
 - `src/js/map-helpers.js` — **único archivo que conoce Leaflet** (variable global `L`); cambiar proveedor de mapas = reescribir solo este archivo. Contiene `CATEGORY_META` con las categorías de partners y sus colores.
 - `src/js/cityMap.js` — módulo reutilizable `mountCityMap(containerId, { pais, ciudad, interactive })`; devuelve una Promise con la instancia del mapa. Primero intenta usar coordenadas ya guardadas en Supabase antes de llamar al geocoder.
 - `src/js/mapPartners.js` — UI de la lista de partners + sincronización con marcadores del mapa. Los partners ahora vienen de `partnersService.js` (Supabase), no de un array estático.
+- `src/react/Nav.jsx`, `TopbarNav.jsx`, `navShared.jsx` — el menú compartido, en React. Ver [Navegación](#navegación) para el detalle completo (qué página usa cuál, por qué existe, y una regla de arquitectura importante sobre `DOMContentLoaded` que aplica a todo lo que interactúe con estos componentes desde fuera).
 
 ## Backend (Supabase)
 
@@ -96,7 +98,7 @@ Todo el HTML/JS que pinta listas dinámicas en el panel escapa los textos que vi
 
 El resultado se guarda en `window.ERASMUS_EXPERIENCE` para que el resto de scripts lo puedan leer, y se añade una clase (`theme-verified` o `theme-parties`) al `<html>` para pintar los colores correctos.
 
-En la experiencia "Parties" además se ocultan por JS (tras `DOMContentLoaded`) los enlaces a Servicios/Alojamiento/Viajes y el logo cambia a "Erasmus Parties"; se añade un enlace "Verified ↗" en la navegación para volver a la web completa.
+En la experiencia "Parties" además se ocultan los enlaces a Servicios/Alojamiento/Viajes y el logo cambia a "Erasmus Parties"; se añade un enlace "Verified ↗" para volver a la web completa. **En el nav** (menú de arriba) esto lo resuelve directamente `Nav.jsx`/`TopbarNav.jsx` leyendo `window.ERASMUS_EXPERIENCE` al renderizar — ver [Navegación](#navegación). Fuera del nav (footer, y cualquier `<a href="servicios.html">` etc. suelto en el HTML) lo sigue haciendo `experience.js` por JS tras `DOMContentLoaded`, como antes.
 
 ## Cómo añadir datos
 
@@ -132,36 +134,52 @@ CARTO Light (`light_all`) vía CDN. La atribución a OpenStreetMap + CARTO es **
 
 ## Navegación
 
-El proyecto tiene tres patrones de header distintos según la página, más un bottom-nav fijo en móvil:
+El menú de las 8 páginas públicas (todo salvo `/admin`) es **React** (`src/react/Nav.jsx` / `TopbarNav.jsx`, ver más abajo) — antes era HTML duplicado byte a byte en cada página, ahora vive en un único sitio. Sigue habiendo tres estilos visuales de header según la página (heredados del diseño previo a la migración), pero los tres los renderiza el mismo par de componentes.
 
-### Patrones de header
+### Patrones de header y qué los monta
 
-| Patrón | Páginas | Notas |
-|--------|---------|-------|
-| `header.topbar` | `ciudad.html`, `mapa.html`, `alojamiento.html`, `servicios.html`, `viajes.html` | `position: sticky; z-index: 1001`; fondo con blur |
-| `.topnav` | `index.html`, `ciudades-todas.html` | `position: fixed; z-index: 200` (en móvil) |
-| `.hero-legacy .topbar` | `ciudades.html` | `position: absolute` sobre foto hero; textos blancos |
+| Patrón CSS | Páginas | Componente | Script de montaje |
+|--------|---------|------------|--------------------|
+| `.topnav` | `index.html`, `ciudades-todas.html` | `Nav.jsx` | `mount-nav.jsx` |
+| `header.topbar` | `ciudad.html`, `mapa.html`, `servicios.html`, `viajes.html`, `alojamiento.html` | `TopbarNav.jsx` (`as="header"`, por defecto) | `mount-topbar-nav.jsx` |
+| `.hero-legacy .topbar` | `ciudades.html` | `TopbarNav.jsx` (`as="div"`) | `mount-hero-legacy-nav.jsx` |
 
-Cada página incluye un bloque `<div class="mobile-nav">` (overlay) y el JS inline de hamburger + ítem activo. En móvil este overlay queda oculto (`display: none !important`) porque la navegación la gestiona el bottom-nav.
+Cada página tiene un `<div id="nav-root"></div>` seguido de `<script type="module" src="/src/react/mount-*.jsx">` en el sitio donde antes iba el header estático — Vite descubre esos scripts automáticamente por estar referenciados desde un HTML ya registrado en `vite.config.js`, no hace falta añadirlos a mano. `Nav.jsx` incluye además el icono de cuenta (`#authBtn`, placeholder sin login todavía) y `TopbarNav.jsx` acepta un prop `backLink` opcional:
+
+- `ciudad.html` / `mapa.html`: llevan botón de "volver", configurado justo antes del `<script type="module">` con una línea `window.__BACK_LINK__ = { i18nKey, label, href }` — sus propios scripts (`ciudad.js`/`mapa.js`) sobreescriben `href`/texto tras cargar datos de Supabase.
+- `ciudades.html`: el back-link va hardcodeado en `mount-hero-legacy-nav.jsx` (siempre "Todos los países" → `index.html`, nunca cambia).
+- El resto de páginas del patrón `header.topbar` no pasan `backLink` y `TopbarNav.jsx` no lo renderiza.
+
+Visualmente los tres patrones están **unificados**: mismo truco de grid de 3 columnas (`1fr auto 1fr`) que centra los links en todo el ancho de la barra, mismo icono de cuenta, y el mismo subrayado degradado en hover/foco (antes solo existía en `index.html`, escapado bajo `body.home-page`; ahora vive bajo los selectores `.topnav`/`.topbar` directamente en `styles.css`, así que aplica a las 8 páginas).
+
+`.mobile-nav` (el overlay del menú móvil) y el toggle de la hamburguesa también los renderiza React (`MobileNavOverlay` en `navShared.jsx`) — no queda ningún bloque `<div class="mobile-nav">` estático en el HTML. En móvil el hamburguesa queda oculto por CSS (`display: none` — la navegación la gestiona el bottom-nav), así que en la práctica solo se ve en desktop.
+
+### Regla de arquitectura: nada de `DOMContentLoaded` para tocar el nav
+
+Todo lo que antes hacían scripts externos "buscando" nodos del nav después de que la página cargara (sombra de scroll al hacer scroll, aplicar el tema Parties, año/idioma del lang-switcher) se movió **dentro** de los componentes React, en su primer render o en un `useEffect`. Motivo, comprobado en la práctica y no solo en teoría: un script clásico enganchado a `DOMContentLoaded` que hace `document.getElementById('topNav')` puede disparar **antes** de que React haya terminado de montar (el commit real al DOM de `createRoot().render()` lo encola el scheduler de React, y en dev con Vite eso puede tardar más que el resto del parseo) — se comprobó con una sombra de scroll que fallaba el 100% de las veces con este patrón.
+
+Por eso:
+- `Nav.jsx`/`TopbarNav.jsx` leen `window.ERASMUS_EXPERIENCE` (tema Parties) y `window.I18n` (idioma/traducciones) directamente al renderizar, en vez de depender de que `experience.js`/`applyTranslations()` los mute después.
+- Las mutaciones que SÍ siguen en `experience.js` (porque también afectan a HTML estático fuera del nav, como el footer) llevan un guard `if (el.closest('[data-react-nav]')) return;` para no tocar dos veces lo que el componente React ya resolvió. `data-react-nav="true"` está en el `<nav>`/`<header>`/`<div>` raíz y en el overlay móvil de ambos componentes.
+- `langSwitcher.js` tiene el mismo guard — el botón `#lang-switcher` dentro del nav lleva su propio `onClick` en React; `langSwitcher.js` solo actúa si el botón que encuentra **no** está dentro de `[data-react-nav]` (páginas fuera de esta migración, si las hubiera en el futuro).
+
+**Si se añade algo nuevo que necesite tocar el nav desde fuera, no uses `DOMContentLoaded` + `querySelector` — o se resuelve dentro del componente React, o se acepta que puede fallar de forma intermitente.**
 
 ### Bottom-nav (móvil, `<768px`)
 
-Clase `.app-bottom-nav` — `position: fixed; bottom: 0; height: 60px; z-index: 500`. Presente en las páginas públicas (no en `/admin`, que tiene su propia UI independiente). Cuatro ítems:
+Clase `.app-bottom-nav` — `position: fixed; bottom: 0; height: 60px; z-index: 500`. Sigue siendo HTML estático (no migrado a React) en cada página pública (no en `/admin`). Contenido:
 
-1. **Ciudades** → `ciudades-todas.html` (icono `location_city`)
-2. **Servicios** → `servicios.html` (icono `storefront`)
-3. **Viajes** → `viajes.html` (icono `flight`)
-4. **Fiestas** → `https://erasmusparties.org` (icono `nightlife`, color magenta permanente `#e1147b`, `target="_blank"`)
+- `index.html`: **4 ítems** — Servicios (`storefront`), Viajes (`flight`), Fiestas (`nightlife`, magenta `#e1147b`, `target="_blank"`), y **Cuenta** (`#authBtnMobile`, placeholder sin login todavía — mismo criterio que `#authBtn` del nav de escritorio, colocado el último a propósito, que es donde apps con bottom-nav suelen poner cuenta/perfil).
+- Resto de páginas públicas: **3 ítems** — Servicios, Viajes, Fiestas (sin Cuenta).
 
-El ítem activo se detecta con `window.location.pathname` y recibe `.app-bottom-nav-item--active`. El JS de detección está en el IIFE inline de cada página (mismo bloque que el hamburger). En móvil el cuerpo tiene `padding-bottom: 68px` para compensar la barra.
-
-### Detección de ítem activo (patrón compartido)
+El ítem activo se detecta con `window.location.pathname` y recibe `.app-bottom-nav-item--active`; ese trocito de JS sigue siendo un `<script>` inline por página (no se ha migrado, es la única pieza de navegación que no vive en React):
 
 ```js
 var page = (window.location.pathname.split('/').pop() || 'index.html').split('?')[0] || 'index.html';
-// topbar-nav + mobile-nav-links → clase is-active
 // app-bottom-nav-item → clase app-bottom-nav-item--active
 ```
+
+En móvil el cuerpo tiene `padding-bottom: 68px` para compensar la barra.
 
 ## CSS
 
@@ -183,8 +201,8 @@ El archivo está dividido en 10 secciones numeradas. Con Vite ya en marcha, sepa
 |---|--------|-----------|
 | 1 | Design System | `:root` tokens, reset, utilidades, tipografía |
 | 2 | Componentes globales | Buttons, badges, cards, forms/inputs, bottom-nav |
-| 3 | Layout global | Top nav/header, footer, hero, section wrappers |
-| 4 | Index.html | Bento grid, nights section, services section, CTA |
+| 3 | Layout global | Top nav/header (`.topnav`, `.topbar` — el HTML lo renderiza React, ver [Navegación](#navegación), pero las clases y esta sección de CSS no cambiaron), footer, hero, section wrappers |
+| 4 | Index.html | Accordion grid de ciudades, nights section, services section, CTA |
 | 5 | Ciudades-todas.html | *(vacío — estilos del hero en `<style>` inline de la página)* |
 | 6 | Ciudad.html | Layout de ciudad, mapa embebido, partners list |
 | 7 | Mapa.html | `.map-page-main`, `.map-canvas`, `.erasmus-pin__dot`, map-with-list |
@@ -227,6 +245,8 @@ Vía CDN, sin instalación:
 
 Instaladas vía npm (ver `package.json`):
 - `vite` + `vite-plugin-static-copy` — build tool
+- `@vitejs/plugin-react` — transforma el JSX de `src/react/*` (ver [Navegación](#navegación))
+- `react` + `react-dom` — solo para el menú compartido, no hay más React en el proyecto
 - `@supabase/supabase-js` — cliente de Supabase (aunque en el navegador se usa la versión CDN cargada como `<script>`, no este paquete)
 - `prettier` — formateo de código
 

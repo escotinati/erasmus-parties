@@ -64,27 +64,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Navbar scroll shadow para el patrón header.topbar / .hero-legacy .topbar
     // (ciudad.html, mapa.html, servicios.html, viajes.html, alojamiento.html,
-    // ciudades.html). El patrón .topnav (index.html, ciudades-todas.html) ya
-    // tiene su propio listener con la misma clase .scrolled en index.js /
-    // el inline de ciudades-todas.html — no se duplica aquí.
-    var topbarHeader = document.querySelector('.topbar');
-    if (topbarHeader) {
-        window.addEventListener(
-            'scroll',
-            function () {
-                topbarHeader.classList.toggle('scrolled', window.scrollY > 10);
-            },
-            { passive: true }
-        );
-    }
+    // ciudades.html): ahora vive dentro de TopbarNav.jsx (rama react/menu),
+    // igual que en Nav.jsx para el patrón .topnav — un querySelector aquí en
+    // DOMContentLoaded podía disparar antes de que React montara el nodo
+    // (se comprobó, fallaba 100% de las veces en local).
 
     if (window.ERASMUS_EXPERIENCE.theme !== 'theme-parties') return;
 
     // 1. Logo: "Verified" → "Parties"
+    // (el nav de index.html/ciudades-todas.html es React — ver Nav.jsx,
+    // que ya resuelve su propio brand/links según la experiencia y se
+    // marca con [data-react-nav] para que estas mutaciones no lo toquen
+    // dos veces, ni corran antes de que exista si el DOMContentLoaded
+    // de esta página dispara antes de que React termine de montar)
     document.querySelectorAll('.brand').forEach(function (el) {
+        if (el.closest('[data-react-nav]')) return;
         el.textContent = 'Erasmus Parties';
     });
     document.querySelectorAll('.logo').forEach(function (el) {
+        if (el.closest('[data-react-nav]')) return;
         el.innerHTML = 'Erasmus<span class="logo-dot">Parties</span>';
     });
     document.querySelectorAll('.footer-logo').forEach(function (el) {
@@ -100,6 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 3. Ocultar "Fiestas ↗" en topbar-nav y mobile-nav-links
     document.querySelectorAll('.nav-parties').forEach(function (a) {
+        if (a.closest('[data-react-nav]')) return;
         a.style.display = 'none';
     });
 
@@ -110,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 5. Añadir "Verified ↗" al final de topbar-nav y mobile-nav-links
     document.querySelectorAll('.topbar-nav, .mobile-nav-links').forEach(function (nav) {
+        if (nav.closest('[data-react-nav]')) return;
         const a = document.createElement('a');
         a.href = 'https://erasmusverified.com';
         a.target = '_blank';

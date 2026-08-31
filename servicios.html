@@ -18,30 +18,9 @@
     </head>
 
     <body class="servicios-page">
-        <header class="topbar">
-            <div class="topbar-left">
-                <a href="index.html" class="logo">Erasmus<span class="logo-dot">Verified</span></a>
-                <nav class="topbar-nav" id="mainNav">
-                    <a href="servicios.html" data-i18n="nav.services">Servicios</a>
-                    <a href="alojamiento.html" data-i18n="nav.accommodation">Alojamiento</a>
-                    <a href="viajes.html" data-i18n="nav.trips">Viajes</a>
-                    <a
-                        href="https://erasmusparties.org"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="nav-parties"
-                        data-i18n="nav.parties"
-                        >🎉 Fiestas ↗</a
-                    >
-                </nav>
-            </div>
-            <div class="topbar-right">
-                <button id="lang-switcher" class="lang-switcher" aria-label="Cambiar idioma">EN</button>
-                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Abrir menú">
-                    <span></span><span></span><span></span>
-                </button>
-            </div>
-        </header>
+        <!-- ── TOP NAV (React, rama react/menu) — ver src/react/TopbarNav.jsx ── -->
+        <div id="nav-root"></div>
+        <script type="module" src="/src/react/mount-topbar-nav.jsx"></script>
 
         <main style="flex: 1">
             <div class="section">
@@ -68,7 +47,8 @@
                             </div>
                             <h3 class="service-name">Orange Holiday Europe</h3>
                             <p class="service-desc">
-                                <strong data-i18n="services.sim_orange_price">25€ / 30 días</strong> ·
+                                <strong data-i18n="services.sim_orange_price">25€ / 30 días</strong>
+                                ·
                                 <span data-i18n="services.sim_orange_desc"
                                     >50 GB en roaming UE, llamadas ilimitadas dentro de la UE.
                                     Activación en tienda física.</span
@@ -91,7 +71,8 @@
                             </div>
                             <h3 class="service-name">Lebara Europe</h3>
                             <p class="service-desc">
-                                <strong data-i18n="services.sim_lebara_price">18€ / 30 días</strong> ·
+                                <strong data-i18n="services.sim_lebara_price">18€ / 30 días</strong>
+                                ·
                                 <span data-i18n="services.sim_lebara_desc"
                                     >20 GB en roaming UE, llamadas ilimitadas a España. Compra 100%
                                     online, sin desplazarte a ninguna tienda.</span
@@ -114,7 +95,10 @@
                             </div>
                             <h3 class="service-name">eSIM Holafly</h3>
                             <p class="service-desc">
-                                <strong data-i18n="services.sim_holafly_price">34€ / 30 días</strong> ·
+                                <strong data-i18n="services.sim_holafly_price"
+                                    >34€ / 30 días</strong
+                                >
+                                ·
                                 <span data-i18n="services.sim_holafly_desc"
                                     >Datos ilimitados en Europa sin SIM física. Activación
                                     instantánea desde tu teléfono, sin esperar ningún envío.</span
@@ -227,7 +211,9 @@
                 <div class="info-box" style="margin-top: 64px">
                     <span class="info-icon material-symbols-outlined">lightbulb</span>
                     <p class="info-text">
-                        <strong data-i18n="services.callout_title">¿Echas en falta algún servicio?</strong>
+                        <strong data-i18n="services.callout_title"
+                            >¿Echas en falta algún servicio?</strong
+                        >
                         <span data-i18n="services.callout_body"
                             >Si conoces una SIM, banco o tarjeta de transporte que debería estar
                             aquí, escríbenos. Revisamos cada propuesta antes de incluirla.</span
@@ -242,8 +228,8 @@
                 <div class="footer-brand">
                     <span class="footer-logo">Erasmus Verified</span>
                     <p class="footer-tagline" data-i18n="footer.tagline_long">
-                        Experiencias premium para estudiantes de intercambio en más de 50
-                        ciudades europeas.
+                        Experiencias premium para estudiantes de intercambio en más de 50 ciudades
+                        europeas.
                     </p>
                 </div>
 
@@ -256,9 +242,7 @@
                             >
                         </li>
                         <li>
-                            <a href="alojamiento.html" data-i18n="nav.accommodation"
-                                >Alojamiento</a
-                            >
+                            <a href="alojamiento.html" data-i18n="nav.accommodation">Alojamiento</a>
                         </li>
                         <li>
                             <a
@@ -281,9 +265,7 @@
                             <a href="#" data-i18n="footer.local_partners">Socios locales</a>
                         </li>
                         <li>
-                            <a href="#" data-i18n="footer.insurance_policy"
-                                >Política de seguros</a
-                            >
+                            <a href="#" data-i18n="footer.insurance_policy">Política de seguros</a>
                         </li>
                         <li><a href="#" data-i18n="footer.privacy">Privacidad</a></li>
                         <li><a href="#" data-i18n="footer.terms">Términos</a></li>
@@ -299,25 +281,7 @@
             </div>
         </footer>
 
-        <!-- ── MOBILE NAV OVERLAY ─────────────────────────────────── -->
-        <div class="mobile-nav" id="mobileNav" aria-hidden="true">
-            <button class="mobile-nav-close" id="mobileNavClose" aria-label="Cerrar menú">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-            <nav class="mobile-nav-links">
-                <a href="servicios.html" data-i18n="nav.services">Servicios</a>
-                <a href="alojamiento.html" data-i18n="nav.accommodation">Alojamiento</a>
-                <a href="viajes.html" data-i18n="nav.trips">Viajes</a>
-                <a
-                    href="https://erasmusparties.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="nav-parties"
-                    data-i18n="nav.parties"
-                    >🎉 Fiestas ↗</a
-                >
-            </nav>
-        </div>
+        <!-- Mobile-nav overlay: ahora vive en src/react/TopbarNav.jsx (rama react/menu) -->
 
         <!-- ── APP BOTTOM NAV (móvil) ────────────────────────────── -->
         <nav class="app-bottom-nav" id="appBottomNav" aria-label="Navegación principal">
@@ -344,40 +308,13 @@
         <script src="/src/utils/translations.js"></script>
         <script src="/src/js/langSwitcher.js"></script>
         <script>
-            /* ── Hamburger + ítem activo (nav global + bottom-nav) ───── */
+            /* ── Ítem activo (solo bottom-nav) + año del copyright ─────
+               El toggle de hamburguesa + ítem activo del topbar/mobile-nav
+               ahora vive dentro de src/react/TopbarNav.jsx (rama react/menu). */
             (function () {
-                var btn = document.getElementById('hamburgerBtn');
-                var mnav = document.getElementById('mobileNav');
-                var close = document.getElementById('mobileNavClose');
-                function openNav() {
-                    btn.classList.add('is-open');
-                    mnav.classList.add('is-open');
-                    mnav.removeAttribute('aria-hidden');
-                }
-                function closeNav() {
-                    btn.classList.remove('is-open');
-                    mnav.classList.remove('is-open');
-                    mnav.setAttribute('aria-hidden', 'true');
-                }
-                if (btn && mnav) {
-                    btn.addEventListener('click', function () {
-                        mnav.classList.contains('is-open') ? closeNav() : openNav();
-                    });
-                    if (close) close.addEventListener('click', closeNav);
-                    mnav.querySelectorAll('a:not(.nav-parties)').forEach(function (a) {
-                        a.addEventListener('click', closeNav);
-                    });
-                }
                 var page =
                     (window.location.pathname.split('/').pop() || 'index.html').split('?')[0] ||
                     'index.html';
-                document
-                    .querySelectorAll('.topbar-nav a, .mobile-nav-links a')
-                    .forEach(function (a) {
-                        var href = (a.getAttribute('href') || '').split('?')[0];
-                        if (href && !href.startsWith('http') && href === page)
-                            a.classList.add('is-active');
-                    });
                 document
                     .querySelectorAll('.app-bottom-nav .app-bottom-nav-item')
                     .forEach(function (a) {

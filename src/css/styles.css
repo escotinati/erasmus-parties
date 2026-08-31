@@ -1153,12 +1153,35 @@ a.city-card {
 
 /* header.topbar — ciudad.html, mapa.html, servicios.html, viajes.html */
 
+/* Mismo truco de grid de 3 columnas que .topnav-inner (línea 1073):
+   logo/topbar-nav/topbar-right como hijos directos de .topbar, para que
+   los links queden centrados en TODO el ancho de la barra en vez de
+   pegados al logo. grid-column explícito en las tres, por el mismo
+   motivo documentado en .topnav-inner > .topbar-nav: evita que al
+   ocultarse .topbar-nav en móvil, el auto-placement reubique
+   .topbar-right en la columna central. */
 .topbar {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
+    gap: 24px;
     z-index: 10;
     transition: box-shadow var(--duration-base) var(--ease-out);
+}
+
+.topbar > .logo {
+    grid-column: 1;
+    justify-self: start;
+}
+
+.topbar > .topbar-nav {
+    grid-column: 2;
+    justify-self: center;
+}
+
+.topbar > .topbar-right {
+    grid-column: 3;
+    justify-self: end;
 }
 
 header.topbar {
@@ -1211,12 +1234,6 @@ header.topbar {
 
 .topbar-nav a:hover {
     color: var(--primary);
-}
-
-.topbar-left {
-    display: flex;
-    align-items: center;
-    gap: 28px;
 }
 
 .topbar-right {
@@ -1549,6 +1566,15 @@ header.topbar {
 /* Líneas del hamburger → blancas sobre la imagen (móvil) */
 .hero-legacy .hamburger-btn span {
     background: #fff;
+}
+
+/* Icono de cuenta → mismo tratamiento que .back-btn sobre la foto */
+.hero-legacy .icon-btn {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.hero-legacy .icon-btn:hover {
+    color: #fff;
 }
 
 /* ── 3.2 Footer — Sprint 3: 3 columnas con design tokens ─────── */
@@ -1922,14 +1948,17 @@ header.topbar {
    4. INDEX.HTML
    ─────────────────────────────────────────────────────── */
 
-/* ── 4.-1 Nav desktop (rediseño, solo home-page) ──────────────
-   Todo escapado bajo .home-page (clase en <body>, solo index.html):
-   .topbar-nav a / .lang-switcher son selectores COMPARTIDOS con
-   header.topbar (ciudad.html, mapa.html, servicios.html, viajes.html,
-   alojamiento.html) y con el propio .topnav de ciudades-todas.html —
-   sin este scoping, cualquier regla tocaría esas páginas también. */
+/* ── 4.-1 Nav desktop (rediseño) ───────────────────────────────
+   Escapado bajo .topnav/.topbar (los dos elementos que renderizan
+   Nav.jsx/TopbarNav.jsx, rama react/menu) en vez de bajo .home-page:
+   antes esto vivía solo bajo body.home-page (solo index.html), pero
+   el rediseño del nav ya es el mismo en las 8 páginas públicas, así
+   que el hover tiene que serlo también. .topbar-nav a / .lang-switcher
+   son selectores COMPARTIDOS con el resto de páginas, pero como aquí
+   ya vamos scopeados a .topnav/.topbar no hace falta nada más. */
 
-.home-page .topnav::after {
+.topnav::after,
+.topbar::after {
     content: '';
     position: absolute;
     left: 0;
@@ -1941,28 +1970,37 @@ header.topbar {
     transition: opacity var(--anim-duration-base) var(--anim-easing-standard);
 }
 
-.home-page .topnav.scrolled::after {
+.topnav.scrolled::after,
+.topbar.scrolled::after {
     opacity: 0.65;
 }
 
-.home-page .topnav .brand {
+/* .brand (Nav.jsx) y .logo (TopbarNav.jsx) son el mismo elemento con
+   nombre distinto según el patrón — mismo motivo que arriba. */
+.topnav .brand,
+.topbar .logo {
     transition: opacity var(--anim-duration-fast) var(--anim-easing-standard);
 }
 
-.home-page .topnav .brand:hover {
+.topnav .brand:hover,
+.topbar .logo:hover {
     opacity: 0.75;
 }
 
 /* Subrayado que crece desde el centro en hover/foco — mismo degradado
    que el CTA y el titular del hero, para que el nav se sienta parte
    del mismo sistema en vez de un componente genérico aparte. */
-.home-page .topnav .topbar-nav a,
-.home-page .topnav .lang-switcher {
+.topnav .topbar-nav a,
+.topnav .lang-switcher,
+.topbar .topbar-nav a,
+.topbar .lang-switcher {
     position: relative;
 }
 
-.home-page .topnav .topbar-nav a::after,
-.home-page .topnav .lang-switcher::after {
+.topnav .topbar-nav a::after,
+.topnav .lang-switcher::after,
+.topbar .topbar-nav a::after,
+.topbar .lang-switcher::after {
     content: '';
     position: absolute;
     left: 0;
@@ -1975,26 +2013,34 @@ header.topbar {
     transition: transform var(--anim-duration-fast) var(--anim-easing-standard);
 }
 
-.home-page .topnav .lang-switcher::after {
+.topnav .lang-switcher::after,
+.topbar .lang-switcher::after {
     bottom: -6px;
 }
 
-.home-page .topnav .topbar-nav a:hover::after,
-.home-page .topnav .topbar-nav a:focus-visible::after,
-.home-page .topnav .topbar-nav a.is-active::after,
-.home-page .topnav .lang-switcher:hover::after,
-.home-page .topnav .lang-switcher:focus-visible::after {
+.topnav .topbar-nav a:hover::after,
+.topnav .topbar-nav a:focus-visible::after,
+.topnav .topbar-nav a.is-active::after,
+.topnav .lang-switcher:hover::after,
+.topnav .lang-switcher:focus-visible::after,
+.topbar .topbar-nav a:hover::after,
+.topbar .topbar-nav a:focus-visible::after,
+.topbar .topbar-nav a.is-active::after,
+.topbar .lang-switcher:hover::after,
+.topbar .lang-switcher:focus-visible::after {
     transform: scaleX(1);
 }
 
 /* "Fiestas ↗" (Verified) y "Verified ↗" (Parties, añadido por
    experience.js) ya llevan su propio acento — el subrayado usa ese
    mismo color en vez del degradado indigo/burgundy por defecto. */
-.home-page .topnav .topbar-nav a.nav-parties::after {
+.topnav .topbar-nav a.nav-parties::after,
+.topbar .topbar-nav a.nav-parties::after {
     background: #e1147b;
 }
 
-.home-page .topnav .topbar-nav a.nav-verified::after {
+.topnav .topbar-nav a.nav-verified::after,
+.topbar .topbar-nav a.nav-verified::after {
     background: #4648d4;
 }
 

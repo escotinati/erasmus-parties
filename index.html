@@ -35,45 +35,15 @@
     </head>
 
     <body class="home-page">
-        <!-- ── TOP NAV ─────────────────────────────────────────────── -->
-        <nav class="topnav" id="topNav">
-            <div class="topnav-inner">
-                <div class="topnav-left">
-                    <a href="index.html" class="brand">Erasmus Verified</a>
-                </div>
-                <nav class="topbar-nav" id="mainNav">
-                    <a href="servicios.html" data-i18n="nav.services">Servicios</a>
-                    <a href="alojamiento.html" data-i18n="nav.accommodation">Alojamiento</a>
-                    <a href="viajes.html" data-i18n="nav.trips">Viajes</a>
-                    <a
-                        href="https://erasmusparties.org"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="nav-parties"
-                        data-i18n="nav.parties"
-                        >🎉 Fiestas ↗</a
-                    >
-                </nav>
-                <div class="topnav-right">
-                    <button id="lang-switcher" class="lang-switcher" aria-label="Cambiar idioma">
-                        EN
-                    </button>
-                    <!-- Placeholder: solo el icono por ahora, sin modal de login/registro
-                         todavía (se añade en un paso posterior). -->
-                    <button
-                        class="icon-btn"
-                        id="authBtn"
-                        aria-label="Iniciar sesión o registrarte"
-                        title="Iniciar sesión o registrarte"
-                    >
-                        <span class="material-symbols-outlined">person</span>
-                    </button>
-                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Abrir menú">
-                        <span></span><span></span><span></span>
-                    </button>
-                </div>
-            </div>
-        </nav>
+        <!-- ── TOP NAV (React, rama react/menu) ──────────────────────
+             Antes era HTML duplicado byte a byte en cada página con
+             este patrón — ver src/react/Nav.jsx. mount-nav.jsx lo
+             monta aquí durante el parseo (antes de DOMContentLoaded),
+             así que experience.js/applyTranslations() (enganchados a
+             DOMContentLoaded o posteriores) lo encuentran ya en el DOM
+             igual que si fuera HTML estático. -->
+        <div id="nav-root"></div>
+        <script type="module" src="/src/react/mount-nav.jsx"></script>
 
         <main>
             <!-- ── HERO ─────────────────────────────────────────────── -->
@@ -479,26 +449,6 @@
             </div>
         </footer>
 
-        <!-- ── MOBILE NAV OVERLAY ───────────────────────────────── -->
-        <div class="mobile-nav" id="mobileNav" aria-hidden="true">
-            <button class="mobile-nav-close" id="mobileNavClose" aria-label="Cerrar menú">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-            <nav class="mobile-nav-links">
-                <a href="servicios.html" data-i18n="nav.services">Servicios</a>
-                <a href="alojamiento.html" data-i18n="nav.accommodation">Alojamiento</a>
-                <a href="viajes.html" data-i18n="nav.trips">Viajes</a>
-                <a
-                    href="https://erasmusparties.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="nav-parties"
-                    data-i18n="nav.parties"
-                    >🎉 Fiestas ↗</a
-                >
-            </nav>
-        </div>
-
         <!-- ── APP BOTTOM NAV (móvil) ────────────────────────────── -->
         <nav class="app-bottom-nav" id="appBottomNav" aria-label="Navegación principal">
             <a href="servicios.html" class="app-bottom-nav-item">
@@ -556,40 +506,15 @@
         <script src="/src/js/index.js"></script>
         <script src="/src/js/nightsSection.js"></script>
         <script>
-            /* ── Hamburger + ítem activo (nav global + bottom-nav) ───── */
+            /* ── Ítem activo (solo bottom-nav) ─────────────────────────
+               El toggle de hamburguesa + ítem activo del topnav/mobile-nav
+               ahora vive dentro de src/react/Nav.jsx (rama react/menu) —
+               este bloque ya solo resuelve el bottom-nav, que sigue siendo
+               HTML estático (no migrado). */
             (function () {
-                var btn = document.getElementById('hamburgerBtn');
-                var nav = document.getElementById('mobileNav');
-                var close = document.getElementById('mobileNavClose');
-                function openNav() {
-                    btn.classList.add('is-open');
-                    nav.classList.add('is-open');
-                    nav.removeAttribute('aria-hidden');
-                }
-                function closeNav() {
-                    btn.classList.remove('is-open');
-                    nav.classList.remove('is-open');
-                    nav.setAttribute('aria-hidden', 'true');
-                }
-                if (btn && nav) {
-                    btn.addEventListener('click', function () {
-                        nav.classList.contains('is-open') ? closeNav() : openNav();
-                    });
-                    if (close) close.addEventListener('click', closeNav);
-                    nav.querySelectorAll('a:not(.nav-parties)').forEach(function (a) {
-                        a.addEventListener('click', closeNav);
-                    });
-                }
                 var page =
                     (window.location.pathname.split('/').pop() || 'index.html').split('?')[0] ||
                     'index.html';
-                document
-                    .querySelectorAll('.topbar-nav a, .mobile-nav-links a')
-                    .forEach(function (a) {
-                        var href = (a.getAttribute('href') || '').split('?')[0];
-                        if (href && !href.startsWith('http') && href === page)
-                            a.classList.add('is-active');
-                    });
                 document
                     .querySelectorAll('.app-bottom-nav .app-bottom-nav-item')
                     .forEach(function (a) {

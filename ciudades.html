@@ -29,41 +29,9 @@
     <body>
         <section class="hero-legacy">
             <div class="hero-bg-img" id="heroBg"></div>
-            <div class="topbar">
-                <a href="index.html" class="logo">Erasmus<span class="logo-dot">Verified</span></a>
-                <nav class="topbar-nav" id="mainNav">
-                    <a href="servicios.html" data-i18n="nav.services">Servicios</a>
-                    <a href="alojamiento.html" data-i18n="nav.accommodation">Alojamiento</a>
-                    <a href="viajes.html" data-i18n="nav.trips">Viajes</a>
-                    <a
-                        href="https://erasmusparties.org"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="nav-parties"
-                        data-i18n="nav.parties"
-                        >🎉 Fiestas ↗</a
-                    >
-                </nav>
-                <div class="topbar-right">
-                    <a href="index.html" class="back-btn">
-                        <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2.5"
-                        >
-                            <polyline points="15 18 9 12 15 6" />
-                        </svg>
-                        <span data-i18n="cities.back_to_countries">Todos los países</span>
-                    </a>
-                    <button id="lang-switcher" class="lang-switcher" aria-label="Cambiar idioma">EN</button>
-                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Abrir menú">
-                        <span></span><span></span><span></span>
-                    </button>
-                </div>
-            </div>
+            <!-- ── TOP NAV (React, rama react/menu) — ver src/react/TopbarNav.jsx ── -->
+            <div id="nav-root"></div>
+            <script type="module" src="/src/react/mount-hero-legacy-nav.jsx"></script>
             <div class="hero-content-legacy">
                 <div class="hero-breadcrumb-legacy">
                     <a href="index.html" data-i18n="nav.home">Inicio</a>
@@ -94,8 +62,8 @@
                 <div class="footer-brand">
                     <span class="footer-logo">Erasmus Verified</span>
                     <p class="footer-tagline" data-i18n="footer.tagline_long">
-                        Experiencias premium para estudiantes de intercambio en más de 50
-                        ciudades europeas.
+                        Experiencias premium para estudiantes de intercambio en más de 50 ciudades
+                        europeas.
                     </p>
                 </div>
 
@@ -108,9 +76,7 @@
                             >
                         </li>
                         <li>
-                            <a href="alojamiento.html" data-i18n="nav.accommodation"
-                                >Alojamiento</a
-                            >
+                            <a href="alojamiento.html" data-i18n="nav.accommodation">Alojamiento</a>
                         </li>
                         <li>
                             <a
@@ -133,9 +99,7 @@
                             <a href="#" data-i18n="footer.local_partners">Socios locales</a>
                         </li>
                         <li>
-                            <a href="#" data-i18n="footer.insurance_policy"
-                                >Política de seguros</a
-                            >
+                            <a href="#" data-i18n="footer.insurance_policy">Política de seguros</a>
                         </li>
                         <li><a href="#" data-i18n="footer.privacy">Privacidad</a></li>
                         <li><a href="#" data-i18n="footer.terms">Términos</a></li>
@@ -151,25 +115,7 @@
             </div>
         </footer>
 
-        <!-- ── MOBILE NAV OVERLAY ─────────────────────────────────── -->
-        <div class="mobile-nav" id="mobileNav" aria-hidden="true">
-            <button class="mobile-nav-close" id="mobileNavClose" aria-label="Cerrar menú">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-            <nav class="mobile-nav-links">
-                <a href="servicios.html" data-i18n="nav.services">Servicios</a>
-                <a href="alojamiento.html" data-i18n="nav.accommodation">Alojamiento</a>
-                <a href="viajes.html" data-i18n="nav.trips">Viajes</a>
-                <a
-                    href="https://erasmusparties.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="nav-parties"
-                    data-i18n="nav.parties"
-                    >🎉 Fiestas ↗</a
-                >
-            </nav>
-        </div>
+        <!-- Mobile-nav overlay: ahora vive en src/react/TopbarNav.jsx (rama react/menu) -->
 
         <!-- ── APP BOTTOM NAV (móvil) ────────────────────────────────── -->
         <nav class="app-bottom-nav" id="appBottomNav" aria-label="Navegación principal">
@@ -202,40 +148,13 @@
         <script src="/src/js/utils/sanitize.js"></script>
         <script src="/src/js/ciudades.js"></script>
         <script>
-            /* ── Hamburger + ítem activo (nav global) ────────────────── */
+            /* ── Ítem activo (solo bottom-nav) + año del copyright ─────
+               El toggle de hamburguesa + ítem activo del topbar/mobile-nav
+               ahora vive dentro de src/react/TopbarNav.jsx (rama react/menu). */
             (function () {
-                var btn = document.getElementById('hamburgerBtn');
-                var mnav = document.getElementById('mobileNav');
-                var close = document.getElementById('mobileNavClose');
-                function openNav() {
-                    btn.classList.add('is-open');
-                    mnav.classList.add('is-open');
-                    mnav.removeAttribute('aria-hidden');
-                }
-                function closeNav() {
-                    btn.classList.remove('is-open');
-                    mnav.classList.remove('is-open');
-                    mnav.setAttribute('aria-hidden', 'true');
-                }
-                if (btn && mnav) {
-                    btn.addEventListener('click', function () {
-                        mnav.classList.contains('is-open') ? closeNav() : openNav();
-                    });
-                    if (close) close.addEventListener('click', closeNav);
-                    mnav.querySelectorAll('a:not(.nav-parties)').forEach(function (a) {
-                        a.addEventListener('click', closeNav);
-                    });
-                }
                 var page =
                     (window.location.pathname.split('/').pop() || 'index.html').split('?')[0] ||
                     'index.html';
-                document
-                    .querySelectorAll('.topbar-nav a, .mobile-nav-links a')
-                    .forEach(function (a) {
-                        var href = (a.getAttribute('href') || '').split('?')[0];
-                        if (href && !href.startsWith('http') && href === page)
-                            a.classList.add('is-active');
-                    });
                 document
                     .querySelectorAll('.app-bottom-nav .app-bottom-nav-item')
                     .forEach(function (a) {

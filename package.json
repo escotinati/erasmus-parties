@@ -21,11 +21,14 @@
   },
   "homepage": "https://github.com/escotinati/erasmus-parties#readme",
   "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
     "prettier": "^3.8.4",
     "vite": "^8.1.0",
     "vite-plugin-static-copy": "^3.4.0"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.108.2"
+    "@supabase/supabase-js": "^2.108.2",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   }
 }
