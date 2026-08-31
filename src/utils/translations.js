@@ -20,6 +20,7 @@ window.I18n.translations = {
             trips: 'Viajes',
             parties: '🎉 Fiestas ↗',
             parties_bottom: 'Fiestas',
+            account: 'Cuenta',
             home: 'Inicio',
             back: 'Volver',
             back_arrow: '← Volver',
@@ -39,7 +40,7 @@ window.I18n.translations = {
             hero_subtitle:
                 'Conéctate con alojamiento premium para estudiantes, eventos nocturnos exclusivos y una comunidad vibrante en más de 50 centros universitarios europeos.',
             search_placeholder_long: '¿A dónde vas en tu próxima aventura?',
-            search_placeholder_short: '¿A dónde vas?',
+            search_placeholder_short: 'Buscar...',
             search_cta: 'Explorar',
             search_result_type_city: 'Ciudad',
             search_not_found_prefix: 'No encontramos',
@@ -94,7 +95,8 @@ window.I18n.translations = {
             partners_title_housing_prefix: 'Alojamiento en',
             partners_title_services: 'Instálate en 3 días',
             partners_title_nightlife_prefix: 'Fiestas en',
-            partners_empty_category: 'Todavía no tenemos partners de esta categoría en esta ciudad.',
+            partners_empty_category:
+                'Todavía no tenemos partners de esta categoría en esta ciudad.',
             partners_empty_city: 'Todavía no tenemos partners en esta ciudad. Vuelve pronto.',
             partners_cta_default: 'Ver más',
             stats_cities_label: 'Ciudades activas',
@@ -135,7 +137,8 @@ window.I18n.translations = {
             all_eyebrow: 'Destinos Erasmus+',
             all_title: 'Todas las ciudades',
             stats_middle: 'ciudades en',
-            stats_suffix: 'países europeos. Encuentra tu destino y únete a la comunidad antes de llegar.',
+            stats_suffix:
+                'países europeos. Encuentra tu destino y únete a la comunidad antes de llegar.',
             filter_placeholder: 'Filtra por ciudad o país…',
             no_results_title: 'Sin resultados',
             no_results_body: 'Prueba con otro nombre de ciudad o país.',
@@ -186,7 +189,8 @@ window.I18n.translations = {
             subtitle:
                 'Colaboramos con las mejores plataformas de alojamiento para estudiantes en Europa. Reserva con confianza.',
             company_eyebrow: '¿Eres una empresa de alojamiento?',
-            collab_body: 'Si tienes alojamiento verificado para estudiantes Erasmus, queremos conocerte.',
+            collab_body:
+                'Si tienes alojamiento verificado para estudiantes Erasmus, queremos conocerte.',
         },
         trips: {
             eyebrow: 'Viajes Erasmus',
@@ -198,7 +202,8 @@ window.I18n.translations = {
             collab_omio_desc: 'Compara trenes, buses y vuelos',
             collab_rentalcars_desc: 'Alquiler de coches en toda Europa',
             company_eyebrow: '¿Eres una empresa de transporte?',
-            collab_body: 'Si ofreces transporte o viajes para estudiantes Erasmus, queremos conocerte.',
+            collab_body:
+                'Si ofreces transporte o viajes para estudiantes Erasmus, queremos conocerte.',
         },
         services: {
             eyebrow: 'Servicios verificados',
@@ -255,6 +260,7 @@ window.I18n.translations = {
             trips: 'Trips',
             parties: '🎉 Parties ↗',
             parties_bottom: 'Parties',
+            account: 'Account',
             home: 'Home',
             back: 'Back',
             back_arrow: '← Back',
@@ -274,7 +280,7 @@ window.I18n.translations = {
             hero_subtitle:
                 'Connect with premium student housing, exclusive nightlife events and a vibrant community in more than 50 European university cities.',
             search_placeholder_long: "Where's your next adventure?",
-            search_placeholder_short: 'Where to?',
+            search_placeholder_short: 'Search...',
             search_cta: 'Explore',
             search_result_type_city: 'City',
             search_not_found_prefix: "We couldn't find",
@@ -370,7 +376,8 @@ window.I18n.translations = {
             all_eyebrow: 'Erasmus+ Destinations',
             all_title: 'All cities',
             stats_middle: 'cities across',
-            stats_suffix: 'European countries. Find your destination and join the community before you arrive.',
+            stats_suffix:
+                'European countries. Find your destination and join the community before you arrive.',
             filter_placeholder: 'Filter by city or country…',
             no_results_title: 'No results',
             no_results_body: 'Try another city or country name.',
@@ -379,7 +386,7 @@ window.I18n.translations = {
             desc_intro: 'Choose your platform and join the Erasmus community before you arrive.',
             tip_label: 'Tip:',
             tip_text:
-                "When you join, introduce yourself with your university and Erasmus dates. The community will welcome you with open arms.",
+                'When you join, introduce yourself with your university and Erasmus dates. The community will welcome you with open arms.',
             join_groups_divider: 'Join the groups',
             join_whatsapp_group: 'Join the WhatsApp group',
             whatsapp_group_label: 'WhatsApp group',
@@ -421,7 +428,8 @@ window.I18n.translations = {
             subtitle:
                 'We partner with the best student housing platforms in Europe. Book with confidence.',
             company_eyebrow: 'Are you an accommodation company?',
-            collab_body: "If you offer verified housing for Erasmus students, we'd love to hear from you.",
+            collab_body:
+                "If you offer verified housing for Erasmus students, we'd love to hear from you.",
         },
         trips: {
             eyebrow: 'Erasmus travel',
@@ -433,7 +441,8 @@ window.I18n.translations = {
             collab_omio_desc: 'Compare trains, buses and flights',
             collab_rentalcars_desc: 'Car rental across Europe',
             company_eyebrow: 'Are you a transport company?',
-            collab_body: "If you offer transport or travel for Erasmus students, we'd love to hear from you.",
+            collab_body:
+                "If you offer transport or travel for Erasmus students, we'd love to hear from you.",
         },
         services: {
             eyebrow: 'Verified services',
@@ -465,7 +474,7 @@ window.I18n.translations = {
             transport_barik_cta: 'Points of sale',
             callout_title: 'Missing a service?',
             callout_body:
-                "If you know a SIM, bank or transport card that should be here, let us know. We review every suggestion before adding it.",
+                'If you know a SIM, bank or transport card that should be here, let us know. We review every suggestion before adding it.',
         },
         footer: {
             copyright: 'Erasmus Verified. Premium Experiences for Exchange Students.',
@@ -475,8 +484,7 @@ window.I18n.translations = {
             privacy: 'Privacy',
             terms: 'Terms',
             tagline: 'Erasmus Verified · Europe Community',
-            tagline_long:
-                'Premium experiences for exchange students in over 50 European cities.',
+            tagline_long: 'Premium experiences for exchange students in over 50 European cities.',
             platform_title: 'Platform',
             legal_title: 'Legal',
             destinations: 'Destinations',
