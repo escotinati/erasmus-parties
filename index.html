@@ -517,6 +517,23 @@
                 >
                 <span class="app-bottom-nav-label" data-i18n="nav.parties_bottom">Fiestas</span>
             </a>
+            <!-- Mismo placeholder que #authBtn en el nav de escritorio: solo el
+                 icono por ahora, sin modal de login/registro todavía. Última
+                 posición a propósito — cuenta/perfil va siempre al final de la
+                 barra en apps con bottom-nav (Instagram, X, Airbnb...), así que
+                 es donde un usuario ya espera encontrarla. -->
+            <button
+                type="button"
+                class="app-bottom-nav-item"
+                id="authBtnMobile"
+                aria-label="Iniciar sesión o registrarte"
+                title="Iniciar sesión o registrarte"
+            >
+                <span class="app-bottom-nav-icon"
+                    ><span class="material-symbols-outlined">person</span></span
+                >
+                <span class="app-bottom-nav-label" data-i18n="nav.account">Cuenta</span>
+            </button>
         </nav>
 
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -578,25 +595,29 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 window.I18n.applyTranslations();
+
+                // Sobreescribe el placeholder que acaba de poner applyTranslations()
+                // con la variante corta en pantallas pequeñas — mismo idioma, solo
+                // más breve, así que sigue pasando por t() en vez de un string
+                // hardcodeado. Tiene que ir DESPUÉS de applyTranslations() y en el
+                // mismo handler: si corriera en un script aparte fuera de
+                // DOMContentLoaded (como estaba antes), se ejecutaba primero por
+                // orden de parseo y applyTranslations() volvía a pisarlo con la
+                // variante larga vía data-i18n.
+                var input = document.getElementById('citySearch');
+                if (input) {
+                    var updatePlaceholder = function () {
+                        input.placeholder =
+                            window.innerWidth <= 600
+                                ? window.I18n.t('home.search_placeholder_short')
+                                : window.I18n.t('home.search_placeholder_long');
+                    };
+                    updatePlaceholder();
+                    window.addEventListener('resize', updatePlaceholder);
+                }
             });
         </script>
         <script>
-            (function () {
-                var input = document.getElementById('citySearch');
-                if (!input) return;
-                // Sobreescribe el placeholder que ya puso applyTranslations() con
-                // la variante corta en pantallas pequeñas — mismo idioma, solo
-                // más breve, así que sigue pasando por t() en vez de un string
-                // hardcodeado.
-                function update() {
-                    input.placeholder =
-                        window.innerWidth <= 600
-                            ? window.I18n.t('home.search_placeholder_short')
-                            : window.I18n.t('home.search_placeholder_long');
-                }
-                update();
-                window.addEventListener('resize', update);
-            })();
             document.getElementById('copyright-year').textContent = new Date().getFullYear();
         </script>
     </body>

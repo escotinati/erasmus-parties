@@ -932,6 +932,11 @@ a.city-card {
     transition: color 0.15s;
     padding: 6px 0 10px;
     min-width: 0;
+    /* El ítem de cuenta (#authBtnMobile) es <button>, no <a> como el
+       resto — reset para que no se note la diferencia de elemento. */
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 
 .app-bottom-nav-item .material-symbols-outlined {
@@ -1084,16 +1089,26 @@ a.city-card {
 }
 
 .topnav-left {
+    grid-column: 1;
     display: flex;
     align-items: center;
     justify-self: start;
 }
 
+/* grid-column explícito en las tres, aquí incluido, a propósito: en
+   móvil .topbar-nav pasa a display:none (bottom-nav lo sustituye) y
+   el auto-placement de grid, al quitarla de en medio, reubicaba
+   .topnav-right en la columna central (la vacía) en vez de dejarla
+   en la derecha — quedaba con hueco muerto a su lado en vez de pegada
+   al borde. Fijar la columna de cada bloque evita que la ausencia de
+   uno mueva a los demás. */
 .topnav-inner > .topbar-nav {
+    grid-column: 2;
     justify-self: center;
 }
 
 .topnav-right {
+    grid-column: 3;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -1985,11 +2000,14 @@ header.topbar {
 
 /* ── 4.-1b Bottom nav móvil (rediseño, solo home-page) ─────────
    .app-bottom-nav / .app-bottom-nav-item son compartidos con el resto
-   de páginas públicas — todo escapado bajo .home-page. Estructura
-   intacta (mismos 3 ítems/enlaces), solo tratamiento visual: cristal
-   a juego con el nav de escritorio, píldora + icono relleno en el
-   ítem activo (Material Symbols soporta el eje FILL 0↔1, igual que el
-   "tab" que se rellena al seleccionarlo en apps como Instagram). */
+   de páginas públicas — todo escapado bajo .home-page. Mismo
+   tratamiento visual para los 4 ítems (los 3 enlaces + el botón de
+   cuenta): cristal a juego con el nav de escritorio, píldora + icono
+   relleno en el ítem activo (Material Symbols soporta el eje FILL
+   0↔1, igual que el "tab" que se rellena al seleccionarlo en apps
+   como Instagram). El botón de cuenta nunca lleva --active (no
+   navega a ninguna página todavía), así que se queda siempre en su
+   estado de reposo. */
 
 .home-page .app-bottom-nav {
     background: rgba(var(--surface-rgb), 0.85);
@@ -2383,8 +2401,15 @@ header.topbar {
 @media (max-width: 768px) {
     /* Antes se apilaban en columna; ahora viven dentro de .hero-panel
        (más estrecho que el hero completo) y se quedan en fila para que
-       la tarjeta de stats no crezca en alto innecesariamente. */
+       la tarjeta de stats no crezca en alto innecesariamente.
+       justify-content pasa de space-between (desktop, ver regla base)
+       a center: con 3 stats en un panel estrecho, space-between hace
+       wrap a 2+1 y deja el primer par pegado a los bordes y el tercero
+       suelto a la izquierda — ni centrado ni con distancia uniforme
+       entre todos. center + gap fijo sí da lo mismo entre cualquier
+       par de stats, se reparta como se reparta el wrap. */
     .home-stats {
+        justify-content: center;
         gap: 20px;
     }
 }
@@ -2499,11 +2524,20 @@ header.topbar {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.7s ease;
 }
 
-.accordion-card:hover img {
-    transform: scale(1.08);
+/* Zoom en hover — como el ensanchado de la card (más arriba), solo
+   con hover real. En táctil no solo "no tiene sentido": el :hover de
+   CSS se queda pegado tras el tap hasta el siguiente toque en otro
+   sitio, así que la imagen se quedaría ampliada sin motivo. */
+@media (hover: hover) and (pointer: fine) {
+    .accordion-card img {
+        transition: transform 0.7s ease;
+    }
+
+    .accordion-card:hover img {
+        transform: scale(1.08);
+    }
 }
 
 .accordion-card-overlay {
@@ -2612,41 +2646,29 @@ header.topbar {
     display: -webkit-box;
 }
 
-@media (max-width: 900px) {
+/* Bajo 1000px, cada card en vertical, una encima de otra — nada de
+   carrusel horizontal ni de reservar hueco para el acordeón (ese
+   efecto vive por completo dentro de @media (hover:hover), así que
+   aquí ni se carga). flex: none + height fija en vez de flex-grow/
+   flex-basis:0 (pensados para repartir ANCHO en el acordeón real):
+   con .accordion-grid en column y height:auto no hay "espacio extra"
+   que repartir, pero dejar flex-grow activo es frágil — mejor
+   desactivarlo del todo. Height fija (no aspect-ratio) a propósito:
+   con aspect-ratio la card se hacía cada vez más alta cuanto más
+   ancha (cerca de los 1000px llegaba a rondar los 700px de alto);
+   350px fijos evitan eso sea cual sea el ancho dentro de este rango. */
+@media (max-width: 1000px) {
     .accordion-grid {
+        flex-direction: column;
         height: auto;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        padding-right: 40px;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
+        gap: 16px;
     }
-    .accordion-grid::-webkit-scrollbar {
-        display: none;
-    }
-    .accordion-card {
-        flex: 0 0 70%;
-        min-height: 280px;
-        scroll-snap-align: start;
-    }
-    .accordion-card--main {
-        flex: 0 0 85%;
-        min-height: 320px;
-    }
-}
 
-@media (max-width: 600px) {
-    .accordion-grid {
-        gap: 12px;
-    }
-    .accordion-card {
-        flex-basis: 78%;
-        min-height: 220px;
-    }
+    .accordion-card,
     .accordion-card--main {
-        flex-basis: 88%;
-        min-height: 260px;
+        flex: none;
+        width: 100%;
+        height: 350px;
     }
 }
 
@@ -3869,9 +3891,6 @@ body.alojamiento-page {
         padding-left: var(--margin-mobile);
         padding-right: var(--margin-mobile);
     }
-    .accordion-grid {
-        min-height: 560px;
-    }
     .services-grid {
         gap: 20px;
     }
@@ -3886,18 +3905,6 @@ body.alojamiento-page {
     }
     .cities-grid {
         grid-template-columns: repeat(3, 1fr);
-    }
-    .accordion-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: auto;
-        min-height: auto;
-    }
-    .accordion-card--main,
-    .accordion-card--wide {
-        grid-column: span 2;
-    }
-    .accordion-card {
-        aspect-ratio: 4/3;
     }
 }
 
@@ -3949,16 +3956,6 @@ body.alojamiento-page {
 }
 
 @media (max-width: 600px) {
-    .accordion-grid {
-        grid-template-columns: 1fr;
-    }
-    .accordion-card--main,
-    .accordion-card--wide {
-        grid-column: span 1;
-    }
-    .accordion-card {
-        aspect-ratio: 4/3;
-    }
     .countries-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
@@ -3981,6 +3978,11 @@ body.alojamiento-page {
         font-size: 16px;
     }
     .search-bar {
+        /* position:relative ya lo pone initAutocomplete() (index.js) para
+           anclar el dropdown, pero aquí pasa a ser también el contexto de
+           .search-bar-btn (ver más abajo) — se declara explícito en vez de
+           depender solo del inline style que pone el JS. */
+        position: relative;
         flex-wrap: nowrap;
         padding: 8px 8px 8px 16px;
     }
@@ -3991,15 +3993,28 @@ body.alojamiento-page {
     }
     .search-bar-input input {
         font-size: 15px;
+        /* Hueco para que el texto no quede debajo del botón flotante
+           (círculo de 36px + 10px de aire, ver .search-bar-btn). */
+        padding-right: 46px;
     }
+    /* El botón pasa a vivir "dentro" del input: en vez de un tercer
+       bloque en la fila (icono | input | botón), flota superpuesto al
+       borde derecho del propio campo de texto. .search-bar-input ya
+       es flex:1 y es el único hijo en flujo dentro de .search-bar
+       una vez el botón sale de flujo, así que ocupa toda la fila.
+       padding/font-size del icono ajustados para que el círculo (36px)
+       quepa dentro del alto real de la píldora (~40px) sin sobresalir. */
     .search-bar-btn {
-        width: auto;
-        flex-shrink: 0;
-        padding: 13px;
+        position: absolute;
+        top: 50%;
+        right: 6px;
+        transform: translateY(-50%);
+        padding: 8px;
         gap: 0;
-        margin-top: 0;
-        justify-content: center;
         aspect-ratio: 1;
+    }
+    .search-bar-btn .material-symbols-outlined {
+        font-size: 20px;
     }
     .search-bar-btn .btn-text {
         display: none;
