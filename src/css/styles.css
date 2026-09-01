@@ -2524,6 +2524,21 @@ header.topbar {
     .partner-grid {
         grid-template-columns: 1fr;
     }
+
+    /* Mismo chip, más compacto — en desktop min-height:44px es el
+       tamaño de objetivo táctil recomendado, pero en móvil con varias
+       categorías la fila hace wrap a 2-3 líneas y ocupa demasiado.
+       36px sigue siendo un objetivo táctil razonable para un filtro
+       secundario (no es la acción principal de la pantalla). */
+    .category-pills {
+        gap: 8px;
+    }
+
+    .category-pill {
+        min-height: 36px;
+        padding: 6px 14px;
+        font-size: 13px;
+    }
 }
 
 /* ── 4.1 Accordion grid (ciudades destacadas, ensanchamiento en hover) ── */

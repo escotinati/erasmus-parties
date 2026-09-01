@@ -252,6 +252,23 @@ function renderCategoryPills() {
 
 // ── 4. GRID DE PARTNERS ──────────────────────────────────────
 
+// Nunca se muestran más de MAX_VISIBLE_PARTNERS a la vez, aunque la
+// ciudad tenga más (cada vez más habitual). fetchPartnersByCity ya
+// trae la lista ordenada por priority DESC (partnersService.js): si
+// esa prioridad realmente distingue unos partners de otros, se
+// respeta tal cual. Si todos comparten la misma (típicamente todos a
+// 0, sin curar todavía), enseñar siempre los 6 primeros por orden de
+// inserción sería arbitrario y siempre los mismos partners — se
+// baraja en su lugar.
+const MAX_VISIBLE_PARTNERS = 6;
+
+function selectVisiblePartners(list) {
+    if (list.length <= MAX_VISIBLE_PARTNERS) return list;
+    const hasDistinctPriority = list.some((p) => p.priority !== list[0].priority);
+    const ordered = hasDistinctPriority ? list : shuffle(list);
+    return ordered.slice(0, MAX_VISIBLE_PARTNERS);
+}
+
 function buildPartnerCard(partner, index) {
     const categories = getHomeCategories();
     const catMeta = categories.find((c) => c.key === partner.category);
@@ -350,7 +367,9 @@ function renderPartnersSection(allPartnersForCity) {
 
     grid.hidden = false;
     empty.hidden = true;
-    filtered.forEach((partner, i) => grid.appendChild(buildPartnerCard(partner, i)));
+    selectVisiblePartners(filtered).forEach((partner, i) =>
+        grid.appendChild(buildPartnerCard(partner, i))
+    );
 
     if (window.initScrollReveal) window.initScrollReveal();
 }
