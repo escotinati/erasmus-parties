@@ -1577,46 +1577,80 @@ header.topbar {
     color: #fff;
 }
 
-/* ── 3.2 Footer — Sprint 3: 3 columnas con design tokens ─────── */
+/* ── 3.2 Footer ───────────────────────────────────────────────
+   Rediseñada para hablar el mismo idioma visual que el resto de la
+   página en vez de los tokens legacy de tokens.css (--space-*,
+   --color-*, --text-small a secas quedaban "en otro dialecto" del
+   sistema y con un ancho de contenedor distinto al del resto de
+   secciones — por eso desentonaba). Ahora usa exactamente los mismos
+   tokens que el header/hero/CTA: --container-max + --margin-desktop
+   para que los bordes cuadren con la .cta-card de justo encima,
+   --anim-duration-fast/--anim-easing-standard para las transiciones
+   (idénticos a los que ya usa el subrayado del nav). */
 
 .site-footer {
+    position: relative;
     background: var(--surface-container-low);
-    border-top: 1px solid rgba(199, 196, 215, 0.5);
+    overflow: hidden;
+}
+
+/* Remate en degradado indigo→burgundy — mismo recurso que el título
+   del hero (§3.3) y el subrayado del nav (§4.-1), aquí a modo de
+   remate: el hero abre la página con el degradado, el footer la
+   cierra con él. --primary/--secondary (no --indigo/--burgundy fijos)
+   a propósito: a diferencia del titular del hero, esta franja sí
+   debe reaccionar al tema Parties. */
+.site-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
 }
 
 .footer-inner {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
-    gap: var(--space-12);
-    padding: var(--space-16) var(--space-8);
-    max-width: 1200px;
+    gap: var(--gutter);
+    max-width: var(--container-max);
     margin: 0 auto;
+    padding: 64px var(--margin-desktop) 48px;
+}
+
+.footer-brand {
+    padding-right: 48px;
 }
 
 .footer-logo {
+    display: inline-block;
     font-family: var(--font-display);
-    font-size: var(--text-h3);
-    font-weight: var(--weight-bold);
-    color: var(--color-primary);
-    display: block;
-    margin-bottom: var(--space-3);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
 }
 
 .footer-tagline {
-    font-size: var(--text-small);
-    color: var(--color-text-muted);
-    line-height: var(--leading-normal);
-    max-width: 280px;
+    font-size: 15px;
+    color: var(--on-surface-variant);
+    line-height: 1.6;
+    max-width: 300px;
 }
 
 .footer-col-title {
     font-family: var(--font-body);
-    font-size: var(--text-small);
-    font-weight: var(--weight-semibold);
-    letter-spacing: 0.06em;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-text-muted);
-    margin-bottom: var(--space-4);
+    color: var(--on-surface);
+    margin-bottom: 20px;
 }
 
 .footer-col ul {
@@ -1625,37 +1659,72 @@ header.topbar {
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: 14px;
 }
 
+/* Subrayado que crece desde la izquierda en hover/foco — mismo
+   recurso y misma curva que el nav (.topnav/.topbar, §4.-1), solo que
+   aquí crece desde el borde en vez de desde el centro: encaja mejor
+   con una lista vertical de un solo enlace por línea. */
 .footer-col ul a {
-    font-size: var(--text-small);
-    color: var(--color-text-muted);
+    position: relative;
+    display: inline-block;
+    font-size: 15px;
+    color: var(--on-surface-variant);
     text-decoration: none;
-    transition: color var(--duration-base) var(--ease-out);
+    transition: color var(--anim-duration-fast) var(--anim-easing-standard);
 }
 
-.footer-col ul a:hover {
-    color: var(--color-primary);
+.footer-col ul a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 1.5px;
+    background: var(--primary);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.footer-col ul a:hover,
+.footer-col ul a:focus-visible {
+    color: var(--on-surface);
+}
+
+.footer-col ul a:hover::after,
+.footer-col ul a:focus-visible::after {
+    transform: scaleX(1);
+}
+
+.footer-col ul a:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
 }
 
 .footer-bottom {
-    border-top: 1px solid var(--color-border);
-    padding: var(--space-6) var(--space-8);
-    max-width: 1200px;
+    border-top: 1px solid var(--outline-variant);
+    max-width: var(--container-max);
     margin: 0 auto;
+    padding: 24px var(--margin-desktop);
 }
 
 .footer-bottom p {
-    font-size: var(--text-small);
-    color: var(--color-text-muted);
+    font-size: 13px;
+    color: var(--on-surface-variant);
 }
 
 @media (max-width: 768px) {
     .footer-inner {
         grid-template-columns: 1fr;
-        gap: var(--space-8);
-        padding: var(--space-12) var(--space-6);
+        gap: 40px;
+        padding: 48px var(--margin-mobile) 32px;
+    }
+
+    .footer-brand {
+        padding-right: 0;
     }
 
     .footer-tagline {
@@ -1663,17 +1732,8 @@ header.topbar {
     }
 
     .footer-bottom {
-        padding: var(--space-6);
+        padding: 20px var(--margin-mobile);
     }
-}
-
-/* Dual-brand: Parties */
-[data-brand='parties'] .footer-logo {
-    color: var(--color-primary); /* rosa en Parties, vía alias en tokens.css */
-}
-
-[data-brand='parties'] .footer-bottom {
-    border-top-color: var(--color-border);
 }
 
 /* ── 3.3 Hero ───────────────────────────────────────────────── */
