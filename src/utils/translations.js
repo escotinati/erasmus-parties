@@ -76,7 +76,7 @@ window.I18n.translations = {
             cta_title: 'Únete a Erasmus Verified.',
             cta_subtitle:
                 'Conéctate con miles de estudiantes que emprenden el mismo viaje. Consejos compartidos, compañeros de piso y recuerdos inolvidables.',
-            cta_download_app: 'Descargar la App',
+            cta_explore_cities: 'Explorar ciudades',
             cta_join_community: 'Unirse a la Comunidad',
             ticker_1: '491 ciudades verificadas',
             ticker_2: '0€ de comisión',
@@ -315,7 +315,7 @@ window.I18n.translations = {
             cta_title: 'Join Erasmus Verified.',
             cta_subtitle:
                 'Connect with thousands of students on the same journey. Shared advice, flatmates and unforgettable memories.',
-            cta_download_app: 'Download the App',
+            cta_explore_cities: 'Explore cities',
             cta_join_community: 'Join the Community',
             ticker_1: '491 verified cities',
             ticker_2: '0€ commission',
