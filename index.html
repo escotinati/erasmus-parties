@@ -390,64 +390,9 @@
             </section>
         </main>
 
-        <!-- ── FOOTER ─────────────────────────────────────────────── -->
-        <footer class="site-footer">
-            <div class="footer-inner">
-                <div class="footer-brand">
-                    <span class="footer-logo">Erasmus Verified</span>
-                    <p class="footer-tagline" data-i18n="footer.tagline_long">
-                        Experiencias premium para estudiantes de intercambio en más de 50 ciudades
-                        europeas.
-                    </p>
-                </div>
-
-                <div class="footer-col">
-                    <p class="footer-col-title" data-i18n="footer.platform_title">Plataforma</p>
-                    <ul>
-                        <li>
-                            <a href="ciudades-todas.html" data-i18n="footer.destinations"
-                                >Destinos</a
-                            >
-                        </li>
-                        <li>
-                            <a href="alojamiento.html" data-i18n="nav.accommodation">Alojamiento</a>
-                        </li>
-                        <li>
-                            <a
-                                href="https://erasmusparties.org"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                data-i18n="nav.parties_bottom"
-                                >Fiestas</a
-                            >
-                        </li>
-                        <li><a href="viajes.html" data-i18n="nav.trips">Viajes</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <p class="footer-col-title" data-i18n="footer.legal_title">Legal</p>
-                    <ul>
-                        <li><a href="#" data-i18n="footer.about">Sobre nosotros</a></li>
-                        <li>
-                            <a href="#" data-i18n="footer.local_partners">Socios locales</a>
-                        </li>
-                        <li>
-                            <a href="#" data-i18n="footer.insurance_policy">Política de seguros</a>
-                        </li>
-                        <li><a href="#" data-i18n="footer.privacy">Privacidad</a></li>
-                        <li><a href="#" data-i18n="footer.terms">Términos</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p>
-                    © <span id="copyright-year"></span> Erasmus Verified.
-                    <span data-i18n="footer.rights">Todos los derechos reservados.</span>
-                </p>
-            </div>
-        </footer>
+        <!-- ── FOOTER (React, rama react/menu) — ver src/react/Footer.jsx ── -->
+        <div id="footer-root"></div>
+        <script type="module" src="/src/react/mount-footer.jsx"></script>
 
         <!-- ── APP BOTTOM NAV (móvil) ────────────────────────────── -->
         <nav class="app-bottom-nav" id="appBottomNav" aria-label="Navegación principal">
@@ -548,9 +493,6 @@
                     window.addEventListener('resize', updatePlaceholder);
                 }
             });
-        </script>
-        <script>
-            document.getElementById('copyright-year').textContent = new Date().getFullYear();
         </script>
     </body>
 </html>
