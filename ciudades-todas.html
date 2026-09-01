@@ -29,9 +29,16 @@
             /* ── Estilos específicos de esta página ─────────────────── */
             /* .all-cities-hero y sus responsive → css/styles.css §5    */
 
-            /* Barra de búsqueda/filtro */
-
+            /* Barra de búsqueda — mismo componente .search-bar que el hero
+               de index.html (icono + input, misma superficie de cristal),
+               reutilizado tal cual en vez de reinventar un input propio.
+               width:100% explícito a propósito: <body> es flex-column, y
+               un hijo directo suyo con solo max-width + margin:auto (sin
+               width) se encoge a su contenido en vez de estirarse — es el
+               mismo motivo por el que hacía falta más abajo en
+               .cities-container. */
             .filter-bar {
+                width: 100%;
                 max-width: var(--container-max);
                 margin: 0 auto;
                 padding: 32px var(--margin-desktop) 0;
@@ -41,40 +48,38 @@
                 flex-wrap: wrap;
             }
 
-            .filter-input-wrap {
+            .filter-bar .search-bar {
                 flex: 1;
-                min-width: 200px;
-                position: relative;
+                min-width: 260px;
             }
 
-            .filter-input-wrap .material-symbols-outlined {
-                position: absolute;
-                left: 14px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: var(--outline);
-                font-size: 20px;
-            }
-
-            .filter-input {
-                width: 100%;
-                background: var(--surface-container-low);
-                border: 1.5px solid var(--outline-variant);
+            /* Solo visible cuando el input tiene texto (JS añade
+               .has-value al wrap) — sin él, es un botón fantasma que no
+               hace nada. Vive dentro de .search-bar-input, después del
+               input, en vez de superpuesto en absolute: ese componente no
+               reserva hueco para nada a la derecha. */
+            .filter-clear {
+                display: none;
+                align-items: center;
+                justify-content: center;
+                width: 28px;
+                height: 28px;
+                flex-shrink: 0;
+                border: none;
+                background: none;
                 border-radius: var(--radius-full);
-                padding: 12px 16px 12px 44px;
-                font-family: var(--font-body);
-                font-size: 15px;
+                color: var(--on-surface-variant);
+                cursor: pointer;
+                transition: background var(--anim-duration-fast) var(--anim-easing-standard);
+            }
+
+            .filter-clear:hover {
+                background: var(--surface-container);
                 color: var(--on-surface);
-                outline: none;
-                transition: border-color 0.15s;
             }
 
-            .filter-input:focus {
-                border-color: var(--primary);
-            }
-
-            .filter-input::placeholder {
-                color: var(--outline);
+            .search-bar.has-value .filter-clear {
+                display: flex;
             }
 
             .filter-count {
@@ -82,9 +87,11 @@
                 color: var(--on-surface-variant);
                 white-space: nowrap;
             }
-            /* Sección por letra */
+            /* Listado de ciudades — mismo motivo del width:100% que
+               .filter-bar arriba (hijo directo de un <body> flex-column). */
 
-            .cities-section {
+            .cities-container {
+                width: 100%;
                 max-width: var(--container-max);
                 margin: 0 auto;
                 padding: 48px var(--margin-desktop) 100px;
@@ -110,66 +117,53 @@
                 border-bottom: 1px solid var(--outline-variant);
             }
 
+            /* Las cards en sí (.city-card, foto + bandera + nombre + país)
+               son el mismo componente que usa ciudades.html — toda su
+               regla vive en styles.css (a.country-card, a.city-card), no
+               se redefine aquí salvo el hover de la imagen (abajo): en
+               vez del zoom+oscurecido de siempre, foto en blanco y negro
+               en reposo que pasa a color al hacer hover — más propio de
+               un directorio (elegir entre muchas) que del efecto original
+               (pensado para una sola card protagonista). Selector
+               scopeado a .city-items-grid para no tocar ciudades.html,
+               que sigue con el hover de siempre. */
+            .city-items-grid .card-img {
+                filter: grayscale(100%) brightness(0.85);
+                transition: filter var(--anim-duration-base) var(--anim-easing-standard);
+            }
+
+            .city-items-grid .city-card:hover .card-img {
+                filter: grayscale(0%) brightness(0.85);
+                transform: none;
+            }
+
+            /* .anim-fade-up.is-visible:not(:hover) (animations.css) resetea
+               transform a translateY(0) salvo en :hover, para no competir
+               con componentes que sí animan su propio transform al hover
+               (card-hoverable, accordion-card). .city-card no es uno de
+               esos casos — su hover vive solo en .card-img (arriba) — así
+               que sin esta regla la card "cae" de vuelta a
+               translateY(var(--anim-translate-md)) al pasar el ratón. */
+            .city-items-grid .city-card.anim-fade-up:hover {
+                transform: translateY(0);
+            }
+
+            /* .city-card:hover cambia border-color a --primary
+               (styles.css) — en este directorio el color ya lo da la foto
+               a color, así que el borde se mantiene sin cambios. */
+            .city-items-grid .city-card:hover {
+                border-color: var(--outline-variant);
+            }
+
+            /* Solo el grid que las contiene es propio de esta página:
+               auto-fill en vez de las 4 columnas fijas de ciudades.html,
+               porque aquí cada letra puede tener 1 ciudad o 50. */
             .city-items-grid {
                 display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 10px;
+                grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+                gap: 14px;
             }
 
-            .city-item {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                padding: 12px 16px;
-                background: var(--surface-container-low);
-                border: 1px solid var(--outline-variant);
-                border-radius: var(--radius-lg);
-                text-decoration: none;
-                color: var(--on-surface);
-                font-size: 14px;
-                font-weight: 500;
-                transition:
-                    background 0.15s,
-                    border-color 0.15s,
-                    transform 0.15s;
-            }
-
-            .city-item:hover {
-                background: var(--primary-fixed);
-                border-color: var(--primary);
-                transform: translateY(-1px);
-                color: var(--primary);
-            }
-
-            .city-item-flag {
-                font-size: 1.1rem;
-                flex-shrink: 0;
-            }
-
-            .city-item-info {
-                flex: 1;
-                overflow: hidden;
-            }
-
-            .city-item-name {
-                font-weight: 600;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            .city-item-country {
-                font-size: 11px;
-                color: var(--on-surface-variant);
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            .city-item:hover .city-item-country {
-                color: var(--primary);
-                opacity: 0.7;
-            }
             /* No results */
 
             .no-results {
@@ -195,20 +189,23 @@
                 color: var(--on-surface);
                 margin-bottom: 8px;
             }
+
             /* Responsive */
 
             @media (max-width: 900px) {
                 .filter-bar {
                     padding: 24px var(--margin-mobile) 0;
                 }
-                .cities-section {
+                .cities-container {
                     padding: 40px var(--margin-mobile) 80px;
-                }
-                .city-items-grid {
-                    grid-template-columns: repeat(3, 1fr);
                 }
             }
 
+            /* auto-fill con minmax(170px, 1fr) ya se adapta solo casi
+               siempre, pero en torno a 380-430px de ancho el hueco
+               disponible cae justo por debajo de 2×170px+gap y colapsa a
+               1 columna — demasiado grande. Fuerza 2 en ese rango,
+               mismo criterio que .cities-grid.cols-2 en ciudades.html. */
             @media (max-width: 600px) {
                 .city-items-grid {
                     grid-template-columns: repeat(2, 1fr);
@@ -241,24 +238,33 @@
             </div>
         </div>
 
-        <!-- FILTER BAR -->
+        <!-- FILTER BAR — mismo componente .search-bar que el hero de index.html -->
         <div class="filter-bar">
-            <div class="filter-input-wrap">
-                <span class="material-symbols-outlined">search</span>
-                <input
-                    type="text"
-                    class="filter-input"
-                    id="filterInput"
-                    placeholder="Filtra por ciudad o país…"
-                    data-i18n="cities.filter_placeholder"
-                    autocomplete="off"
-                />
+            <div class="search-bar" id="filterInputWrap">
+                <div class="search-bar-input">
+                    <span class="material-symbols-outlined search-icon">search</span>
+                    <input
+                        type="text"
+                        id="filterInput"
+                        placeholder="Busca tu ciudad…"
+                        data-i18n="cities.filter_placeholder"
+                        autocomplete="off"
+                    />
+                </div>
+                <button
+                    type="button"
+                    class="filter-clear"
+                    id="filterClear"
+                    aria-label="Limpiar filtro"
+                >
+                    <span class="material-symbols-outlined" style="font-size: 18px">close</span>
+                </button>
             </div>
             <span class="filter-count" id="filterCount"></span>
         </div>
 
         <!-- CITIES LIST -->
-        <div class="cities-section" id="citiesSection">
+        <div class="cities-container" id="citiesSection">
             <div class="no-results" id="noResults">
                 <span class="no-results-icon">🔍</span>
                 <h3 data-i18n="cities.no_results_title">Sin resultados</h3>
@@ -300,11 +306,13 @@
         <script src="/src/utils/translations.js"></script>
         <script src="/src/js/langSwitcher.js"></script>
         <script src="/src/js/services/citiesService.js"></script>
+        <script src="/src/js/utils/sanitize.js"></script>
         <script src="/src/js/utils/animations.js"></script>
         <script>
             (async function () {
                 // Mismo criterio anti-XSS que el resto del proyecto (admin.js):
-                // name/country/flag ya son editables desde el admin.
+                // name/country ya son editables desde el admin.
+
                 function escapeHtml(str) {
                     if (str === null || str === undefined) return '';
                     return String(str).replace(
@@ -328,7 +336,7 @@
                     .map((city) => ({
                         name: city.name,
                         country: city.country,
-                        flag: city.flag,
+                        image_url: city.image_url,
                         url: `ciudad.html?ciudad=${city.id}`,
                     }))
                     .sort((a, b) => a.name.localeCompare(b.name, 'es'));
@@ -371,25 +379,32 @@
                     }`;
 
                     const groups = groupByLetter(cities);
+                    const sortedEntries = Object.entries(groups).sort();
                     // Índice global (no por letra) para que el stagger avance
                     // ciudad a ciudad a través de todos los grupos, no que se
                     // reinicie en cada encabezado de letra.
                     let globalIndex = 0;
-                    for (const [letter, group] of Object.entries(groups).sort()) {
+                    for (const [letter, group] of sortedEntries) {
                         const div = document.createElement('div');
                         div.className = 'letter-group';
                         div.innerHTML = `
-        <div class="letter-heading">${escapeHtml(letter)}</div>
+        <div class="letter-heading anim-fade-in">${escapeHtml(letter)}</div>
         <div class="city-items-grid">
           ${group
               .map((city) => {
                   const delayCls = `anim-delay-${(globalIndex++ % 8) + 1}`;
+                  const safeImageUrl = sanitizeUrl(city.image_url);
                   return `
-            <a class="city-item anim-fade-up ${delayCls}" href="${city.url}">
-              <span class="city-item-flag">${escapeHtml(city.flag)}</span>
-              <div class="city-item-info">
-                <div class="city-item-name">${escapeHtml(city.name)}</div>
-                <div class="city-item-country">${escapeHtml(city.country)}</div>
+            <a class="city-card anim-fade-up ${delayCls}" href="${city.url}">
+              ${
+                  safeImageUrl
+                      ? `<img class="card-img" src="${safeImageUrl}" alt="${escapeHtml(city.name)}" loading="lazy"/>`
+                      : `<div class="card-img-placeholder"></div>`
+              }
+              <div class="card-overlay"></div>
+              <div class="card-body">
+                <div class="card-name">${escapeHtml(city.name)}</div>
+                <span class="card-meta">${escapeHtml(city.country)}</span>
               </div>
             </a>`;
               })
@@ -415,8 +430,12 @@
                         .toLowerCase();
                 }
 
-                document.getElementById('filterInput').addEventListener('input', function () {
-                    const q = this.value.trim();
+                const filterInput = document.getElementById('filterInput');
+                const filterInputWrap = document.getElementById('filterInputWrap');
+
+                function applyFilter() {
+                    const q = filterInput.value.trim();
+                    filterInputWrap.classList.toggle('has-value', q.length > 0);
                     const nq = normalize(q);
                     if (!nq) {
                         renderGroups(allCities);
@@ -426,6 +445,14 @@
                         (c) => normalize(c.name).includes(nq) || normalize(c.country).includes(nq)
                     );
                     renderGroups(filtered);
+                }
+
+                filterInput.addEventListener('input', applyFilter);
+
+                document.getElementById('filterClear').addEventListener('click', () => {
+                    filterInput.value = '';
+                    filterInput.focus();
+                    applyFilter();
                 });
             })();
         </script>

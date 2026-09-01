@@ -138,7 +138,7 @@ window.I18n.translations = {
             stats_middle: 'ciudades en',
             stats_suffix:
                 'países europeos. Encuentra tu destino y únete a la comunidad antes de llegar.',
-            filter_placeholder: 'Filtra por ciudad o país…',
+            filter_placeholder: 'Busca tu ciudad…',
             no_results_title: 'Sin resultados',
             no_results_body: 'Prueba con otro nombre de ciudad o país.',
         },
@@ -376,7 +376,7 @@ window.I18n.translations = {
             stats_middle: 'cities across',
             stats_suffix:
                 'European countries. Find your destination and join the community before you arrive.',
-            filter_placeholder: 'Filter by city or country…',
+            filter_placeholder: 'Search for your city…',
             no_results_title: 'No results',
             no_results_body: 'Try another city or country name.',
         },
