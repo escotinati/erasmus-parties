@@ -86,12 +86,17 @@ document.addEventListener('DOMContentLoaded', function () {
         el.innerHTML = 'Erasmus<span class="logo-dot">Parties</span>';
     });
     document.querySelectorAll('.footer-logo').forEach(function (el) {
+        if (el.closest('[data-react-footer]')) return;
         el.textContent = 'Erasmus Parties';
     });
 
     // 2. Ocultar Servicios, Alojamiento y Viajes en todas las navs
+    // (el footer es React — ver Footer.jsx, que ya filtra Alojamiento/
+    // Viajes según la experiencia y se marca con [data-react-footer]
+    // para que esto no lo toque dos veces ni corra antes de que exista)
     ['servicios.html', 'alojamiento.html', 'viajes.html'].forEach(function (page) {
         document.querySelectorAll('a[href="' + page + '"]').forEach(function (a) {
+            if (a.closest('[data-react-footer]')) return;
             a.style.display = 'none';
         });
     });
