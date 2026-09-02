@@ -3101,7 +3101,15 @@ header.topbar {
 .nights-section {
     background: var(--surface-container-low);
     max-width: 100%;
-    padding: var(--space-16) 0;
+    /* padding-block, no el shorthand `padding`: con `padding: X 0` esta
+       regla y la de `.section` (misma especificidad, 0,1,0) empatan, y
+       gana la que esté más abajo en el archivo — aquí siempre esta,
+       poniendo el eje horizontal a 0 pase lo que pase. padding-block
+       deja el eje horizontal fuera de esta declaración por completo, así
+       que la corrección de `.section`/`.cta-section`/etc. (--bp-lg más
+       abajo) puede aplicar sin que esta regla la pise en 768-1199px
+       (hallazgo B, ver docs/mobile-audit.md fila 22). */
+    padding-block: var(--space-16);
 }
 
 .nights-header {
