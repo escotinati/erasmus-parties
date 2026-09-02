@@ -145,4 +145,14 @@ Casos donde forzar la migración cambiaría el aspecto en algún ancho real, por
 5. **Resto de bloques a 767/768px sin pareja obvia** (filas 1, 4, 6, 10, 18, 20, 21) — cada uno migra a `--bp-md`(900) individualmente, cambiando el comportamiento en el rango 768-899px para ese selector concreto. Ninguno es tan grave como el 1024 o los grupos de arriba, pero son 7 cambios de comportamiento reales, no cosméticos.
 6. **Alturas de header no unificables en un solo token** (sección b) — `--header-h: 73px` cubre bien `header.topbar` en escritorio, pero no `.topnav`(80px, protegido porque lo usa el scroll-scrub) ni `header.topbar` en móvil (65px/64px).
 
-De los 27 `@media`, **11 migran limpio** (filas 5, 7, 12, 15, 16, 17, 19, 23, 25, 26, 27). Las otras **16** (filas 1, 2, 3, 4, 6, 8, 9, 10, 11, 13, 14, 18, 20, 21, 22, 24) necesitan tu decisión sobre si aceptar el cambio de rango o dejarlas como excepción documentada.
+De los 27 `@media`, **11 migran limpio** (filas 5, 7, 12, 15, 16, 17, 19, 23, 25, 26, 27). Las otras **16** (filas 1, 2, 3, 4, 6, 8, 9, 10, 11, 13, 14, 18, 20, 21, 22, 24) necesitaban decisión sobre si aceptar el cambio de rango o dejarlas como excepción documentada.
+
+## Decisión final (post paso 0)
+
+- **Grupo swap nav (filas 2, 3, 24)** → **migrar a `--bp-md` (900)**. Se acepta que tablets 769-899px vean el bottom-nav de móvil en vez del menú de escritorio.
+- **Grupo `.events-scroll` (filas 10, 11, 13, 14)** → **migrar a `--bp-md` (900)**. Se acepta que tablets 769-899px vean el carrusel horizontal en vez del grid de eventos.
+- **`max-width: 1024px` (fila 22, línea 4093)** → **migrar a `--bp-lg` (1200)**. Se acepta que el rango 1024-1199px pierda el padding-mobile que tiene hoy (pasa a padding de escritorio antes de lo que debería).
+- **Resto de sueltos a 767/768px (filas 1, 4, 6, 18, 20, 21)** → **migrar a `--bp-md` (900)**, mismo criterio que los grupos de arriba. Se acepta el cambio de comportamiento en el rango 768-899px para cada selector.
+- **Scroll-scrub + su pareja de stacking (filas 8, 9, línea 2567/2880)** → **excepción, no se tocan**. Confirmado desde el encargo original.
+
+Resultado: de los 27 `@media`, **25 pasan al sistema mobile-first de tres cortes** (11 ya exactos + 14 migrados por decisión) y **2 quedan como excepción documentada** (el par del scroll-scrub) — el balance que se buscaba desde el principio ("3 breakpoints limpios + excepciones documentadas, no regresiones invisibles").
