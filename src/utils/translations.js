@@ -25,11 +25,9 @@ window.I18n.translations = {
             back: 'Volver',
             back_arrow: '← Volver',
             back_home_arrow: '← Inicio',
-            back_to_home: 'Volver al inicio',
             back_to_home_arrow: '← Volver al inicio',
         },
         common: {
-            loading: 'Cargando…',
             check_back_soon: 'Vuelve pronto.',
             collaborate_with_us: 'Colabora con nosotros',
             contact_cta: 'Contactar',
@@ -125,12 +123,6 @@ window.I18n.translations = {
             view_event_cta: 'Ver evento',
         },
         cities: {
-            select_city_title: 'Selecciona tu ciudad',
-            hero_subtitle: 'Elige tu ciudad y únete a la comunidad Erasmus local',
-            back_to_countries: 'Todos los países',
-            back_to_countries_arrow: '← Volver a países',
-            active_groups_tag: 'Grupos activos',
-            count_available_suffix: 'ciudades disponibles',
             count_suffix_plural: 'ciudades',
             count_suffix_singular: 'ciudad',
             all_eyebrow: 'Destinos Erasmus+',
@@ -180,7 +172,6 @@ window.I18n.translations = {
         errors: {
             city_not_found_title: 'Ciudad no encontrada',
             city_not_found_body: 'Vuelve al inicio y selecciona tu destino.',
-            country_not_found: 'País no encontrado.',
         },
         accommodation: {
             eyebrow: 'Alojamiento verificado',
@@ -264,11 +255,9 @@ window.I18n.translations = {
             back: 'Back',
             back_arrow: '← Back',
             back_home_arrow: '← Home',
-            back_to_home: 'Back to home',
             back_to_home_arrow: '← Back to home',
         },
         common: {
-            loading: 'Loading…',
             check_back_soon: 'Check back soon.',
             collaborate_with_us: 'Partner with us',
             contact_cta: 'Contact us',
@@ -363,12 +352,6 @@ window.I18n.translations = {
             view_event_cta: 'View event',
         },
         cities: {
-            select_city_title: 'Select your city',
-            hero_subtitle: 'Choose your city and join the local Erasmus community',
-            back_to_countries: 'All countries',
-            back_to_countries_arrow: '← Back to countries',
-            active_groups_tag: 'Active groups',
-            count_available_suffix: 'cities available',
             count_suffix_plural: 'cities',
             count_suffix_singular: 'city',
             all_eyebrow: 'Erasmus+ Destinations',
@@ -418,7 +401,6 @@ window.I18n.translations = {
         errors: {
             city_not_found_title: 'City not found',
             city_not_found_body: 'Go back home and select your destination.',
-            country_not_found: 'Country not found.',
         },
         accommodation: {
             eyebrow: 'Verified accommodation',

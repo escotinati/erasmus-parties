@@ -39,7 +39,6 @@ export default defineConfig(({ mode }) => {
                 input: {
                     index: resolve(__dirname, 'index.html'),
                     ciudad: resolve(__dirname, 'ciudad.html'),
-                    ciudades: resolve(__dirname, 'ciudades.html'),
                     ciudadesTodas: resolve(__dirname, 'ciudades-todas.html'),
                     mapa: resolve(__dirname, 'mapa.html'),
                     alojamiento: resolve(__dirname, 'alojamiento.html'),

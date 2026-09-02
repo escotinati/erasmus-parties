@@ -77,7 +77,7 @@
     --margin-desktop: 64px;
     --margin-mobile: 20px;
     --container-max: 1280px;
-    /* Legacy aliases para ciudades.html / ciudad.html */
+    /* Legacy aliases */
     --bg: var(--background);
     --text: var(--on-surface);
     --text-muted: var(--on-surface-variant);
@@ -386,30 +386,6 @@ a.btn-primary-pill {
     flex-shrink: 0;
 }
 
-.card-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #00e5a0;
-    background: rgba(0, 229, 160, 0.12);
-    border: 1px solid rgba(0, 229, 160, 0.22);
-    padding: 3px 8px;
-    border-radius: var(--radius-full);
-}
-
-.card-tag::before {
-    content: '';
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: currentColor;
-    flex-shrink: 0;
-}
-
 /* ── 2.3 Cards ──────────────────────────────────────────────── */
 
 /* Service card — compartida por index.html y servicios.html */
@@ -577,7 +553,7 @@ a.btn-primary-pill {
     width: 100%;
 }
 
-/* Country / city cards — ciudades.html */
+/* Country / city cards — ciudades-todas.html */
 
 /* Selector con tag (a.city-card) a propósito: sube la especificidad por
    encima de .anim-fade-up (animations.css, cargado después de este archivo)
@@ -1531,52 +1507,6 @@ header.topbar {
     }
 }
 
-/* ciudades.html — topbar sobre imagen hero-legacy
-   (.logo y .topbar-nav a usan colores oscuros → se sobreescriben con
-   blanco para mantener legibilidad sobre la foto oscurecida) */
-
-.hero-legacy .logo {
-    color: rgba(255, 255, 255, 0.95);
-}
-
-.hero-legacy .logo-dot {
-    color: #e1147b; /* acento cálido, visible sobre imagen oscura */
-}
-
-.hero-legacy .topbar-nav a {
-    color: rgba(255, 255, 255, 0.75);
-}
-
-.hero-legacy .topbar-nav a:hover {
-    color: #fff;
-}
-
-.hero-legacy .topbar-nav a.is-active {
-    color: #fff;
-}
-
-.hero-legacy .topbar-nav a.nav-parties {
-    color: #e1147b;
-}
-
-.hero-legacy .topbar-nav a.nav-parties:hover {
-    color: #ff3d9a;
-}
-
-/* Líneas del hamburger → blancas sobre la imagen (móvil) */
-.hero-legacy .hamburger-btn span {
-    background: #fff;
-}
-
-/* Icono de cuenta → mismo tratamiento que .back-btn sobre la foto */
-.hero-legacy .icon-btn {
-    color: rgba(255, 255, 255, 0.85);
-}
-
-.hero-legacy .icon-btn:hover {
-    color: #fff;
-}
-
 /* ── 3.2 Footer ───────────────────────────────────────────────
    Rediseñada para hablar el mismo idioma visual que el resto de la
    página en vez de los tokens legacy de tokens.css (--space-*,
@@ -1803,118 +1733,6 @@ header.topbar {
     margin: 0 auto 48px;
 }
 
-/* Hero legacy — ciudades.html (foto de portada de país) */
-
-.hero-legacy {
-    position: relative;
-    width: 100%;
-    min-height: 380px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 0 0 48px;
-    overflow: hidden;
-}
-
-.hero-bg-img {
-    position: absolute;
-    inset: 0;
-    background-size: cover;
-    background-position: center 40%;
-    filter: brightness(0.5);
-}
-
-.hero-bg-img::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to bottom,
-        rgba(250, 248, 255, 0.3) 0%,
-        rgba(250, 248, 255, 0.1) 40%,
-        rgba(19, 27, 46, 0.85) 75%,
-        rgba(19, 27, 46, 1) 100%
-    );
-}
-
-.hero-content-legacy {
-    position: relative;
-    z-index: 2;
-    padding: 0 var(--margin-desktop);
-}
-
-.hero-breadcrumb-legacy {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--secondary);
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.hero-breadcrumb-legacy a {
-    color: rgba(255, 255, 255, 0.65);
-    text-decoration: none;
-    transition: color 0.15s;
-}
-
-.hero-breadcrumb-legacy a:hover {
-    color: #fff;
-}
-
-.hero-breadcrumb-legacy .sep {
-    opacity: 0.4;
-}
-
-.hero-h1-legacy {
-    font-family: var(--font-display);
-    font-size: clamp(28px, 5vw, 48px);
-    font-weight: 800;
-    letter-spacing: -1.5px;
-    line-height: 1.1;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 12px;
-}
-
-.hero-flag-legacy {
-    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-}
-
-.hero-sub-legacy {
-    font-size: 16px;
-    color: rgba(255, 255, 255, 0.75);
-    max-width: 440px;
-    line-height: 1.6;
-}
-
-/* Topbar heredado — sobre foto hero (ciudades.html) */
-
-.hero-legacy .topbar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 24px var(--margin-desktop);
-}
-
-/* Back button sobre foto */
-
-.hero-legacy .back-btn {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: #fff;
-}
-
-.hero-legacy .back-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
 /* Stats del hero legacy */
 
 .hero-stats {
@@ -1966,42 +1784,13 @@ header.topbar {
     margin-bottom: 64px;
 }
 
-/* Section header heredado — ciudades.html */
-
-.section-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    padding: 48px var(--margin-desktop) 24px;
-}
-
-.section-count {
-    font-size: 13px;
-    color: var(--on-surface-variant);
-}
-
-/* Grids de países y ciudades — ciudades.html */
+/* Grid de países */
 
 .countries-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
     padding: 0 var(--margin-desktop) 80px;
-}
-
-.cities-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    padding: 0 var(--margin-desktop) 80px;
-}
-
-.cities-grid.cols-3 {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-.cities-grid.cols-2 {
-    grid-template-columns: repeat(2, 1fr);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -4101,14 +3890,8 @@ body.alojamiento-page {
         padding-left: var(--margin-mobile);
         padding-right: var(--margin-mobile);
     }
-    .hero-content-legacy,
-    .section-header,
-    .hero-stats {
-        padding-left: var(--margin-mobile);
-        padding-right: var(--margin-mobile);
-    }
-    .countries-grid,
-    .cities-grid {
+    .hero-stats,
+    .countries-grid {
         padding-left: var(--margin-mobile);
         padding-right: var(--margin-mobile);
     }
@@ -4122,9 +3905,6 @@ body.alojamiento-page {
 
 @media (max-width: 900px) {
     .countries-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    .cities-grid {
         grid-template-columns: repeat(3, 1fr);
     }
 }
@@ -4162,9 +3942,6 @@ body.alojamiento-page {
     .cta-avatars {
         display: none;
     }
-    .hero-legacy .topbar {
-        padding: 18px var(--margin-mobile);
-    }
     header.topbar {
         padding: 16px var(--margin-mobile);
     }
@@ -4180,12 +3957,6 @@ body.alojamiento-page {
     .countries-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
-    }
-    .cities-grid,
-    .cities-grid.cols-3,
-    .cities-grid.cols-2 {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
     }
     .hero {
         min-height: 100svh;

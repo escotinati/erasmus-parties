@@ -117,16 +117,16 @@
                 border-bottom: 1px solid var(--outline-variant);
             }
 
-            /* Las cards en sí (.city-card, foto + bandera + nombre + país)
-               son el mismo componente que usa ciudades.html — toda su
-               regla vive en styles.css (a.country-card, a.city-card), no
-               se redefine aquí salvo el hover de la imagen (abajo): en
-               vez del zoom+oscurecido de siempre, foto en blanco y negro
-               en reposo que pasa a color al hacer hover — más propio de
-               un directorio (elegir entre muchas) que del efecto original
-               (pensado para una sola card protagonista). Selector
-               scopeado a .city-items-grid para no tocar ciudades.html,
-               que sigue con el hover de siempre. */
+            /* Las cards en sí (.city-card, foto + nombre + país) son el
+               componente compartido de ciudad (a.country-card,
+               a.city-card en styles.css), no se redefine aquí salvo el
+               hover de la imagen (abajo): en vez del zoom+oscurecido de
+               siempre, foto en blanco y negro en reposo que pasa a color
+               al hacer hover — más propio de un directorio (elegir entre
+               muchas) que del efecto original (pensado para una sola
+               card protagonista). Selector scopeado a .city-items-grid
+               por si en el futuro otra página reutiliza el componente
+               con su hover original. */
             .city-items-grid .card-img {
                 filter: grayscale(100%) brightness(0.85);
                 transition: filter var(--anim-duration-base) var(--anim-easing-standard);
@@ -155,9 +155,9 @@
                 border-color: var(--outline-variant);
             }
 
-            /* Solo el grid que las contiene es propio de esta página:
-               auto-fill en vez de las 4 columnas fijas de ciudades.html,
-               porque aquí cada letra puede tener 1 ciudad o 50. */
+            /* El grid que las contiene es propio de esta página: usa
+               auto-fill en vez de columnas fijas, porque aquí cada letra
+               puede tener 1 ciudad o 50. */
             .city-items-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -204,8 +204,7 @@
             /* auto-fill con minmax(170px, 1fr) ya se adapta solo casi
                siempre, pero en torno a 380-430px de ancho el hueco
                disponible cae justo por debajo de 2×170px+gap y colapsa a
-               1 columna — demasiado grande. Fuerza 2 en ese rango,
-               mismo criterio que .cities-grid.cols-2 en ciudades.html. */
+               1 columna — demasiado grande. Fuerza 2 en ese rango. */
             @media (max-width: 600px) {
                 .city-items-grid {
                     grid-template-columns: repeat(2, 1fr);

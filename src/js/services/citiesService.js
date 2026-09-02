@@ -40,7 +40,7 @@ async function fetchCityById(cityId) {
 
 // Devuelve TODAS las ciudades, activas e inactivas — sin filtro de
 // active. La usa tanto el admin (populateCitySelect) como el
-// directorio completo de ciudades.js/ciudades-todas.html, que
+// directorio completo de ciudades-todas.html, que
 // necesitan ver también las ciudades sin grupo activo todavía.
 // Cada consumidor reordena/agrupa en cliente según lo que necesite
 // (por país, alfabético...), así que el ORDER BY de aquí no se toca.

@@ -1,7 +1,6 @@
 // ─────────────────────────────────────────────────────────────
-//  navShared.jsx — piezas comunes a los tres patrones de header
-//  (rama react/menu): .topnav (Nav.jsx), header.topbar y
-//  .hero-legacy .topbar (ambos en TopbarNav.jsx).
+//  navShared.jsx — piezas comunes a los dos patrones de header
+//  (rama react/menu): .topnav (Nav.jsx) y header.topbar (TopbarNav.jsx).
 //
 //  Mismas reglas que Nav.jsx (ver el comentario largo de ese archivo
 //  para el porqué): nada de esto depende de scripts externos

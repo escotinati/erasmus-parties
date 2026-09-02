@@ -5,9 +5,9 @@
 //  <script> clásicos, ver CLAUDE.md). Antes este bloque estaba
 //  duplicado byte a byte en cada página con el patrón .topnav
 //  (index.html, ciudades-todas.html) — ahora vive aquí una sola vez.
-//  Los otros dos patrones de header (header.topbar y
-//  .hero-legacy .topbar) viven en TopbarNav.jsx; ambos comparten los
-//  links/lang-switcher/hamburguesa/overlay móvil vía navShared.jsx.
+//  El otro patrón de header (header.topbar) vive en TopbarNav.jsx;
+//  ambos comparten los links/lang-switcher/hamburguesa/overlay móvil
+//  vía navShared.jsx.
 //
 //  Regla general de estos componentes, aprendida a base de bugs
 //  reales: NINGÚN script externo enganchado a DOMContentLoaded puede

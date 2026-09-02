@@ -13,8 +13,8 @@ La misma web sirve **dos marcas** desde un solo código: "Erasmus Verified" (la 
 **Stack**: HTML + CSS + JS vanilla (sin ES Modules, todo con `<script>` clásicos y funciones/objetos globales), más:
 
 - **Vite** como build tool — ya no se abre `index.html` directamente, se usa `npm run dev` para desarrollar y `npm run build` para generar la carpeta `dist/` que se despliega.
-- **Supabase** como backend — base de datos (Postgres) + login de administrador. Sustituye poco a poco a los datos estáticos de `data.js` (ver sección de Backend).
-- **React** (`src/react/*`, vía `@vitejs/plugin-react`) — **única excepción** a "sin ES Modules": el menú compartido de las 8 páginas públicas está montado como isla de React dentro de HTML/scripts clásicos. Ver [Navegación](#navegación) para el detalle completo; no se ha migrado nada más del proyecto a React, es deliberadamente una pieza aislada.
+- **Supabase** como backend — base de datos (Postgres) + login de administrador (ver sección de Backend).
+- **React** (`src/react/*`, vía `@vitejs/plugin-react`) — **única excepción** a "sin ES Modules": el menú compartido de las 7 páginas públicas está montado como isla de React dentro de HTML/scripts clásicos. Ver [Navegación](#navegación) para el detalle completo; no se ha migrado nada más del proyecto a React, es deliberadamente una pieza aislada.
 
 **Herramientas de desarrollo**: Prettier instalado como devDependency (`npm install` para instalar). Configuración en `.prettierrc`: 4 espacios, comillas simples, semi. Un hook de Claude Code formatea automáticamente JS/CSS/HTML tras cada edición — no hace falta ejecutarlo manualmente.
 
@@ -33,21 +33,19 @@ Todo el JS de páginas y módulos compartidos vive ahora en `src/js/` (antes era
 
 ### Páginas y sus scripts
 
-| Página                | Script               | Propósito                                                                                                              |
-| --------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `index.html`          | `src/js/index.js`    | Autocomplete de búsqueda, hero con stats animadas, accordion grid de ciudades (con efecto pin & scrub al hacer scroll) |
-| `ciudades-todas.html` | inline               | Listado completo de ciudades con filtro alfabético                                                                     |
-| `ciudades.html`       | `src/js/ciudades.js` | Grid de ciudades de un país (hero con foto)                                                                            |
-| `ciudad.html`         | `src/js/ciudad.js`   | Detalle de ciudad, botones WhatsApp/Telegram, mapa embebido                                                            |
-| `mapa.html`           | `src/js/mapa.js`     | Mapa a pantalla completa con lista de partners                                                                         |
-| `alojamiento.html`    | inline               | Página de alojamiento para estudiantes Erasmus                                                                         |
-| `servicios.html`      | inline               | Servicios verificados: SIM, banca, transporte                                                                          |
-| `viajes.html`         | inline               | Viajes en grupo para estudiantes Erasmus                                                                               |
-| `admin/index.html`    | `src/js/admin.js`    | Panel de administración (login + gestión de ciudades/partners) — ver sección propia                                    |
+| Página                | Script             | Propósito                                                                                                              |
+| --------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `index.html`          | `src/js/index.js`  | Autocomplete de búsqueda, hero con stats animadas, accordion grid de ciudades (con efecto pin & scrub al hacer scroll) |
+| `ciudades-todas.html` | inline             | Listado completo de ciudades con buscador                                                                              |
+| `ciudad.html`         | `src/js/ciudad.js` | Detalle de ciudad, botones WhatsApp/Telegram, mapa embebido                                                            |
+| `mapa.html`           | `src/js/mapa.js`   | Mapa a pantalla completa con lista de partners                                                                         |
+| `alojamiento.html`    | inline             | Página de alojamiento para estudiantes Erasmus                                                                         |
+| `servicios.html`      | inline             | Servicios verificados: SIM, banca, transporte                                                                          |
+| `viajes.html`         | inline             | Viajes en grupo para estudiantes Erasmus                                                                               |
+| `admin/index.html`    | `src/js/admin.js`  | Panel de administración (login + gestión de ciudades/partners) — ver sección propia                                    |
 
 ### Módulos compartidos (cargados donde se necesitan)
 
-- `src/js/data.js` — objeto global `COUNTRIES` con todos los países y ciudades. **En proceso de sustitución por Supabase**: hoy solo lo usan `ciudades.js` y el inline de `ciudades-todas.html` (el listado completo por país). El resto de páginas (home, ciudad, mapa, admin) ya piden los datos a Supabase.
 - `src/js/lib/supabaseClient.js` — crea `window.supabaseClient`, el cliente de Supabase que usan todos los demás scripts para hablar con la base de datos.
 - `src/js/services/citiesService.js` — funciones `fetchActiveCities()`, `fetchCityById(id)`, `fetchAllCities()` para leer ciudades desde Supabase.
 - `src/js/services/partnersService.js` — función `fetchPartnersByCity(cityId)` (trae partners + sus links) y `groupPartnersByCategory(partners)`.
@@ -61,7 +59,7 @@ Todo el JS de páginas y módulos compartidos vive ahora en `src/js/` (antes era
 
 ## Backend (Supabase)
 
-La base de datos y el panel de administración viven en un proyecto de Supabase (Postgres + Auth). Las ciudades y partners nuevos ya **no se añaden editando código** — se hace desde el panel de administración en `/admin` (ver sección siguiente). Editar `data.js` a mano solo tiene sentido para las páginas que todavía no están migradas.
+La base de datos y el panel de administración viven en un proyecto de Supabase (Postgres + Auth). Las ciudades y partners nuevos ya **no se añaden editando código** — se hace desde el panel de administración en `/admin` (ver sección siguiente).
 
 ### Tablas principales
 
@@ -109,14 +107,6 @@ En la experiencia "Parties" además se ocultan los enlaces a Servicios/Alojamien
 
 Usar el panel de administración en `/admin` (ver sección de arriba). Es la forma recomendada: los datos quedan en Supabase y aparecen automáticamente en home, ciudad y mapa.
 
-### Nueva ciudad o país (páginas todavía no migradas)
-
-Para `ciudades.html` y `ciudades-todas.html`, que aún leen de `data.js`:
-
-1. En `src/js/data.js`, añadir al objeto `COUNTRIES` siguiendo el patrón: `{ flag, heroImg, cardImg, cities: [{ name, img }] }`. Las imágenes son URLs de Unsplash.
-2. En `ciudad.html`, añadir la ciudad al objeto `links` al inicio del script inline: `"Nombre Ciudad": { wa: "url_o_null", tg: "url_o_null" }`.
-3. Si ambos son `null`, aparece automáticamente el mensaje "Próximamente".
-
 ## Mapa interactivo
 
 ### `mountCityMap(containerId, { pais, ciudad, interactive })`
@@ -146,23 +136,21 @@ CARTO Light (`light_all`) vía CDN. La atribución a OpenStreetMap + CARTO es **
 
 ## Navegación
 
-El menú de las 8 páginas públicas (todo salvo `/admin`) es **React** (`src/react/Nav.jsx` / `TopbarNav.jsx`, ver más abajo) — antes era HTML duplicado byte a byte en cada página, ahora vive en un único sitio. Sigue habiendo tres estilos visuales de header según la página (heredados del diseño previo a la migración), pero los tres los renderiza el mismo par de componentes.
+El menú de las 7 páginas públicas (todo salvo `/admin`) es **React** (`src/react/Nav.jsx` / `TopbarNav.jsx`, ver más abajo) — antes era HTML duplicado byte a byte en cada página, ahora vive en un único sitio. Sigue habiendo dos estilos visuales de header según la página (heredados del diseño previo a la migración), pero los dos los renderiza el mismo par de componentes.
 
 ### Patrones de header y qué los monta
 
-| Patrón CSS             | Páginas                                                                         | Componente                                   | Script de montaje           |
-| ---------------------- | ------------------------------------------------------------------------------- | -------------------------------------------- | --------------------------- |
-| `.topnav`              | `index.html`, `ciudades-todas.html`                                             | `Nav.jsx`                                    | `mount-nav.jsx`             |
-| `header.topbar`        | `ciudad.html`, `mapa.html`, `servicios.html`, `viajes.html`, `alojamiento.html` | `TopbarNav.jsx` (`as="header"`, por defecto) | `mount-topbar-nav.jsx`      |
-| `.hero-legacy .topbar` | `ciudades.html`                                                                 | `TopbarNav.jsx` (`as="div"`)                 | `mount-hero-legacy-nav.jsx` |
+| Patrón CSS      | Páginas                                                                         | Componente      | Script de montaje      |
+| --------------- | ------------------------------------------------------------------------------- | --------------- | ---------------------- |
+| `.topnav`       | `index.html`, `ciudades-todas.html`                                             | `Nav.jsx`       | `mount-nav.jsx`        |
+| `header.topbar` | `ciudad.html`, `mapa.html`, `servicios.html`, `viajes.html`, `alojamiento.html` | `TopbarNav.jsx` | `mount-topbar-nav.jsx` |
 
 Cada página tiene un `<div id="nav-root"></div>` seguido de `<script type="module" src="/src/react/mount-*.jsx">` en el sitio donde antes iba el header estático — Vite descubre esos scripts automáticamente por estar referenciados desde un HTML ya registrado en `vite.config.js`, no hace falta añadirlos a mano. `Nav.jsx` incluye además el icono de cuenta (`#authBtn`, placeholder sin login todavía) y `TopbarNav.jsx` acepta un prop `backLink` opcional:
 
 - `ciudad.html` / `mapa.html`: llevan botón de "volver", configurado justo antes del `<script type="module">` con una línea `window.__BACK_LINK__ = { i18nKey, label, href }` — sus propios scripts (`ciudad.js`/`mapa.js`) sobreescriben `href`/texto tras cargar datos de Supabase.
-- `ciudades.html`: el back-link va hardcodeado en `mount-hero-legacy-nav.jsx` (siempre "Todos los países" → `index.html`, nunca cambia).
 - El resto de páginas del patrón `header.topbar` no pasan `backLink` y `TopbarNav.jsx` no lo renderiza.
 
-Visualmente los tres patrones están **unificados**: mismo truco de grid de 3 columnas (`1fr auto 1fr`) que centra los links en todo el ancho de la barra, mismo icono de cuenta, y el mismo subrayado degradado en hover/foco (antes solo existía en `index.html`, escapado bajo `body.home-page`; ahora vive bajo los selectores `.topnav`/`.topbar` directamente en `styles.css`, así que aplica a las 8 páginas).
+Visualmente los dos patrones están **unificados**: mismo truco de grid de 3 columnas (`1fr auto 1fr`) que centra los links en todo el ancho de la barra, mismo icono de cuenta, y el mismo subrayado degradado en hover/foco (antes solo existía en `index.html`, escapado bajo `body.home-page`; ahora vive bajo los selectores `.topnav`/`.topbar` directamente en `styles.css`, así que aplica a las 7 páginas).
 
 `.mobile-nav` (el overlay del menú móvil) y el toggle de la hamburguesa también los renderiza React (`MobileNavOverlay` en `navShared.jsx`) — no queda ningún bloque `<div class="mobile-nav">` estático en el HTML. En móvil el hamburguesa queda oculto por CSS (`display: none` — la navegación la gestiona el bottom-nav), así que en la práctica solo se ve en desktop.
 
@@ -219,7 +207,7 @@ El archivo está dividido en 10 secciones numeradas. Con Vite ya en marcha, sepa
 | 4   | Index.html           | Accordion grid de ciudades, nights section, services section, CTA                                                                                                                     |
 | 5   | Ciudades-todas.html  | _(vacío — estilos del hero en `<style>` inline de la página)_                                                                                                                         |
 | 6   | Ciudad.html          | Layout de ciudad, mapa embebido, partners list                                                                                                                                        |
-| 7   | Mapa.html            | `.map-page-main`, `.map-canvas`, `.erasmus-pin__dot`, map-with-list                                                                                                                   |
+| 7   | Mapa.html            | `.map-page-main`, `.map-canvas`, `.erasmus-pin__icon`, map-with-list                                                                                                                  |
 | 8   | Servicios.html       | `body.servicios-page` (gradiente), `.servicios-category`, `.services-grid--2col`                                                                                                      |
 | 9   | Viajes.html          | `.event-badge--partner`, `body.viajes-page .event-price`                                                                                                                              |
 | 10  | Responsive           | Media queries globales que afectan a múltiples secciones                                                                                                                              |

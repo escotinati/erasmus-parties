@@ -62,9 +62,9 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.setAttribute('data-brand', 'parties');
     }
 
-    // Navbar scroll shadow para el patrón header.topbar / .hero-legacy .topbar
-    // (ciudad.html, mapa.html, servicios.html, viajes.html, alojamiento.html,
-    // ciudades.html): ahora vive dentro de TopbarNav.jsx (rama react/menu),
+    // Navbar scroll shadow para el patrón header.topbar (ciudad.html,
+    // mapa.html, servicios.html, viajes.html, alojamiento.html): ahora
+    // vive dentro de TopbarNav.jsx (rama react/menu),
     // igual que en Nav.jsx para el patrón .topnav — un querySelector aquí en
     // DOMContentLoaded podía disparar antes de que React montara el nodo
     // (se comprobó, fallaba 100% de las veces en local).

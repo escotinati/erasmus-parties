@@ -1,26 +1,19 @@
 // ─────────────────────────────────────────────────────────────
-//  TopbarNav.jsx — patrones header.topbar y .hero-legacy .topbar
-//  (rama react/menu)
+//  TopbarNav.jsx — patrón header.topbar (rama react/menu)
 //
-//  Cubre las 6 páginas que quedaban con el header duplicado en HTML
-//  estático: ciudad.html, mapa.html, servicios.html, viajes.html,
-//  alojamiento.html (header.topbar) y ciudades.html
-//  (.hero-legacy .topbar). logo/topbar-nav/topbar-right son siempre
-//  hijos DIRECTOS de .topbar (nunca envueltos en un .topbar-left) —
-//  .topbar usa el mismo truco de grid de 3 columnas que .topnav-inner
-//  (ver styles.css) para centrar los links en todo el ancho de la
-//  barra, igual que en index.html/ciudades-todas.html.
-//
-//  `as`: 'header' (por defecto) para el patrón normal, o 'div' para
-//  .hero-legacy, donde el topbar vive dentro de un <section> que ya
-//  hace de contenedor (ver mount-hero-legacy-nav.jsx).
+//  Cubre las 5 páginas con el header duplicado en HTML estático:
+//  ciudad.html, mapa.html, servicios.html, viajes.html,
+//  alojamiento.html. logo/topbar-nav/topbar-right son siempre hijos
+//  DIRECTOS de .topbar (nunca envueltos en un .topbar-left) — .topbar
+//  usa el mismo truco de grid de 3 columnas que .topnav-inner (ver
+//  styles.css) para centrar los links en todo el ancho de la barra,
+//  igual que en index.html/ciudades-todas.html.
 //
 //  `backLink` (opcional): { i18nKey, label, href }. Solo lo llevan
-//  ciudad.html, mapa.html (texto que sus scripts reescriben tras
-//  cargar datos de Supabase, con await de por medio — llega siempre
-//  después de que React haya montado, no hay carrera ahí) y
-//  ciudades.html (estático, nunca se reescribe). El resto de páginas
-//  del patrón header.topbar no lo pasan y no se renderiza.
+//  ciudad.html, mapa.html — sus scripts reescriben el texto tras
+//  cargar datos de Supabase, con await de por medio (llega siempre
+//  después de que React haya montado, no hay carrera ahí). El resto
+//  de páginas no lo pasan y no se renderiza.
 //
 //  Ver Nav.jsx para la explicación larga de por qué este componente
 //  resuelve i18n/lang-switcher/tema Parties él mismo en vez de dejarlo
@@ -43,11 +36,10 @@ import {
     MobileNavOverlay,
 } from './navShared.jsx';
 
-export default function TopbarNav({ as = 'header', backLink }) {
+export default function TopbarNav({ backLink }) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const page = currentPage();
-    const Wrapper = as;
 
     useEffect(() => {
         function onScroll() {
@@ -59,7 +51,7 @@ export default function TopbarNav({ as = 'header', backLink }) {
 
     return (
         <>
-            <Wrapper className={`topbar${scrolled ? ' scrolled' : ''}`} data-react-nav="true">
+            <header className={`topbar${scrolled ? ' scrolled' : ''}`} data-react-nav="true">
                 <a href="index.html" className="logo">
                     Erasmus
                     <span className="logo-dot">
@@ -94,7 +86,7 @@ export default function TopbarNav({ as = 'header', backLink }) {
                         onClick={() => setMobileOpen((open) => !open)}
                     />
                 </div>
-            </Wrapper>
+            </header>
 
             <MobileNavOverlay page={page} open={mobileOpen} onClose={() => setMobileOpen(false)} />
         </>
