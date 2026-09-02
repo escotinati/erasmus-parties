@@ -171,7 +171,7 @@ window.I18n.translations = {
             city_not_located_prefix: 'No hemos podido localizar',
             city_not_located_suffix: 'en este momento.',
             tap_to_interact: 'Toca para interactuar con el mapa',
-            category_nightlife: 'Nightlife',
+            category_nightlife: 'Ocio nocturno',
             category_housing: 'Alojamiento',
             category_services: 'Bar',
             category_community: 'Comunidad',

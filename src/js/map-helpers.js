@@ -58,26 +58,26 @@ function addMarker({ lat, lng }, { label, color = '#4648d4' } = {}) {
  * Las demás categorías quedan definidas para cuando tengan partners reales.
  */
 const CATEGORY_META = {
-    nightlife: { label: 'Nightlife', color: '#2563eb' },
-    housing: { label: 'Alojamiento', color: '#0e7490' },
-    services: { label: 'Bar', color: '#ca8a04' },
-    community: { label: 'Comunidad', color: '#16a34a' },
-    travel: { label: 'Viajes', color: '#7c3aed' },
-    restaurants: { label: 'Restaurantes', color: '#dc2626' },
-    sports: { label: 'Deporte', color: '#ea580c' },
-    culture: { label: 'Cultura', color: '#db2777' },
-    shopping: { label: 'Compras', color: '#9333ea' },
-    wellness: { label: 'Bienestar', color: '#059669' },
-    events: { label: 'Eventos', color: '#d97706' },
-    education: { label: 'Formación', color: '#0284c7' },
-    transport: { label: 'Transporte', color: '#64748b' },
-    food: { label: 'Comida rápida', color: '#f59e0b' },
-    coworking: { label: 'Coworking', color: '#0891b2' },
-    healthcare: { label: 'Salud', color: '#16a34a' },
-    language: { label: 'Idiomas', color: '#7c3aed' },
-    volunteering: { label: 'Voluntariado', color: '#be185d' },
-    music: { label: 'Música', color: '#1d4ed8' },
-    photography: { label: 'Fotografía', color: '#92400e' },
+    nightlife: { label: 'Nightlife', color: '#2563eb', icon: 'nightlife' },
+    housing: { label: 'Alojamiento', color: '#0e7490', icon: 'home' },
+    services: { label: 'Bar', color: '#ca8a04', icon: 'local_bar' },
+    community: { label: 'Comunidad', color: '#16a34a', icon: 'groups' },
+    travel: { label: 'Viajes', color: '#7c3aed', icon: 'flight' },
+    restaurants: { label: 'Restaurantes', color: '#dc2626', icon: 'restaurant' },
+    sports: { label: 'Deporte', color: '#ea580c', icon: 'sports_soccer' },
+    culture: { label: 'Cultura', color: '#db2777', icon: 'theater_comedy' },
+    shopping: { label: 'Compras', color: '#9333ea', icon: 'shopping_bag' },
+    wellness: { label: 'Bienestar', color: '#059669', icon: 'spa' },
+    events: { label: 'Eventos', color: '#d97706', icon: 'event' },
+    education: { label: 'Formación', color: '#0284c7', icon: 'school' },
+    transport: { label: 'Transporte', color: '#64748b', icon: 'directions_bus' },
+    food: { label: 'Comida rápida', color: '#f59e0b', icon: 'fastfood' },
+    coworking: { label: 'Coworking', color: '#0891b2', icon: 'business_center' },
+    healthcare: { label: 'Salud', color: '#16a34a', icon: 'medical_services' },
+    language: { label: 'Idiomas', color: '#7c3aed', icon: 'translate' },
+    volunteering: { label: 'Voluntariado', color: '#be185d', icon: 'volunteer_activism' },
+    music: { label: 'Música', color: '#1d4ed8', icon: 'music_note' },
+    photography: { label: 'Fotografía', color: '#92400e', icon: 'photo_camera' },
 };
 
 /**
@@ -92,7 +92,7 @@ function createPartnerMarker(partner, { expanded = false } = {}) {
 
     const icon = L.divIcon({
         className: 'partner-pin' + (expanded ? ' partner-pin--expanded' : ''),
-        html: `<span class="partner-pin__dot" style="--pin-color:${meta.color}"></span>`,
+        html: `<span class="material-symbols-outlined partner-pin__icon" style="--pin-color:${meta.color};font-size:${size}px">location_on</span>`,
         iconSize: [size, size],
         iconAnchor: [size / 2, size],
     });
@@ -111,7 +111,7 @@ function setMarkerExpanded(marker, partner, expanded) {
     marker.setIcon(
         L.divIcon({
             className: 'partner-pin' + (expanded ? ' partner-pin--expanded' : ''),
-            html: `<span class="partner-pin__dot" style="--pin-color:${meta.color}"></span>`,
+            html: `<span class="material-symbols-outlined partner-pin__icon" style="--pin-color:${meta.color};font-size:${size}px">location_on</span>`,
             iconSize: [size, size],
             iconAnchor: [size / 2, size],
         })

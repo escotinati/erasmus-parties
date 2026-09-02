@@ -67,7 +67,11 @@ async function mountPartnersList(listContainerId, map, cityId, defaultCategory =
     function renderList() {
         container.innerHTML = '';
         for (const { category, partners } of groups) {
-            const meta = CATEGORY_META[category] || { label: category, color: '#64748b' };
+            const meta = CATEGORY_META[category] || {
+                label: category,
+                color: '#64748b',
+                icon: 'place',
+            };
             const label = categoryLabel(category, meta.label);
             const isExpanded = state.expandedCategory === category;
             const isEmpty = partners.length === 0;
@@ -79,7 +83,7 @@ async function mountPartnersList(listContainerId, map, cityId, defaultCategory =
                 (isExpanded ? ' is-expanded' : '') +
                 (isEmpty ? ' is-empty' : '');
             categoryBtn.innerHTML = `
-      <span class="category-toggle__dot" style="--pin-color:${meta.color}"></span>
+      <span class="material-symbols-outlined category-toggle__icon" style="--pin-color:${meta.color}">${meta.icon}</span>
       <span class="category-toggle__label">${label}</span>
     `;
             categoryBtn.addEventListener('click', () => toggleCategory(category));
