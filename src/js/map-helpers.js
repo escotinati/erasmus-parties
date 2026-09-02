@@ -20,10 +20,16 @@ let map = null;
 function initMap(containerId, center, zoom = 14) {
     map = L.map(containerId, { center: [center.lat, center.lng], zoom });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        maxZoom: 19,
-    }).addTo(map);
+    const cartoKey = window.__CARTO_API_KEY__ || '';
+    L.tileLayer(
+        `https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png?key=${cartoKey}`,
+        {
+            attribution:
+                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19,
+        }
+    ).addTo(map);
 
     return map;
 }
@@ -37,16 +43,15 @@ function initMap(containerId, center, zoom = 14) {
 function addMarker({ lat, lng }, { label, color = '#4648d4' } = {}) {
     const icon = L.divIcon({
         className: 'erasmus-pin',
-        html: `<span class="erasmus-pin__dot" style="--pin-color:${color}"></span>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 24], // la punta del pin marca la coordenada exacta
+        html: `<span class="material-symbols-outlined erasmus-pin__icon" style="--pin-color:${color}">location_on</span>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 32], // la punta del pin marca la coordenada exacta
     });
 
     const marker = L.marker([lat, lng], { icon, title: label || '' });
     marker.addTo(map);
     return marker;
 }
-
 
 /**
  * Metadatos visuales por categoría. nightlife en azul, según lo acordado.
@@ -103,10 +108,12 @@ function setMarkerExpanded(marker, partner, expanded) {
     const meta = CATEGORY_META[partner.category] || { color: '#64748b' };
     const size = expanded ? 34 : 24;
 
-    marker.setIcon(L.divIcon({
-        className: 'partner-pin' + (expanded ? ' partner-pin--expanded' : ''),
-        html: `<span class="partner-pin__dot" style="--pin-color:${meta.color}"></span>`,
-        iconSize: [size, size],
-        iconAnchor: [size / 2, size],
-    }));
+    marker.setIcon(
+        L.divIcon({
+            className: 'partner-pin' + (expanded ? ' partner-pin--expanded' : ''),
+            html: `<span class="partner-pin__dot" style="--pin-color:${meta.color}"></span>`,
+            iconSize: [size, size],
+            iconAnchor: [size / 2, size],
+        })
+    );
 }

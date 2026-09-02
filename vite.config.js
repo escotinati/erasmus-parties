@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
     const supabaseUrl = JSON.stringify(env.VITE_SUPABASE_URL || '');
     const supabaseKey = JSON.stringify(env.VITE_SUPABASE_ANON_KEY || '');
+    const cartoApiKey = JSON.stringify(env.VITE_CARTO_API_KEY || '');
 
     return {
         plugins: [
@@ -16,7 +17,7 @@ export default defineConfig(({ mode }) => {
                 transformIndexHtml(html) {
                     return html.replace(
                         '<head>',
-                        `<head>\n    <script>window.__SUPABASE_URL__=${supabaseUrl};window.__SUPABASE_KEY__=${supabaseKey};</script>`
+                        `<head>\n    <script>window.__SUPABASE_URL__=${supabaseUrl};window.__SUPABASE_KEY__=${supabaseKey};window.__CARTO_API_KEY__=${cartoApiKey};</script>`
                     );
                 },
             },
