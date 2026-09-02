@@ -784,11 +784,13 @@ a.city-card {
     border: none;
     outline: none;
     font-family: var(--font-body);
-    /* Mobile-first: valores móviles por defecto, revierten en --bp-sm.
-       padding-right deja hueco para el botón flotante en móvil
-       (círculo de 36px + 10px de aire, ver .search-bar-btn). 16px de
-       mínimo (no 15px) a propósito: por debajo, iOS Safari hace zoom
-       automático al enfocar el campo y descoloca el layout. */
+    /* Mobile-first: padding-right móvil por defecto (deja hueco para
+       el botón flotante — círculo de 36px + 10px de aire, ver
+       .search-bar-btn), revierte en --bp-sm. font-size: main usa dos
+       niveles (18px desktop / 15px móvil, ver max-width original) —
+       15px no cumplía font-size>=16 (evita el zoom de iOS Safari al
+       enfocar), así que el nivel móvil sube al mínimo que sí cumple
+       (16px) y el nivel --bp-sm recupera el 18px de main sin cambios. */
     font-size: 16px;
     padding-right: 46px;
     color: var(--on-surface);
@@ -2718,6 +2720,7 @@ header.topbar {
         padding: 8px;
     }
     .search-bar-input input {
+        /* font-size: 18px — recupera el valor desktop de main */
         font-size: 18px;
         padding-right: 0;
     }
