@@ -3876,17 +3876,18 @@ main.city-main {
     width: 100%;
 }
 
-/* Pin de Leaflet por divIcon — forma de gota con CSS puro */
+/* Pin de Leaflet por divIcon — icono "pin" de Material Symbols */
 
-.erasmus-pin__dot {
+.erasmus-pin__icon {
     display: block;
-    width: 20px;
-    height: 20px;
-    background: var(--pin-color, var(--primary));
-    border: 2px solid #fff;
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    font-size: 32px;
+    color: var(--pin-color, var(--primary));
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
 }
 
 @media (max-width: 768px) {
