@@ -72,6 +72,17 @@ async function mountPartnersList(listContainerId, map, cityId, defaultCategory =
                 color: '#64748b',
                 icon: 'place',
             };
+            // meta.label normalmente viene de CATEGORY_META (constante hardcodeada
+            // en map-helpers.js), pero si `category` no es una de sus claves, el
+            // fallback de más arriba usa el propio `category` —dato de Supabase
+            // (partners.category), editable desde /admin— como label. Hoy el
+            // <select> de /admin solo ofrece las 5 categorías que sí están en
+            // CATEGORY_META, así que esta rama no es alcanzable desde la UI, pero
+            // son dos listas mantenidas por separado (ver docs/tech-debt.md) y un
+            // valor insertado por otra vía (edición directa en Supabase) no debe
+            // acabar sin escapar. Se deja `label` sin escapar aquí (se usa también
+            // vía textContent más abajo, donde escaparlo lo dejaría doblemente
+            // escapado) y se escapa solo en el punto de uso dentro de innerHTML.
             const label = categoryLabel(category, meta.label);
             const isExpanded = state.expandedCategory === category;
             const isEmpty = partners.length === 0;
@@ -84,7 +95,7 @@ async function mountPartnersList(listContainerId, map, cityId, defaultCategory =
                 (isEmpty ? ' is-empty' : '');
             categoryBtn.innerHTML = `
       <span class="material-symbols-outlined category-toggle__icon" style="--pin-color:${meta.color}">${meta.icon}</span>
-      <span class="category-toggle__label">${label}</span>
+      <span class="category-toggle__label">${escapeHtml(label)}</span>
     `;
             categoryBtn.addEventListener('click', () => toggleCategory(category));
             container.appendChild(categoryBtn);
@@ -186,9 +197,19 @@ function buildPartnerDetail(partner) {
     desc.textContent = I18n.tField(partner.description);
     detail.appendChild(desc);
 
+    // partner.links viene de partner_links (Supabase), editable desde /admin
+    // por cualquier admin — no es contenido que controlemos nosotros. Sin
+    // sanitizeUrl aquí, un `javascript:` guardado en ese campo se ejecutaría
+    // en el navegador del estudiante al hacer clic. Ya es la tercera vez que
+    // este patrón se escapa de un archivo (index.js y nightsSection.js ya lo
+    // hacen bien): cualquier .href/.src que venga de Supabase pasa SIEMPRE
+    // por sanitizeUrl, sin excepciones "por ahora".
     for (const link of partner.links) {
+        const safeUrl = sanitizeUrl(link.url);
+        if (!safeUrl) continue; // sin URL válida, no hay enlace — nunca un <a> muerto
+
         const a = document.createElement('a');
-        a.href = link.url;
+        a.href = safeUrl;
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
         a.className = 'partner-detail__link';
@@ -198,7 +219,7 @@ function buildPartnerDetail(partner) {
                 partnerId: partner.id,
                 partnerName: partner.name,
                 linkType: link.type,
-                linkUrl: link.url,
+                linkUrl: safeUrl, // el valor saneado, no el original — mismo criterio que el href
             });
         });
         detail.appendChild(a);
