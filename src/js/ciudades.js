@@ -38,8 +38,19 @@ async function initCiudadesPage() {
     // country.heroImg, un campo que no existe en la tabla cities) — se
     // usa la imagen de la primera ciudad (orden alfabético) como fondo,
     // mejor que dejarlo vacío.
+    // cities[0].image_url es de Supabase, editable desde /admin. Hacen falta
+    // DOS comprobaciones distintas, no una: sanitizeUrl valida el ESQUEMA
+    // (rechaza javascript:/data:/etc.), pero el valor sigue viajando dentro
+    // de url('...') en CSS, donde una comilla o un paréntesis en la URL
+    // rompen la cadena y permiten inyectar CSS arbitrario aunque el esquema
+    // sea http/https válido. JSON.stringify() sobre la URL ya validada la
+    // devuelve entrecomillada y con esos caracteres escapados — soluciona el
+    // problema de entrecomillado, no el de esquema, por eso van las dos.
     const heroBg = document.getElementById('heroBg');
-    if (heroBg && cities[0].image_url) heroBg.style.backgroundImage = `url('${cities[0].image_url}')`;
+    const safeImageUrl = sanitizeUrl(cities[0].image_url);
+    if (heroBg && safeImageUrl) {
+        heroBg.style.backgroundImage = `url(${JSON.stringify(safeImageUrl)})`;
+    }
 
     const heroFlag = document.getElementById('heroFlag');
     const heroTitle = document.getElementById('heroTitle');
@@ -48,8 +59,10 @@ async function initCiudadesPage() {
 
     if (heroFlag) heroFlag.textContent = cities[0].flag || '';
     if (heroTitle) heroTitle.textContent = paisName;
-    if (heroCityCount) heroCityCount.textContent = `${cities.length} ${I18n.t('cities.count_available_suffix')}`;
-    if (sectionCount) sectionCount.textContent = `${cities.length} ${I18n.t('cities.count_suffix_plural')}`;
+    if (heroCityCount)
+        heroCityCount.textContent = `${cities.length} ${I18n.t('cities.count_available_suffix')}`;
+    if (sectionCount)
+        sectionCount.textContent = `${cities.length} ${I18n.t('cities.count_suffix_plural')}`;
 
     const grid = document.getElementById('citiesGrid');
     const count = cities.length;
