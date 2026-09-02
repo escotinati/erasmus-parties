@@ -37,7 +37,9 @@
                 width: 100%;
                 max-width: var(--container-max);
                 margin: 0 auto;
-                padding: 32px var(--margin-desktop) 0;
+                /* Mobile-first: margen móvil por defecto, revierte en
+                   --bp-md */
+                padding: 24px var(--margin-mobile) 0;
                 display: flex;
                 align-items: center;
                 gap: 16px;
@@ -90,7 +92,9 @@
                 width: 100%;
                 max-width: var(--container-max);
                 margin: 0 auto;
-                padding: 48px var(--margin-desktop) 100px;
+                /* Mobile-first: margen móvil por defecto, revierte en
+                   --bp-md */
+                padding: 40px var(--margin-mobile) 80px;
             }
 
             .letter-group {
@@ -153,10 +157,13 @@
 
             /* Solo el grid que las contiene es propio de esta página:
                auto-fill en vez de las 4 columnas fijas de ciudades.html,
-               porque aquí cada letra puede tener 1 ciudad o 50. */
+               porque aquí cada letra puede tener 1 ciudad o 50.
+               Mobile-first: 2 columnas fijas por defecto (ver también
+               la nota de auto-fill más abajo), auto-fill desde
+               --bp-sm. */
             .city-items-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
                 gap: 14px;
             }
 
@@ -188,23 +195,26 @@
 
             /* Responsive */
 
-            @media (max-width: 900px) {
-                .filter-bar {
-                    padding: 24px var(--margin-mobile) 0;
-                }
-                .cities-container {
-                    padding: 40px var(--margin-mobile) 80px;
+            @media (min-width: 600px) {
+                /* --bp-sm — auto-fill con minmax(170px, 1fr) ya se
+                   adapta solo casi siempre, pero por debajo de este
+                   punto (ver base más arriba) el hueco disponible cae
+                   justo por debajo de 2×170px+gap y colapsaría a 1
+                   columna — demasiado grande. Se fuerza 2 columnas
+                   fijas hasta aquí, mismo criterio que
+                   .cities-grid.cols-2 en ciudades.html. */
+                .city-items-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
                 }
             }
 
-            /* auto-fill con minmax(170px, 1fr) ya se adapta solo casi
-               siempre, pero en torno a 380-430px de ancho el hueco
-               disponible cae justo por debajo de 2×170px+gap y colapsa a
-               1 columna — demasiado grande. Fuerza 2 en ese rango,
-               mismo criterio que .cities-grid.cols-2 en ciudades.html. */
-            @media (max-width: 600px) {
-                .city-items-grid {
-                    grid-template-columns: repeat(2, 1fr);
+            @media (min-width: 900px) {
+                /* --bp-md */
+                .filter-bar {
+                    padding: 32px var(--margin-desktop) 0;
+                }
+                .cities-container {
+                    padding: 48px var(--margin-desktop) 100px;
                 }
             }
         </style>
