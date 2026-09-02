@@ -8,91 +8,116 @@
    ========================================================================== */
 
 :root {
-
-  /* ---------- COLORES: Verified ---------- */
-  /* Alias de compatibilidad con tokens legacy — src/css/styles.css ya
+    /* ---------- COLORES: Verified ---------- */
+    /* Alias de compatibilidad con tokens legacy — src/css/styles.css ya
      define estos colores bajo otro nombre; no se redefine el valor aquí,
      solo se apunta al existente para que ambos sistemas usen SIEMPRE el
      mismo hex sin tener que mantenerlo sincronizado a mano. */
-  --color-primary:        var(--primary);
-  --color-primary-hover:  var(--primary-hover, #3730a3);
-  --color-surface:        var(--surface);
-  --color-bg:             var(--background);
-  --color-dark:           var(--on-surface);
-  --color-text:           var(--on-surface);
-  --color-text-muted:     var(--on-surface-variant);
-  --color-border:         var(--outline-variant);
-  /* --color-accent no tiene equivalente directo: --accent (legacy) ya
+    --color-primary: var(--primary);
+    --color-primary-hover: var(--primary-hover, #3730a3);
+    --color-surface: var(--surface);
+    --color-bg: var(--background);
+    --color-dark: var(--on-surface);
+    --color-text: var(--on-surface);
+    --color-text-muted: var(--on-surface-variant);
+    --color-border: var(--outline-variant);
+    /* --color-accent no tiene equivalente directo: --accent (legacy) ya
      apunta a --primary, no a un tono más claro como este, así que se
      mantiene con su propio valor. */
-  --color-accent:         #818CF8;
+    --color-accent: #818cf8;
 
-  /* ---------- COLORES: Semánticos ---------- */
-  /* Sin equivalente en el sistema existente — no había tokens de estado
+    /* ---------- COLORES: Semánticos ---------- */
+    /* Sin equivalente en el sistema existente — no había tokens de estado
      (éxito/aviso/error/info) definidos, se añaden con valor propio. */
-  --color-success:        #10B981;
-  --color-warning:        #F59E0B;
-  --color-error:          #EF4444;
-  --color-info:           #3B82F6;
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-error: #ef4444;
+    --color-info: #3b82f6;
 
-  /* ---------- TIPOGRAFÍA ---------- */
-  /* --font-display / --font-body: NO se redefinen aquí — src/css/styles.css
+    /* ---------- TIPOGRAFÍA ---------- */
+    /* --font-display / --font-body: NO se redefinen aquí — src/css/styles.css
      ya los define con el mismo nombre y el mismo valor ('Syne'/'Inter').
      Redeclararlos sería un solapamiento real de tokens (Regla 1), no solo
      un alias de compatibilidad. */
 
-  --text-display: clamp(40px, 5vw, 56px);
-  --text-h1:      clamp(28px, 4vw, 40px);
-  --text-h2:      28px;
-  --text-h3:      20px;
-  --text-body:    15px;
-  --text-small:   13px;
+    --text-display: clamp(40px, 5vw, 56px);
+    --text-h1: clamp(28px, 4vw, 40px);
+    --text-h2: 28px;
+    --text-h3: 20px;
+    --text-body: 15px;
+    --text-small: 13px;
 
-  --weight-regular:   400;
-  --weight-medium:    500;
-  --weight-semibold:  600;
-  --weight-bold:      700;
-  --weight-extrabold: 800;
+    --weight-regular: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+    --weight-extrabold: 800;
 
-  --leading-tight:  1.2;
-  --leading-snug:   1.4;
-  --leading-normal: 1.6;
+    --leading-tight: 1.2;
+    --leading-snug: 1.4;
+    --leading-normal: 1.6;
 
-  /* ---------- ESPACIADO (base 8px) ---------- */
-  /* Sin equivalente: --gutter/--margin-desktop/--margin-mobile son
+    /* ---------- ESPACIADO (base 8px) ---------- */
+    /* Sin equivalente: --gutter/--margin-desktop/--margin-mobile son
      valores de layout puntuales, no una escala de espaciado. */
-  --space-1:  4px;
-  --space-2:  8px;
-  --space-3:  12px;
-  --space-4:  16px;
-  --space-6:  24px;
-  --space-8:  32px;
-  --space-12: 48px;
-  --space-16: 64px;
-  --space-20: 80px;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-20: 80px;
 
-  /* ---------- RADIOS ---------- */
-  /* --radius-sm/md/lg/full: NO se redefinen — mismo nombre y mismo valor
+    /* ---------- LAYOUT MÓVIL ---------- */
+    /* Breakpoints únicos del refactor feature/mobile-breakpoints (ver
+     docs/mobile-audit.md). Valores mobile-first: el corte es la anchura
+     MÍNIMA a partir de la cual se aplica el estilo de pantalla más grande
+     (se usan siempre con min-width, nunca max-width).
+     No hay margen lateral aquí: para eso ya existe --margin-mobile
+     (20px) en src/css/styles.css — no lo redefinas ni inventes un
+     --margin-sm/md/lg paralelo. */
+    --bp-sm: 600px; /* 2ª columna en rejillas. Navegación sin cambios */
+    --bp-md: 900px; /* futuro: bottom nav -> rail lateral */
+    --bp-lg: 1200px; /* futuro: rail -> top nav */
+
+    /* Alturas reales de chrome fijo (header/bottom-nav), para poder
+     escribir `calc(100dvh - var(--header-h))` en vez de un literal
+     suelto. Valores DELIBERADAMENTE los actuales, no los ideales —
+     cambiarlos es una decisión visual de otra rama, no de este refactor.
+     --header-h cubre exacto el header.topbar de escritorio (ciudad,
+     mapa, servicios, viajes, alojamiento); NO cubre .topnav (80px fijo,
+     protegido aparte porque el scroll-scrub de index.html depende de
+     ese valor) ni header.topbar en móvil (65px/64px según la página) —
+     ver el hallazgo detallado en docs/mobile-audit.md sección (b). */
+    --header-h: 73px; /* altura REAL de header.topbar en escritorio */
+    --nav-bottom-h: 60px; /* altura REAL del bottom nav actual */
+    --nav-bottom-total: calc(var(--nav-bottom-h) + env(safe-area-inset-bottom, 0px));
+    --tap-min: 44px;
+
+    /* ---------- RADIOS ---------- */
+    /* --radius-sm/md/lg/full: NO se redefinen — mismo nombre y mismo valor
      ya en src/css/styles.css (0.25rem/0.5rem/0.75rem/9999px = 4/8/12px).
      Solo --radius-xl y --radius-2xl son nuevos de verdad. */
-  --radius-xl:   16px;
-  --radius-2xl:  24px;
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
 
-  /* ---------- SOMBRAS ---------- */
-  /* Sin equivalente: el sistema existente usa box-shadow con valores
+    /* ---------- SOMBRAS ---------- */
+    /* Sin equivalente: el sistema existente usa box-shadow con valores
      sueltos inline, no tokens con nombre. */
-  --shadow-sm:    0 1px 3px rgba(0, 0, 0, .06);
-  --shadow-md:    0 4px 12px rgba(0, 0, 0, .08);
-  --shadow-lg:    0 12px 32px rgba(0, 0, 0, .12);
-  --shadow-focus: 0 0 0 3px rgba(79, 70, 229, .25);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+    --shadow-focus: 0 0 0 3px rgba(79, 70, 229, 0.25);
 
-  /* ---------- ANIMACIONES ---------- */
-  /* Sin equivalente: transiciones existentes usan duraciones sueltas
+    /* ---------- ANIMACIONES ---------- */
+    /* Sin equivalente: transiciones existentes usan duraciones sueltas
      (0.15s, 0.2s...) sin token compartido. */
-  --duration-fast: 100ms;
-  --duration-base: 200ms;
-  --duration-slow: 350ms;
-  --ease-out: cubic-bezier(.16, 1, .3, 1);
+    --duration-fast: 100ms;
+    --duration-base: 200ms;
+    --duration-slow: 350ms;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ==========================================================================
@@ -107,17 +132,17 @@
    herencia de custom properties con normalidad.
    ========================================================================== */
 
-[data-brand="parties"] {
-  --color-primary:        var(--primary);
-  --color-primary-hover:  var(--primary-container, #C2106B);
-  --color-bg:             var(--background);
-  --color-surface:        var(--surface);
-  --color-dark:           var(--on-surface);
-  --color-text:           var(--on-surface);
-  --color-text-muted:     var(--on-surface-variant);
-  --color-border:         var(--outline-variant);
-  /* Sin equivalente directo en .theme-parties: se mantienen con valor
+[data-brand='parties'] {
+    --color-primary: var(--primary);
+    --color-primary-hover: var(--primary-container, #c2106b);
+    --color-bg: var(--background);
+    --color-surface: var(--surface);
+    --color-dark: var(--on-surface);
+    --color-text: var(--on-surface);
+    --color-text-muted: var(--on-surface-variant);
+    --color-border: var(--outline-variant);
+    /* Sin equivalente directo en .theme-parties: se mantienen con valor
      propio, igual que en Verified. */
-  --color-accent:         #7C3AED;
-  --shadow-focus:         0 0 0 3px rgba(225, 20, 123, .3);
+    --color-accent: #7c3aed;
+    --shadow-focus: 0 0 0 3px rgba(225, 20, 123, 0.3);
 }
