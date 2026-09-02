@@ -149,6 +149,9 @@
 
 html {
     scroll-behavior: smooth;
+    /* Evita que iOS Safari reescale el texto al rotar a horizontal
+       (webkit-only, propiedad no estándar a propósito). */
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -160,9 +163,10 @@ body {
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
-    /* Mobile-first: compensa la altura del bottom-nav (60px) + margen
-       de seguridad — 0 en --bp-md, donde no hay bottom-nav. */
-    padding-bottom: 68px;
+    /* Mobile-first: compensa la altura del bottom-nav (--nav-bottom-h)
+       + 8px de margen de seguridad — 0 en --bp-md, donde no hay
+       bottom-nav. */
+    padding-bottom: calc(var(--nav-bottom-h) + 8px);
 }
 
 /* home-page: la barra reserva también env(safe-area-inset-bottom)
@@ -170,7 +174,16 @@ body {
    altura extra para no dejar contenido oculto detrás. Mobile-first
    igual que arriba, revierte en --bp-md. */
 body.home-page {
-    padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--nav-bottom-h) + 8px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Quita el delay de ~300ms antes del tap en navegadores móviles
+   (esperan a ver si viene un segundo toque para hacer zoom) en todo
+   elemento clicable — no cambia nada en escritorio. */
+a,
+button,
+[role='button'] {
+    touch-action: manipulation;
 }
 
 /* ── Utilities ──────────────────────────────────────────────── */
@@ -772,9 +785,11 @@ a.city-card {
     outline: none;
     font-family: var(--font-body);
     /* Mobile-first: valores móviles por defecto, revierten en --bp-sm.
-       padding-right dej hueco para el botón flotante en móvil (círculo
-       de 36px + 10px de aire, ver .search-bar-btn). */
-    font-size: 15px;
+       padding-right deja hueco para el botón flotante en móvil
+       (círculo de 36px + 10px de aire, ver .search-bar-btn). 16px de
+       mínimo (no 15px) a propósito: por debajo, iOS Safari hace zoom
+       automático al enfocar el campo y descoloca el layout. */
+    font-size: 16px;
     padding-right: 46px;
     color: var(--on-surface);
 }
@@ -953,7 +968,7 @@ a.city-card {
 
 /* ── 2.5 Bottom nav (mobile) ────────────────────────────────── */
 
-/* App bottom nav — reemplaza al legacy en móvil (<768px) */
+/* App bottom nav — reemplaza al legacy en móvil (< --bp-md) */
 
 .app-bottom-nav {
     /* Mobile-first: visible por defecto, se oculta en --bp-md
@@ -963,7 +978,7 @@ a.city-card {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 60px;
+    height: var(--nav-bottom-h);
     z-index: 500; /* por encima de Leaflet tiles y del mobile-nav (150) */
     background: var(--surface);
     border-top: 1px solid var(--outline-variant);
@@ -2249,8 +2264,8 @@ header.topbar {
     box-shadow: 0 -8px 24px rgba(19, 27, 46, 0.06);
     /* iOS: reserva el hueco de la home indicator sin recortar los
        ítems ni encogerlos — el padding vive DEBAJO de su altura
-       normal, así el contenido flex sigue centrado en los 60px. */
-    height: calc(60px + env(safe-area-inset-bottom, 0px));
+       normal, así el contenido flex sigue centrado en --nav-bottom-h. */
+    height: var(--nav-bottom-total);
     padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
@@ -3142,7 +3157,10 @@ header.topbar {
     border-radius: var(--radius-full);
     padding: 10px 36px 10px 40px;
     font-family: var(--font-body);
-    font-size: 14px;
+    /* 16px de mínimo (no 14px) a propósito: por debajo, iOS Safari
+       hace zoom automático al enfocar un <select> y descoloca el
+       layout. */
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     text-overflow: ellipsis;
@@ -4096,8 +4114,9 @@ main.city-main {
 
 .map-canvas {
     /* Mobile-first: 65px (alto real de header.topbar en móvil) es el
-       valor por defecto, revierte a 73px (desktop) en --bp-md. Doble
-       declaración vh/dvh sin tocar aquí — la limpia el paso 3. */
+       valor por defecto, revierte a --header-h (desktop) en --bp-md.
+       65px se queda literal — no hay token para la altura de
+       header.topbar en móvil (ver docs/mobile-audit.md sección b). */
     height: calc(100dvh - 65px);
     width: 100%;
 }
@@ -4119,9 +4138,7 @@ main.city-main {
 @media (min-width: 900px) {
     /* --bp-md */
     .map-canvas {
-        height: calc(100vh - 73px);
-        height: calc(100dvh - 73px);
-        /* 73px ≈ altura de header.topbar */
+        height: calc(100dvh - var(--header-h));
     }
 }
 
@@ -4130,6 +4147,7 @@ main.city-main {
 .map-with-list {
     display: flex;
     flex-direction: column;
+    /* 64px literal — no hay token, ver docs/mobile-audit.md sección b */
     height: calc(100dvh - 64px);
 }
 
@@ -4149,17 +4167,16 @@ main.city-main {
     /* --bp-md */
     .map-with-list {
         flex-direction: row;
-        height: calc(100dvh - 73px);
+        height: calc(100dvh - var(--header-h));
     }
     .map-with-list .map-canvas {
         flex: 1;
-        height: calc(100vh - 73px);
-        height: calc(100dvh - 73px);
+        height: calc(100dvh - var(--header-h));
     }
     .map-with-list .partners-list {
         width: 340px;
         flex-shrink: 0;
-        height: calc(100dvh - 73px);
+        height: calc(100dvh - var(--header-h));
         overflow-y: scroll;
         border-top: none;
         border-left: 1px solid var(--outline-variant);
