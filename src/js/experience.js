@@ -108,7 +108,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // 4. Ocultar "Fiestas" en el bottom-nav (clase distinta)
+    // .app-bottom-nav ahora es React (AppShell.jsx, rama
+    // feature/mobile-app-shell) y ya resuelve el ítem 5 (Fiestas↔Verified)
+    // según el tema en su propio render — guard [data-react-nav], mismo
+    // criterio que el resto de esta función, para no tocar dos veces lo
+    // que el componente ya resolvió.
     document.querySelectorAll('.app-bottom-nav-item--parties').forEach(function (a) {
+        if (a.closest('[data-react-nav]')) return;
         a.style.display = 'none';
     });
 
@@ -124,8 +130,10 @@ document.addEventListener('DOMContentLoaded', function () {
         nav.appendChild(a);
     });
 
-    // 6. Añadir "Verified ↗" al app-bottom-nav
+    // 6. Añadir "Verified" al app-bottom-nav — ver nota del punto 4,
+    // AppShell.jsx ya lo resuelve internamente.
     document.querySelectorAll('.app-bottom-nav').forEach(function (nav) {
+        if (nav.closest('[data-react-nav]')) return;
         const a = document.createElement('a');
         a.href = 'https://erasmusverified.com';
         a.target = '_blank';

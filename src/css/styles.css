@@ -1006,11 +1006,35 @@ a.city-card {
     transition: color 0.15s;
     padding: 6px 0 10px;
     min-width: 0;
+    /* Primer uso real de --tap-min (declarado en tokens.css desde el
+       Sprint 1, sin consumidores hasta AppShell.jsx) — el alto ya
+       superaba 44px de sobra (icono+gap+label+padding ≈ 50px dentro
+       de los 60px de --nav-bottom-h), esto solo lo hace explícito. */
+    min-height: var(--tap-min);
     /* El ítem de cuenta (#authBtnMobile) es <button>, no <a> como el
        resto — reset para que no se note la diferencia de elemento. */
     background: none;
     border: none;
     cursor: pointer;
+}
+
+/* Etiqueta corta <360px (AppShell.jsx): por defecto se muestra el
+   texto completo y se oculta el corto; a 320px con 5 ítems tocan
+   64px/tab y "Servicios" es la única etiqueta que realmente aprieta
+   — el resto ya define su propio shortFallback igual al fallback
+   completo, así que no cambian visualmente en ningún ancho. */
+.app-bottom-nav-label-short {
+    display: none;
+}
+
+@media (max-width: 359px) {
+    .app-bottom-nav-label-full {
+        display: none;
+    }
+
+    .app-bottom-nav-label-short {
+        display: inline;
+    }
 }
 
 .app-bottom-nav-item .material-symbols-outlined {
