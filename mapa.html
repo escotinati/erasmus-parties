@@ -72,43 +72,9 @@
 
         <!-- Mobile-nav overlay: ahora vive en src/react/TopbarNav.jsx (rama react/menu) -->
 
-        <!-- ── APP BOTTOM NAV (móvil) ────────────────────────── -->
-        <nav class="app-bottom-nav" id="appBottomNav" aria-label="Navegación principal">
-            <a href="servicios.html" class="app-bottom-nav-item">
-                <span class="material-symbols-outlined">storefront</span>
-                <span data-i18n="nav.services">Servicios</span>
-            </a>
-            <a href="viajes.html" class="app-bottom-nav-item">
-                <span class="material-symbols-outlined">flight</span>
-                <span data-i18n="nav.trips">Viajes</span>
-            </a>
-            <a
-                href="https://erasmusparties.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="app-bottom-nav-item app-bottom-nav-item--parties"
-            >
-                <span class="material-symbols-outlined">nightlife</span>
-                <span data-i18n="nav.parties_bottom">Fiestas</span>
-            </a>
-        </nav>
-        <script>
-            /* ── Ítem activo (solo bottom-nav) ──────────────────────────
-               El toggle de hamburguesa + ítem activo del topbar/mobile-nav
-               ahora vive dentro de src/react/TopbarNav.jsx (rama react/menu). */
-            (function () {
-                var page =
-                    (window.location.pathname.split('/').pop() || 'index.html').split('?')[0] ||
-                    'index.html';
-                document
-                    .querySelectorAll('.app-bottom-nav .app-bottom-nav-item')
-                    .forEach(function (a) {
-                        var href = (a.getAttribute('href') || '').split('?')[0];
-                        if (href && !href.startsWith('http') && href === page)
-                            a.classList.add('app-bottom-nav-item--active');
-                    });
-            })();
-        </script>
+        <!-- ── APP BOTTOM NAV (React) — ver src/react/AppShell.jsx ── -->
+        <div id="shell-root"></div>
+        <script type="module" src="/src/react/mount-shell.jsx"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 window.I18n.applyTranslations();

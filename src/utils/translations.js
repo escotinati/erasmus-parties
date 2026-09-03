@@ -16,12 +16,16 @@ window.I18n.translations = {
     es: {
         nav: {
             services: 'Servicios',
+            services_short: 'Serv.',
             accommodation: 'Alojamiento',
             trips: 'Viajes',
             parties: '🎉 Fiestas ↗',
             parties_bottom: 'Fiestas',
+            verified_bottom: 'Verified',
             account: 'Cuenta',
             home: 'Inicio',
+            nights_bottom: 'Noches',
+            map: 'Mapa',
             back: 'Volver',
             back_arrow: '← Volver',
             back_home_arrow: '← Inicio',
@@ -255,12 +259,16 @@ window.I18n.translations = {
     en: {
         nav: {
             services: 'Services',
+            services_short: 'Serv.',
             accommodation: 'Accommodation',
             trips: 'Trips',
             parties: '🎉 Parties ↗',
             parties_bottom: 'Parties',
+            verified_bottom: 'Verified',
             account: 'Account',
             home: 'Home',
+            nights_bottom: 'Nights',
+            map: 'Map',
             back: 'Back',
             back_arrow: '← Back',
             back_home_arrow: '← Home',
