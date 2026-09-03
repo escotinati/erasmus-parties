@@ -1142,6 +1142,168 @@ a.city-card {
     font-size: 24px;
 }
 
+/* ── 2.6 Sheet (diálogo / bottom sheet) ───────────────────────
+   Construido sobre <dialog> nativo (showModal()) — la lógica de
+   apertura/cierre vive en src/js/ui/sheet.js. Aislado en esta rama
+   (feature/sheet-component, ver dev/sheet-demo.html); su primer
+   consumidor real será mapPartners.js en la rama siguiente.
+
+   Mobile-first: por defecto es una hoja anclada abajo que solo anima
+   translateY (eje de entrada). Desde --bp-md se convierte en diálogo
+   centrado (scale + opacity — no hay "eje de entrada" para algo
+   centrado, así que aquí sí tiene sentido animar ambos) sin tirador
+   de arrastre. Solo transform/opacity en los dos casos, nunca
+   propiedades de layout. */
+
+dialog.sheet {
+    /* Reset del <dialog> nativo: la hoja de estilos del user-agent
+       le pone border/padding/background propios y lo centra con
+       margin:auto — todo eso lo sustituye esta regla. */
+    border: none;
+    margin: 0;
+    padding: 0;
+    background: var(--surface);
+    color: var(--on-surface);
+    box-shadow: var(--shadow-lg);
+
+    position: fixed;
+    inset: auto 0 0 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 85dvh;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+
+    flex-direction: column;
+    min-height: 0;
+
+    transform: translateY(100%);
+    transition: transform var(--duration-slow) var(--ease-out);
+}
+
+dialog.sheet[open] {
+    /* [open] (reflejado por el propio <dialog> al llamar a
+       showModal()) es lo único que decide display — la posición de
+       reposo cerrada es la transform de la regla de arriba;
+       .sheet--visible (añadida un frame después de showModal(), ver
+       sheet.js) es la que dispara la transición de entrada. Sin este
+       desacoplo no hay nada de lo que partir para animar: no se
+       puede transicionar display:none → flex en el mismo frame. */
+    display: flex;
+}
+
+dialog.sheet.sheet--visible {
+    transform: translateY(0);
+}
+
+dialog.sheet::backdrop {
+    /* Scrim neutro (no es un color de marca — MD3 define el scrim
+       como un valor fijo independiente del tema, igual en
+       theme-verified y theme-parties). */
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+dialog.sheet.sheet--visible::backdrop {
+    opacity: 1;
+}
+
+.sheet-handle {
+    width: 36px;
+    height: 4px;
+    margin: 10px auto 0;
+    border-radius: var(--radius-full);
+    background: var(--outline-variant);
+    flex: 0 0 auto;
+    touch-action: none; /* el gesto de arrastre lo gestiona sheet.js, no el scroll táctil nativo */
+}
+
+.sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-2) var(--space-3) var(--space-6);
+    flex: 0 0 auto;
+    touch-action: none; /* misma zona de arrastre que el tirador */
+}
+
+.sheet-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-h3);
+    font-weight: var(--weight-bold);
+}
+
+.sheet-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap-min);
+    height: var(--tap-min);
+    flex: 0 0 auto;
+    border: none;
+    border-radius: var(--radius-full);
+    background: none;
+    color: var(--on-surface-variant);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.sheet-close:hover {
+    background: var(--surface-container-low);
+}
+
+.sheet-body {
+    padding: 0 var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    dialog.sheet,
+    dialog.sheet::backdrop {
+        transition: none;
+    }
+}
+
+@media (min-width: 900px) {
+    /* --bp-md: diálogo centrado, sin tirador de arrastre */
+    dialog.sheet {
+        inset: 0;
+        margin: auto;
+        width: calc(100% - var(--space-8) * 2);
+        max-width: 480px;
+        max-height: 85dvh;
+        border-radius: var(--radius-2xl);
+        opacity: 0;
+        transform: scale(0.96);
+        transition:
+            transform var(--duration-base) var(--ease-out),
+            opacity var(--duration-base) var(--ease-out);
+    }
+
+    dialog.sheet.sheet--visible {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .sheet-handle {
+        display: none;
+    }
+
+    .sheet-header {
+        padding-left: var(--space-8);
+    }
+
+    .sheet-body {
+        padding-left: var(--space-8);
+        padding-right: var(--space-8);
+    }
+}
+
 /* ═══════════════════════════════════════════════════════════
    3. LAYOUT GLOBAL
    ─────────────────────────────────────────────────────── */

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sheet — demo interna</title>
+        <!-- Página de desarrollo, fuera del flujo público: no se enlaza desde
+             ninguna parte del sitio ni entra en rollupOptions.input de
+             vite.config.js (npm run dev la sirve igual, como cualquier
+             archivo del repo). Sirve para probar src/js/ui/sheet.js aislado,
+             antes de que mapPartners.js lo consuma en la rama siguiente. -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="stylesheet" href="/src/styles/tokens.css" />
+        <link rel="stylesheet" href="/src/styles/typography.css" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="/src/css/styles.css" />
+        <!-- Resuelve el tema (?exp=parties / ?exp=verified en la URL) igual
+             que cualquier página pública, para probar el Sheet en ambos sin
+             ramas de código propias de esta demo. -->
+        <script src="/src/js/experience.js"></script>
+        <style>
+            /* Estilos exclusivos de esta página de desarrollo — no del sitio
+               público, no cuentan como una sección numerada de styles.css. */
+            body.sheet-demo-page {
+                max-width: 640px;
+                margin: 0 auto;
+                padding: var(--space-8) var(--space-6) var(--space-20);
+            }
+
+            .sheet-demo-actions {
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-3);
+                align-items: flex-start;
+                margin-top: var(--space-6);
+            }
+
+            .sheet-demo-note {
+                color: var(--on-surface-variant);
+                font-size: var(--text-small);
+            }
+
+            .sheet-demo-field {
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-1);
+                margin-bottom: var(--space-4);
+            }
+
+            .sheet-demo-field label {
+                font-weight: var(--weight-semibold);
+                font-size: var(--text-small);
+            }
+
+            .sheet-demo-field input {
+                padding: var(--space-2) var(--space-3);
+                border: 1px solid var(--outline-variant);
+                border-radius: var(--radius-md);
+                font: inherit;
+            }
+        </style>
+    </head>
+    <body class="sheet-demo-page">
+        <h1>Sheet — demo interna</h1>
+        <p class="sheet-demo-note">
+            Prueba de <code>src/js/ui/sheet.js</code>, aislada de
+            mapPartners.js/ciudad.html/mapa.html (rama feature/sheet-component). Redimensiona por
+            debajo/encima de <code>--bp-md</code> (900px) para ver la hoja móvil vs. el diálogo
+            centrado, y añade <code>?exp=parties</code>
+            a la URL para probar el otro tema.
+        </p>
+
+        <div class="sheet-demo-actions">
+            <button type="button" id="btnShort" class="btn-primary-pill">Contenido corto</button>
+            <button type="button" id="btnLong" class="btn-primary-pill">
+                Contenido largo (con scroll)
+            </button>
+            <button type="button" id="btnFocus" class="btn-primary-pill">
+                Enlaces y botones (prueba de foco)
+            </button>
+        </div>
+
+        <script src="/src/js/ui/sheet.js"></script>
+        <script>
+            (function () {
+                function buildShortContent() {
+                    const p = document.createElement('p');
+                    p.textContent =
+                        'Panel con poco contenido: su altura se ajusta al texto, no ocupa los 85dvh máximos.';
+                    return p;
+                }
+
+                function buildLongContent() {
+                    const frag = document.createDocumentFragment();
+                    for (let i = 1; i <= 25; i++) {
+                        const p = document.createElement('p');
+                        p.textContent =
+                            'Párrafo ' +
+                            i +
+                            ' de contenido de prueba, suficiente para forzar scroll dentro del panel ' +
+                            'sin que el fondo de la página se mueva.';
+                        frag.appendChild(p);
+                    }
+                    return frag;
+                }
+
+                function buildFocusContent() {
+                    const frag = document.createDocumentFragment();
+
+                    const p = document.createElement('p');
+                    p.textContent =
+                        'Usa Tab/Shift+Tab: el foco debe quedarse dentro del panel (incluye el botón ' +
+                        'de cerrar de la cabecera) y no debe poder llegar a nada de detrás.';
+                    frag.appendChild(p);
+
+                    const field = document.createElement('div');
+                    field.className = 'sheet-demo-field';
+                    const label = document.createElement('label');
+                    label.setAttribute('for', 'sheet-demo-input');
+                    label.textContent = 'Un campo cualquiera';
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.id = 'sheet-demo-input';
+                    input.placeholder = 'Escribe algo…';
+                    field.appendChild(label);
+                    field.appendChild(input);
+                    frag.appendChild(field);
+
+                    const link = document.createElement('a');
+                    link.href = 'https://example.org';
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.textContent = 'Un enlace de prueba ↗';
+                    frag.appendChild(link);
+
+                    const actions = document.createElement('div');
+                    actions.className = 'sheet-demo-actions';
+                    const btnA = document.createElement('button');
+                    btnA.type = 'button';
+                    btnA.className = 'btn-primary-pill';
+                    btnA.textContent = 'Botón A';
+                    const btnB = document.createElement('button');
+                    btnB.type = 'button';
+                    btnB.className = 'btn-primary-pill';
+                    btnB.textContent = 'Botón B';
+                    actions.appendChild(btnA);
+                    actions.appendChild(btnB);
+                    frag.appendChild(actions);
+
+                    return frag;
+                }
+
+                function wire(buttonId, title, contentBuilder) {
+                    const btn = document.getElementById(buttonId);
+                    const sheet = window.Sheet.create({
+                        title: title,
+                        content: contentBuilder(),
+                        onClose: function () {
+                            console.log('[sheet-demo] cerrado:', title);
+                        },
+                    });
+                    btn.addEventListener('click', function () {
+                        sheet.open(btn);
+                    });
+                }
+
+                wire('btnShort', 'Contenido corto', buildShortContent);
+                wire('btnLong', 'Contenido largo', buildLongContent);
+                wire('btnFocus', 'Enlaces y botones', buildFocusContent);
+            })();
+        </script>
+    </body>
+</html>
