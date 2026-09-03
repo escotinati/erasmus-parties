@@ -46,18 +46,17 @@
     syncMapHeight();
     window.addEventListener('resize', syncMapHeight);
 
-    mountCityMap('map', { pais: city.country, ciudad: city.name, lat: city.lat, lng: city.lng, interactive: true }).then(
-        (mapInstance) => {
-            if (mapInstance) {
-                syncMapHeight();
-                mapInstance.invalidateSize();
-                mountPartnersList(
-                    'partners-list',
-                    mapInstance,
-                    city.id,
-                    window.ERASMUS_EXPERIENCE.defaultCategory
-                );
-            }
+    mountCityMap('map', {
+        pais: city.country,
+        ciudad: city.name,
+        lat: city.lat,
+        lng: city.lng,
+        interactive: true,
+    }).then((mapInstance) => {
+        if (mapInstance) {
+            syncMapHeight();
+            mapInstance.invalidateSize();
+            mountPartnersList('partners-list', mapInstance, city);
         }
-    );
+    });
 })();

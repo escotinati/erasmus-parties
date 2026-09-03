@@ -65,12 +65,7 @@
         interactive: true,
     }).then(async (mapInstance) => {
         if (mapInstance) {
-            await mountPartnersList(
-                'city-partners-list',
-                mapInstance,
-                city.id,
-                window.ERASMUS_EXPERIENCE.defaultCategory
-            );
+            await mountPartnersList('city-partners-list', mapInstance, city);
             const mapEl = document.getElementById('city-map-embed');
             const asideEl = document.getElementById('city-partners-list');
             const syncHeight = () => {
