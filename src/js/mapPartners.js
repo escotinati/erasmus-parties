@@ -1,21 +1,32 @@
 // ─────────────────────────────────────────────────────────────
-//  MAPPARTNERS.JS — Erasmus Parties
+//  MAPPARTNERS.JS — Erasmus Verified / Erasmus Parties
 //
 //  Listado de categorías/partners sincronizado con pines en el mapa.
-//  Estado local simple: qué categoría está desplegada y qué partner
-//  está expandido (acordeón: solo uno a la vez).
+//  Modelo de multi-selección (chips), no acordeón: un Set de
+//  categorías activas decide qué grupos aparecen en la lista y qué
+//  pines en el mapa — no hay "una categoría desplegada a la vez"
+//  como en la versión anterior. Abrir un partner ya no expande su
+//  fila inline: abre el detalle en un Sheet (src/js/ui/sheet.js).
 //
-//  Depende de: PARTNERS/getPartnersByCity/groupPartnersByCategory
-//  (partners.js), createPartnerMarker/setMarkerExpanded/CATEGORY_META
-//  (map-helpers.js), y recibe el `map` de Leaflet ya inicializado
-//  (cityMap.js / mapa.js).
+//  Depende de: fetchPartnersByCity/groupPartnersByCategory
+//  (partnersService.js), createPartnerMarker/setMarkerExpanded/
+//  CATEGORY_META (map-helpers.js), window.Sheet (sheet.js), y recibe
+//  `map` (Leaflet, ya inicializado por cityMap.js) y `city` (el
+//  objeto completo de Supabase, no solo su id — lo pasan ciudad.js y
+//  mapa.js, que ya lo tienen en su propio scope antes de llamar).
 // ─────────────────────────────────────────────────────────────
 
-/**
- * Monta el listado de categorías/partners en `listContainerId`,
- * y gestiona sus pines sobre `map`. `ciudad` filtra qué partners
- * se muestran.
- */
+// Copia local idéntica a la de src/react/navShared.jsx (isPartiesExperience,
+// la usa AppShell.jsx) y a la de src/js/index.js: mapPartners.js es
+// vanilla y no puede importar el módulo ES de navShared.jsx, así que
+// replica el mismo patrón ya establecido en el proyecto para este
+// problema exacto — cada script clásico que lo necesita lleva su
+// propia copia idéntica. No es una duplicación accidental ni hay que
+// "unificarla": es el patrón ya asentado, no un descuido.
+function isPartiesExperience() {
+    return window.ERASMUS_EXPERIENCE && window.ERASMUS_EXPERIENCE.theme === 'theme-parties';
+}
+
 // Etiqueta de categoría traducida, con fallback al label hardcodeado de
 // CATEGORY_META si no existe clave en translations.js (las categorías
 // fuera del CHECK de partners.category en Supabase, ej. "restaurants",
@@ -26,121 +37,57 @@ function categoryLabel(category, fallbackLabel) {
     return translated !== key ? translated : fallbackLabel;
 }
 
-async function mountPartnersList(listContainerId, map, cityId, defaultCategory = null) {
+async function mountPartnersList(listContainerId, map, city) {
     const container = document.getElementById(listContainerId);
     container.innerHTML = `<p class="partners-list-loading">${I18n.t('map.loading_partners')}</p>`;
 
-    const partners = await fetchPartnersByCity(cityId);
-    const groups = groupPartnersByCategory(partners);
+    const partners = await fetchPartnersByCity(city.id);
+    const groups = groupPartnersByCategory(partners); // ya filtra categorías sin partners (regla 3)
 
     if (groups.length === 0) {
-        container.innerHTML = `<p class="partners-list-empty">${I18n.t('map.no_partners')}</p>`;
+        renderNoPartnersState();
         return;
     }
 
-    // Estado local: qué categoría está desplegada, qué partner expandido,
+    // Estado local: qué categorías están activas (Set, multi-selección)
     // y un registro de los markers ya creados (para no recrearlos).
     const state = {
-        expandedCategory: null,
-        selectedPartnerId: null,
+        activeCategories: initialActiveCategories(),
     };
     const markersByPartnerId = {};
 
     // Crea TODOS los markers al cargar (pocos partners, sin coste real),
-    // pero no los añade al mapa todavía — se añaden al expandir su categoría.
+    // pero no los añade al mapa todavía — eso lo decide syncMarkers().
     for (const { partners } of groups) {
         for (const partner of partners) {
-            markersByPartnerId[partner.id] = createPartnerMarker(partner, { expanded: false });
-            markersByPartnerId[partner.id].on('click', () => selectPartner(partner.id));
+            const marker = createPartnerMarker(partner, { expanded: false });
+            marker.on('click', () => selectPartner(partner.id, marker));
+            markersByPartnerId[partner.id] = marker;
         }
     }
 
+    syncMarkers();
     renderList();
 
-    // Expande la categoría por defecto si la experiencia activa lo requiere
-    // (ej. theme-parties abre nightlife automáticamente).
-    // El setTimeout da tiempo a que el mapa esté listo para recibir markers.
-    if (defaultCategory) {
-        setTimeout(() => toggleCategory(defaultCategory), 100);
-    }
-
-    function renderList() {
-        container.innerHTML = '';
-        for (const { category, partners } of groups) {
-            const meta = CATEGORY_META[category] || {
-                label: category,
-                color: '#64748b',
-                icon: 'place',
-            };
-            // meta.label normalmente viene de CATEGORY_META (constante hardcodeada
-            // en map-helpers.js), pero si `category` no es una de sus claves, el
-            // fallback de más arriba usa el propio `category` —dato de Supabase
-            // (partners.category), editable desde /admin— como label. Hoy el
-            // <select> de /admin solo ofrece las 5 categorías que sí están en
-            // CATEGORY_META, así que esta rama no es alcanzable desde la UI, pero
-            // son dos listas mantenidas por separado (ver docs/tech-debt.md) y un
-            // valor insertado por otra vía (edición directa en Supabase) no debe
-            // acabar sin escapar. Se deja `label` sin escapar aquí (se usa también
-            // vía textContent más abajo, donde escaparlo lo dejaría doblemente
-            // escapado) y se escapa solo en el punto de uso dentro de innerHTML.
-            const label = categoryLabel(category, meta.label);
-            const isExpanded = state.expandedCategory === category;
-            const isEmpty = partners.length === 0;
-
-            const categoryBtn = document.createElement('button');
-            categoryBtn.type = 'button';
-            categoryBtn.className =
-                'category-toggle' +
-                (isExpanded ? ' is-expanded' : '') +
-                (isEmpty ? ' is-empty' : '');
-            categoryBtn.innerHTML = `
-      <span class="material-symbols-outlined category-toggle__icon" style="--pin-color:${meta.color}">${meta.icon}</span>
-      <span class="category-toggle__label">${escapeHtml(label)}</span>
-    `;
-            categoryBtn.addEventListener('click', () => toggleCategory(category));
-            container.appendChild(categoryBtn);
-
-            if (!isExpanded) continue;
-
-            if (isEmpty) {
-                // Coherente con el patrón .coming-soon que ya usas en ciudad.js
-                const comingSoon = document.createElement('p');
-                comingSoon.className = 'category-coming-soon';
-                comingSoon.textContent = `${I18n.t('map.no_partners_category_prefix')} ${label} ${I18n.t('map.no_partners_category_suffix')}`;
-                container.appendChild(comingSoon);
-                continue;
-            }
-
-            const partnerList = document.createElement('div');
-            partnerList.className = 'partner-list';
-
-            for (const partner of partners) {
-                const isSelected = state.selectedPartnerId === partner.id;
-
-                const partnerBtn = document.createElement('button');
-                partnerBtn.type = 'button';
-                partnerBtn.className = 'partner-toggle' + (isSelected ? ' is-selected' : '');
-                partnerBtn.textContent = partner.name;
-                partnerBtn.addEventListener('click', () => selectPartner(partner.id));
-                partnerList.appendChild(partnerBtn);
-
-                if (isSelected) {
-                    partnerList.appendChild(buildPartnerDetail(partner));
-                }
-            }
-            container.appendChild(partnerList);
+    // ── Arranque por marca (regla 1) ──────────────────────────────
+    function initialActiveCategories() {
+        if (isPartiesExperience()) {
+            const hasNightlife = groups.some((g) => g.category === 'nightlife');
+            return new Set(hasNightlife ? ['nightlife'] : []);
         }
+        return new Set(groups.map((g) => g.category));
     }
 
-    function toggleCategory(category) {
-        const wasExpanded = state.expandedCategory === category;
-        state.expandedCategory = wasExpanded ? null : category;
-        state.selectedPartnerId = null;
+    // Con una sola categoría en la ciudad no hay chips que decidan nada
+    // (regla 4): esa categoría se muestra siempre, entera.
+    function isCategoryVisible(category) {
+        return groups.length === 1 || state.activeCategories.has(category);
+    }
 
-        for (const { category: cat, partners } of groups) {
-            const shouldShow = state.expandedCategory === cat;
+    function syncMarkers() {
+        for (const { category, partners } of groups) {
+            const shouldShow = isCategoryVisible(category);
             for (const partner of partners) {
-                // si partners está vacío, este for no hace nada — ya es seguro
                 const marker = markersByPartnerId[partner.id];
                 if (shouldShow) {
                     marker.addTo(map);
@@ -149,29 +96,215 @@ async function mountPartnersList(listContainerId, map, cityId, defaultCategory =
                 }
             }
         }
+    }
 
+    function toggleCategory(category) {
+        if (state.activeCategories.has(category)) {
+            state.activeCategories.delete(category);
+        } else {
+            state.activeCategories.add(category);
+        }
+        syncMarkers();
         renderList();
         requestAnimationFrame(() => map.invalidateSize());
     }
 
-    function selectPartner(partnerId) {
-        const wasSelected = state.selectedPartnerId === partnerId;
-        const previousId = state.selectedPartnerId;
-        state.selectedPartnerId = wasSelected ? null : partnerId;
+    // Reactiva todas las categorías con partners — recuperación de la
+    // regla 6 (todos los chips apagados a mano).
+    function showAllCategories() {
+        state.activeCategories = new Set(groups.map((g) => g.category));
+        syncMarkers();
+        renderList();
+        requestAnimationFrame(() => map.invalidateSize());
+    }
 
-        // Desinfla el partner anterior, si había uno distinto
-        if (previousId && previousId !== partnerId) {
-            const prevPartner = findPartnerById(previousId);
-            setMarkerExpanded(markersByPartnerId[previousId], prevPartner, false);
+    function renderList() {
+        container.innerHTML = '';
+
+        const singleCategory = groups.length === 1;
+        const allOff = !singleCategory && state.activeCategories.size === 0;
+
+        if (singleCategory) {
+            container.appendChild(buildCountText(groups[0]));
+        } else {
+            container.appendChild(buildChipBar());
         }
 
-        // Infla/desinfla el partner actual según el nuevo estado
+        if (allOff) {
+            container.appendChild(buildAllFiltersOffState());
+            return;
+        }
+
+        for (const group of groups) {
+            if (!isCategoryVisible(group.category)) continue;
+            container.appendChild(buildGroupSection(group));
+        }
+    }
+
+    // ── Regla 4: una sola categoría con partners → sin barra de chips ──
+    function buildCountText(group) {
+        const p = document.createElement('p');
+        p.className = 'partners-count';
+        p.textContent = `${group.partners.length} ${I18n.t('map.partners_count_label')} ${city.name}`;
+        return p;
+    }
+
+    // ── Barra de chips (multi-selección) ──────────────────────────
+    function buildChipBar() {
+        const bar = document.createElement('div');
+        bar.className = 'partner-filters';
+
+        for (const { category, partners } of groups) {
+            const meta = CATEGORY_META[category] || {
+                label: category,
+                color: '#64748b',
+                icon: 'place',
+            };
+            const label = categoryLabel(category, meta.label);
+            const isActive = state.activeCategories.has(category);
+
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = 'category-chip' + (isActive ? ' is-active' : '');
+            chip.setAttribute('aria-pressed', String(isActive));
+            chip.style.setProperty('--pin-color', meta.color);
+
+            const icon = document.createElement('span');
+            icon.className = 'material-symbols-outlined category-chip__icon';
+            icon.setAttribute('aria-hidden', 'true');
+            icon.textContent = meta.icon;
+
+            const labelEl = document.createElement('span');
+            labelEl.className = 'category-chip__label';
+            labelEl.textContent = label;
+
+            chip.appendChild(icon);
+            chip.appendChild(labelEl);
+            chip.addEventListener('click', () => toggleCategory(category));
+            bar.appendChild(chip);
+        }
+
+        // Regla 6: chip de reinicio al final de la barra mientras todo
+        // esté apagado — equivalente al botón "ver todo" del estado
+        // vacío, no lo sustituye.
+        if (state.activeCategories.size === 0) {
+            const reset = document.createElement('button');
+            reset.type = 'button';
+            reset.className = 'category-chip category-chip--reset';
+            reset.textContent = I18n.t('map.show_all_cta');
+            reset.addEventListener('click', showAllCategories);
+            bar.appendChild(reset);
+        }
+
+        return bar;
+    }
+
+    // ── Regla 6: todos los chips apagados a mano ───────────────────
+    function buildAllFiltersOffState() {
+        const wrap = document.createElement('div');
+        wrap.className = 'partners-empty-state';
+
+        const msg = document.createElement('p');
+        msg.textContent = I18n.t('map.all_filters_off');
+        wrap.appendChild(msg);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-primary-pill';
+        btn.textContent = I18n.t('map.show_all_cta');
+        btn.addEventListener('click', showAllCategories);
+        wrap.appendChild(btn);
+
+        return wrap;
+    }
+
+    // ── Regla 5: la ciudad no tiene ningún partner activo ──────────
+    // Sin mapa de pines (no hay ninguno que crear) ni chips — mensaje
+    // + botón al grupo de WhatsApp de la ciudad, solo si existe una
+    // URL válida (sanitizeUrl(), mismo criterio que ciudad.js). Si no
+    // hay whatsapp_url, o no es válida, el botón no se renderiza: se
+    // deja solo el mensaje, nunca un enlace muerto.
+    function renderNoPartnersState() {
+        container.innerHTML = '';
+
+        const wrap = document.createElement('div');
+        wrap.className = 'partners-empty-state';
+
+        const msg = document.createElement('p');
+        msg.textContent = I18n.t('map.no_partners');
+        wrap.appendChild(msg);
+
+        const safeWhatsapp = sanitizeUrl(city.whatsapp_url);
+        if (safeWhatsapp) {
+            const btn = document.createElement('a');
+            btn.href = safeWhatsapp;
+            btn.target = '_blank';
+            btn.rel = 'noopener noreferrer';
+            btn.className = 'btn-primary-pill';
+            btn.textContent = I18n.t('city.join_whatsapp_group');
+            wrap.appendChild(btn);
+        }
+
+        container.appendChild(wrap);
+    }
+
+    // ── Grupo de una categoría activa: cabecera + lista de partners ──
+    function buildGroupSection(group) {
+        const { category, partners } = group;
+        const meta = CATEGORY_META[category] || {
+            label: category,
+            color: '#64748b',
+            icon: 'place',
+        };
+        const label = categoryLabel(category, meta.label);
+
+        const section = document.createElement('div');
+        section.className = 'partner-group';
+
+        const heading = document.createElement('h3');
+        heading.className = 'partner-group__title';
+        heading.style.setProperty('--pin-color', meta.color);
+
+        const headingIcon = document.createElement('span');
+        headingIcon.className = 'material-symbols-outlined partner-group__icon';
+        headingIcon.setAttribute('aria-hidden', 'true');
+        headingIcon.textContent = meta.icon;
+        heading.appendChild(headingIcon);
+        heading.appendChild(document.createTextNode(label));
+        section.appendChild(heading);
+
+        const list = document.createElement('div');
+        list.className = 'partner-list';
+        for (const partner of partners) {
+            const partnerBtn = document.createElement('button');
+            partnerBtn.type = 'button';
+            partnerBtn.className = 'partner-toggle';
+            partnerBtn.textContent = partner.name;
+            partnerBtn.addEventListener('click', (e) => selectPartner(partner.id, e.currentTarget));
+            list.appendChild(partnerBtn);
+        }
+        section.appendChild(list);
+
+        return section;
+    }
+
+    // ── Regla 7: abrir un partner → Sheet, no expansión inline ─────
+    function selectPartner(partnerId, triggerElement) {
         const partner = findPartnerById(partnerId);
-        setMarkerExpanded(markersByPartnerId[partnerId], partner, !wasSelected);
+        if (!partner) return;
 
-        renderList();
+        const marker = markersByPartnerId[partnerId];
+        setMarkerExpanded(marker, partner, true);
 
-        requestAnimationFrame(() => map.invalidateSize());
+        const sheet = Sheet.create({
+            title: partner.name,
+            content: buildPartnerDetail(partner),
+            closeLabel: I18n.t('common.close'),
+            onClose: () => {
+                setMarkerExpanded(marker, partner, false);
+            },
+        });
+        sheet.open(triggerElement);
     }
 
     function findPartnerById(id) {
@@ -185,8 +318,8 @@ async function mountPartnersList(listContainerId, map, cityId, defaultCategory =
 
 /**
  * Construye el bloque de detalle de un partner: descripción + sus
- * enlaces (web, entradas, fiesta propia si existe).
- * Diseño visual pendiente de afinar más adelante (acordado).
+ * enlaces (web, entradas, fiesta propia si existe). Nodo del DOM, no
+ * HTML — lo consume Sheet.create({ content }) directamente.
  */
 function buildPartnerDetail(partner) {
     const detail = document.createElement('div');

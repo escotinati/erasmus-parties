@@ -37,6 +37,7 @@ window.I18n.translations = {
             check_back_soon: 'Vuelve pronto.',
             collaborate_with_us: 'Colabora con nosotros',
             contact_cta: 'Contactar',
+            close: 'Cerrar',
         },
         home: {
             hero_title_line1: 'Encuentra todo lo que necesitas',
@@ -168,8 +169,9 @@ window.I18n.translations = {
         map: {
             loading_partners: 'Cargando partners…',
             no_partners: 'Todavía no tenemos partners en esta ciudad.',
-            no_partners_category_prefix: 'Todavía no tenemos partners de',
-            no_partners_category_suffix: 'en esta ciudad. Vuelve pronto.',
+            partners_count_label: 'sitios en',
+            all_filters_off: 'Has apagado todos los filtros.',
+            show_all_cta: 'Ver todo',
             directions: 'Cómo llegar',
             loading_map_prefix: 'Cargando mapa de',
             city_not_located_prefix: 'No hemos podido localizar',
@@ -280,6 +282,7 @@ window.I18n.translations = {
             check_back_soon: 'Check back soon.',
             collaborate_with_us: 'Partner with us',
             contact_cta: 'Contact us',
+            close: 'Close',
         },
         home: {
             hero_title_line1: 'Find everything you need',
@@ -410,8 +413,9 @@ window.I18n.translations = {
         map: {
             loading_partners: 'Loading partners…',
             no_partners: "We don't have any partners in this city yet.",
-            no_partners_category_prefix: "We don't have any",
-            no_partners_category_suffix: 'partners in this city yet. Check back soon.',
+            partners_count_label: 'spots in',
+            all_filters_off: "You've turned off all filters.",
+            show_all_cta: 'Show all',
             directions: 'Get directions',
             loading_map_prefix: 'Loading map for',
             city_not_located_prefix: "We couldn't locate",

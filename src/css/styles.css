@@ -4178,67 +4178,135 @@ main.city-main {
     }
 }
 
-/* ── 6.3 Partners list y acordeón ───────────────────────────── */
+/* ── 6.3 Partners list (chips multi-selección + Sheet) ─────────
+   Reemplaza al acordeón anterior (una categoría desplegada a la vez,
+   detalle de partner expandido inline en la lista) — ver
+   src/js/mapPartners.js. Modelo nuevo: chips multi-selección deciden
+   qué categorías se ven (mobile-first: tira horizontal con scroll;
+   revierte a envolver en varias líneas en --bp-md, ver el @media al
+   final de esta sección — el layout de dos columnas en sí ya vive en
+   .city-map-columns/.map-with-list, sección 6.2/7, sin cambios aquí)
+   y el detalle de un partner se abre en un Sheet (src/js/ui/sheet.js),
+   no expandido en la lista. */
 
-/* Botón de categoría */
+/* Barra de chips de categoría */
 
-.category-toggle {
+.partner-filters {
     display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 2px;
+    margin-bottom: 16px;
+}
+
+.partner-filters::-webkit-scrollbar {
+    display: none;
+}
+
+.category-chip {
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
-    width: 100%;
-    padding: 12px;
+    gap: 6px;
+    flex-shrink: 0;
+    min-height: var(--tap-min);
+    padding: 0 14px;
     background: var(--surface);
     border: 1px solid var(--outline-variant);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-full);
     font-family: var(--font-body);
     font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    margin-bottom: 8px;
-    transition: border-color var(--duration-fast) var(--ease-out);
-}
-
-.category-toggle.is-expanded {
-    border-color: var(--primary);
-}
-
-.category-toggle__icon {
-    font-size: 20px;
-    color: var(--pin-color);
-    flex-shrink: 0;
-}
-
-/* Categoría sin partners: visualmente atenuada pero sigue siendo clicable */
-
-.category-toggle.is-empty {
-    opacity: 0.6;
-}
-
-.category-toggle.is-empty .category-toggle__icon {
-    filter: grayscale(60%);
-}
-
-.category-coming-soon {
-    margin: 0 0 16px 12px;
-    padding: 10px 12px;
     font-size: 13px;
     color: var(--on-surface-variant);
-    background: var(--surface-container-low);
-    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition:
+        background var(--duration-fast) var(--ease-out),
+        border-color var(--duration-fast) var(--ease-out),
+        color var(--duration-fast) var(--ease-out);
 }
 
-/* Lista de partners dentro de una categoría expandida */
+/* Activo = color de la propia categoría (el mismo --pin-color que ya
+   usan sus pines en el mapa) — coherencia visual entre chip y pin, no
+   un lenguaje de color nuevo. Apagado: sin atenuar (regla de negocio:
+   nada de pines grises), directamente fuera del mapa y de la lista. */
+.category-chip.is-active {
+    background: var(--pin-color);
+    border-color: var(--pin-color);
+    color: #fffbff;
+}
+
+.category-chip__icon {
+    font-size: 18px;
+}
+
+/* Chip de reinicio: mismo alto/forma que el resto, tratamiento propio
+   (discontinuo) para que se lea como "acción", no como una categoría
+   más — solo aparece con todos los chips apagados (ver mapPartners.js). */
+.category-chip--reset {
+    border-style: dashed;
+    color: var(--primary);
+}
+
+/* Texto de recuento — sustituye a la barra de chips cuando la ciudad
+   solo tiene una categoría con partners (nada que filtrar). */
+.partners-count {
+    margin: 0 0 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--on-surface-variant);
+}
+
+/* Estado vacío compartido: ciudad sin ningún partner activo, y todos
+   los chips apagados a mano — mismo contenedor, mensaje/botón propios
+   de cada caso (ver mapPartners.js). */
+.partners-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px 4px;
+    color: var(--on-surface-variant);
+    font-size: 14px;
+}
+
+/* Cabecera de un grupo de categoría activa */
+
+.partner-group {
+    margin-bottom: 20px;
+}
+
+.partner-group__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--on-surface-variant);
+}
+
+.partner-group__icon {
+    font-size: 16px;
+    color: var(--pin-color);
+}
+
+/* Lista de partners dentro de un grupo */
 
 .partner-list {
-    margin: 0 0 16px 12px;
-    padding-left: 12px;
-    border-left: 2px solid var(--outline-variant);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .partner-toggle {
     display: block;
     width: 100%;
+    min-height: var(--tap-min);
     text-align: left;
     padding: 10px 12px;
     background: none;
@@ -4248,15 +4316,14 @@ main.city-main {
     color: var(--on-surface);
     cursor: pointer;
     border-radius: var(--radius-md);
+    transition: background var(--duration-fast) var(--ease-out);
 }
 
-.partner-toggle.is-selected {
-    background: var(--primary-fixed);
-    color: var(--primary);
-    font-weight: 600;
+.partner-toggle:hover {
+    background: var(--surface-container-low);
 }
 
-/* Detalle de partner: descripción + enlaces */
+/* Detalle de partner: descripción + enlaces (contenido del Sheet) */
 
 .partner-detail {
     padding: 12px;
@@ -4297,6 +4364,19 @@ main.city-main {
         'opsz' 24;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
     transition: font-size 0.2s;
+}
+
+@media (min-width: 900px) {
+    /* --bp-md (regla de negocio 8): la lista ya tiene su propio scroll
+       en dos columnas desde antes (.city-map-columns/.map-with-list,
+       sección 6.2/7) — lo único nuevo aquí es que los chips dejan de
+       deslizarse en horizontal y se envuelven en varias líneas, ya
+       que hay ancho de sobra en la columna de la lista. El HTML de
+       mapPartners.js no cambia por breakpoint, solo este contenedor. */
+    .partner-filters {
+        flex-wrap: wrap;
+        overflow-x: visible;
+    }
 }
 
 /* ═══════════════════════════════════════════════════════════
