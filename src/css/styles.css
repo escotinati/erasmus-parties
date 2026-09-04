@@ -4309,72 +4309,74 @@ main.city-main {
     margin-bottom: 20px;
 }
 
+/* Heading simple, no interactivo — solo regla 4 (una sola categoría
+   con partners, nada que filtrar). */
 .partner-group__title {
     display: flex;
     align-items: center;
     gap: 8px;
-    justify-content: space-between;
     margin: 0 0 8px;
-    /* Reserva el mismo hueco que .partner-group__toggle roba con su
-       margen negativo (ver más abajo): sin esto, el toggle — pegado al
-       borde derecho por space-between — asoma 12px fuera de este
-       título y genera scroll horizontal real en el aside estrecho de
-       escritorio (~226px en ciudad.html). Con el hueco reservado, el
-       área táctil completa sigue cayendo dentro del título, solo que
-       ahora la usa en vez de desbordarlo. */
-    padding-right: calc((var(--tap-min) - 20px) / 2);
     font-family: var(--font-body);
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.02em;
     color: var(--on-surface-variant);
-    transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.partner-group__title .partner-group__icon {
+    color: var(--pin-color);
 }
 
 .partner-group__icon {
     font-size: 16px;
-    color: var(--pin-color);
     flex-shrink: 0;
 }
 
-.partner-group__label {
-    /* Empuja el toggle al extremo derecho del título con space-between
-       de arriba, sea cual sea la longitud de la etiqueta. */
-    flex: 1;
+/* El propio título ES el control de activar/desactivar — sustituye al
+   antiguo .category-chip (barra aparte) y a un icono de toggle
+   incrustado en el título (probado en un commit anterior de esta
+   misma rama, descartado: un check pequeño dentro de una línea de
+   texto no se leía como un control claro). Ahora es una pastilla a lo
+   ancho del aside, rellena de --pin-color cuando la categoría está
+   activa — mismo lenguaje de color que ya tenía el chip original,
+   ahora en la posición de la cabecera de grupo. */
+.partner-group__heading {
+    margin: 0 0 8px;
 }
 
-/* Control de activar/desactivar fusionado en el título — sustituye al
-   antiguo .category-chip. Botón de --tap-min completo (área táctil
-   real, el icono de 20px solo se centra dentro por flex) con margen
-   negativo para que su HUECO EN EL FLUJO se quede en 20px — así el
-   <h3> no crece de alto por un botón de 44px incrustado en una línea
-   de texto de 12px. Con box-sizing:border-box global (línea 30), el
-   ancho tenía que fijarse en var(--tap-min) directamente, no vía
-   padding: padding+width:20px pedía un content-box negativo, que el
-   navegador no puede dar — el resultado real era una caja de 24px, no
-   44px, así que el área táctil prometida en el commit original
-   (feature/merge-category-toggle-title) no se estaba cumpliendo. */
 .partner-group__toggle {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: var(--tap-min);
-    height: var(--tap-min);
-    margin: calc((var(--tap-min) - 20px) / -2);
-    background: none;
+    gap: 8px;
+    width: 100%;
+    min-height: var(--tap-min);
+    padding: 0 14px;
+    background: var(--pin-color);
     border: none;
     border-radius: var(--radius-full);
-    color: var(--on-surface-variant);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: #fffbff;
+    text-align: left;
     cursor: pointer;
     transition:
-        background var(--duration-fast) var(--ease-out),
-        color var(--duration-fast) var(--ease-out);
+        opacity var(--duration-fast) var(--ease-out),
+        filter var(--duration-fast) var(--ease-out);
+}
+
+/* Icono blanco (color: inherit del texto del botón), no --pin-color:
+   el fondo YA lleva el color de la categoría, repetirlo en el icono
+   lo dejaría invisible sobre sí mismo. */
+.partner-group__toggle .partner-group__icon {
+    color: inherit;
 }
 
 .partner-group__toggle:hover {
-    background: var(--surface-container-low);
+    filter: brightness(0.92);
 }
 
 .partner-group__toggle:focus-visible {
@@ -4382,25 +4384,14 @@ main.city-main {
     outline: none;
 }
 
-.partner-group__toggle-icon {
-    font-size: 20px;
-}
-
-/* Activo = color de la propia categoría (el mismo --pin-color que ya
-   usan sus pines en el mapa) — coherencia visual con el pin, no un
-   lenguaje de color nuevo. La FORMA del icono (toggle_on/toggle_off,
-   ver mapPartners.js) es la señal principal de estado, no solo el
-   color — se distingue incluso sin percepción de color. */
-.partner-group__toggle[aria-pressed='true'] .partner-group__toggle-icon {
-    color: var(--pin-color);
-}
-
-/* Categoría apagada a mano: la sección se queda en el DOM colapsada,
-   no desaparece — el título (icono+etiqueta atenuados, control
-   siempre nítido para poder reactivarla) sigue siendo la salida. */
-.partner-group--collapsed .partner-group__icon,
-.partner-group--collapsed .partner-group__label {
-    opacity: 0.5;
+/* Apagada = mismo relleno de color, atenuado — no un gris neutro: la
+   categoría se sigue identificando por su color incluso apagada,
+   coherente con sus pines si se reactiva. La sección entera se queda
+   colapsada en el DOM (.partner-group--collapsed oculta .partner-list
+   más abajo) — la pastilla, siempre visible aunque atenuada, sigue
+   siendo la forma de reactivarla. */
+.partner-group__toggle[aria-pressed='false'] {
+    opacity: 0.45;
 }
 
 .partner-group--collapsed .partner-list {

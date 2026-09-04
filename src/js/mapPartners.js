@@ -185,15 +185,19 @@ async function mountPartnersList(listContainerId, map, city) {
         container.appendChild(wrap);
     }
 
-    // ── Grupo de una categoría: cabecera fusionada (icono + etiqueta +
-    // control de activar/desactivar) + lista de partners debajo. La
-    // sección SIEMPRE está en el DOM, activa o no — cuando está apagada
-    // se queda colapsada (clase .partner-group--collapsed: oculta
-    // .partner-list, atenúa icono+etiqueta) en vez de desaparecer, así
-    // el propio título sigue siendo la forma de reactivarla. Con una
-    // sola categoría en la ciudad (regla 4) no lleva control: nada que
-    // filtrar, y apagar la única categoría dejaría la lista vacía sin
-    // otra visible que sirviera de salida. ──
+    // ── Grupo de una categoría: cabecera + lista de partners debajo.
+    // La sección SIEMPRE está en el DOM, activa o no — cuando está
+    // apagada se queda colapsada (clase .partner-group--collapsed:
+    // oculta .partner-list) en vez de desaparecer, así la cabecera
+    // sigue siendo la forma de reactivarla. Con más de una categoría
+    // en la ciudad, la cabecera ES el control de activar/desactivar:
+    // una pastilla del color de la categoría (--pin-color) — llena
+    // cuando está activa, atenuada cuando no (mismo lenguaje visual
+    // que tenía el antiguo .category-chip, ahora en la posición del
+    // título en vez de una barra aparte). Con una sola categoría
+    // (regla 4) la cabecera es un heading simple, sin control: nada
+    // que filtrar, y apagar la única categoría dejaría la lista vacía
+    // sin otra visible que sirviera de salida. ──
     function buildGroupSection(group) {
         const { category, partners } = group;
         const meta = CATEGORY_META[category] || {
@@ -209,47 +213,52 @@ async function mountPartnersList(listContainerId, map, city) {
         section.className =
             'partner-group' + (!singleCategory && !isActive ? ' partner-group--collapsed' : '');
 
-        const heading = document.createElement('h3');
-        heading.className = 'partner-group__title';
-        heading.style.setProperty('--pin-color', meta.color);
+        function buildIcon() {
+            const icon = document.createElement('span');
+            icon.className = 'material-symbols-outlined partner-group__icon';
+            icon.setAttribute('aria-hidden', 'true');
+            icon.textContent = meta.icon;
+            return icon;
+        }
 
-        const headingIcon = document.createElement('span');
-        headingIcon.className = 'material-symbols-outlined partner-group__icon';
-        headingIcon.setAttribute('aria-hidden', 'true');
-        headingIcon.textContent = meta.icon;
-        heading.appendChild(headingIcon);
+        function buildLabel() {
+            const span = document.createElement('span');
+            span.className = 'partner-group__label';
+            span.textContent = label;
+            return span;
+        }
 
-        const labelEl = document.createElement('span');
-        labelEl.className = 'partner-group__label';
-        labelEl.textContent = label;
-        heading.appendChild(labelEl);
+        if (singleCategory) {
+            const heading = document.createElement('h3');
+            heading.className = 'partner-group__title';
+            heading.style.setProperty('--pin-color', meta.color);
+            heading.appendChild(buildIcon());
+            heading.appendChild(buildLabel());
+            section.appendChild(heading);
+        } else {
+            // <h3> envuelve al <button> en vez de sustituirlo: conserva
+            // la navegación por encabezados de un lector de pantalla,
+            // el elemento realmente interactivo (foco, Enter/Espacio,
+            // aria-pressed) es el <button> de dentro. Sin aria-label
+            // propio: el texto visible de la etiqueta ya es un nombre
+            // accesible claro, aria-pressed comunica el estado — un
+            // "Mostrar/Ocultar X" aparte sería redundante con lo que el
+            // lector de pantalla ya anuncia por sí solo.
+            const headingWrap = document.createElement('h3');
+            headingWrap.className = 'partner-group__heading';
 
-        if (!singleCategory) {
-            // toggle_on/toggle_off (no un simple check): la FORMA del
-            // icono cambia entera entre estados, no solo su color — se
-            // lee como "esto es un interruptor" antes de tocarlo,
-            // incluso sin distinguir color. El color activo sigue
-            // siendo --pin-color, igual que antes en el chip.
             const toggle = document.createElement('button');
             toggle.type = 'button';
             toggle.className = 'partner-group__toggle';
+            toggle.style.setProperty('--pin-color', meta.color);
             toggle.setAttribute('aria-pressed', String(isActive));
-            toggle.setAttribute(
-                'aria-label',
-                `${I18n.t(isActive ? 'map.category_hide' : 'map.category_show')} ${label}`
-            );
-
-            const toggleIcon = document.createElement('span');
-            toggleIcon.className = 'material-symbols-outlined partner-group__toggle-icon';
-            toggleIcon.setAttribute('aria-hidden', 'true');
-            toggleIcon.textContent = isActive ? 'toggle_on' : 'toggle_off';
-            toggle.appendChild(toggleIcon);
-
+            toggle.appendChild(buildIcon());
+            toggle.appendChild(buildLabel());
             toggle.addEventListener('click', () => toggleCategory(category));
-            heading.appendChild(toggle);
-        }
 
-        section.appendChild(heading);
+            headingWrap.appendChild(toggle);
+            section.appendChild(headingWrap);
+        }
 
         const list = document.createElement('div');
         list.className = 'partner-list';
