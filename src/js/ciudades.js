@@ -88,7 +88,7 @@ async function initCiudadesPage() {
         .map(
             (city, i) => `
     <a class="city-card anim-fade-up anim-delay-${(i % 8) + 1}" href="ciudad.html?ciudad=${city.id}">
-      <img class="card-img" src="${escapeHtml(city.image_url)}" alt="${escapeHtml(city.name)}" loading="lazy"/>
+      <img class="card-img" src="${escapeHtml(sanitizeUrl(city.image_url))}" alt="${escapeHtml(city.name)}" loading="lazy"/>
       <div class="card-overlay"></div>
       <div class="card-arrow">${ARROW_SVG}</div>
       <div class="card-body">
