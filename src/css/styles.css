@@ -841,15 +841,30 @@ a.city-card {
    input) — revierte a su forma normal (position:static implícito,
    padding/gap del botón base) en --bp-sm. Solo afecta a
    .search-bar-btn, no a .events-scroll .event-cta-btn (comparten la
-   regla base de arriba, pero no esta). */
+   regla base de arriba, pero no esta).
+
+   width/height fijos en vez de aspect-ratio:1 con padding — bug real
+   encontrado en esta rama: antes de que cargue la fuente Material
+   Symbols (icon-font vía Google Fonts, tarda en redes reales; en
+   local carga casi instantánea desde caché y no se nota), el span
+   del icono renderiza su texto de respaldo literal ("arrow_forward",
+   13 caracteres) — con aspect-ratio:1 forzando la altura a seguir a
+   ese ancho, el botón se inflaba a ~180×180px, tapando el input y el
+   resto del hero (confirmado bloqueando la fuente por completo).
+   Con tamaño fijo, el peor caso es que el texto de respaldo se
+   recorte (overflow:hidden) mientras carga la fuente — círculo
+   siempre estable, nunca gigante. */
 .search-bar-btn {
     position: absolute;
     top: 50%;
     right: 6px;
     transform: translateY(-50%);
-    padding: 8px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
     gap: 0;
-    aspect-ratio: 1;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .search-bar-btn .material-symbols-outlined {
@@ -3001,9 +3016,12 @@ header.topbar {
     .search-bar-btn {
         position: static;
         transform: none;
+        width: auto;
+        height: auto;
         padding: 14px 32px;
         gap: 8px;
-        aspect-ratio: auto;
+        justify-content: flex-start;
+        overflow: visible;
     }
     .search-bar-btn .material-symbols-outlined {
         font-size: inherit;
