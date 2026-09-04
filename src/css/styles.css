@@ -4282,6 +4282,13 @@ main.city-main {
     display: flex;
     gap: 8px;
     overflow-x: auto;
+    /* proximity, no mandatory: a diferencia de .events-scroll (cards
+       de 320px, donde mandatory tiene sentido — quieres que cada card
+       quede perfectamente encuadrada), esto es una barra de filtros —
+       forzar el salto tras cualquier arrastre, por pequeño que sea,
+       se sentiría pegajoso en un control de acción. proximity solo
+       encaja si el usuario ya se para cerca de un punto de snap. */
+    scroll-snap-type: x proximity;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -4298,6 +4305,7 @@ main.city-main {
     align-items: center;
     gap: 6px;
     flex-shrink: 0;
+    scroll-snap-align: start;
     min-height: var(--tap-min);
     padding: 0 14px;
     background: var(--surface);
@@ -4463,6 +4471,7 @@ main.city-main {
     .partner-filters {
         flex-wrap: wrap;
         overflow-x: visible;
+        scroll-snap-type: none;
     }
 }
 
