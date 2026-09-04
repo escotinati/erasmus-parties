@@ -4269,19 +4269,22 @@ main.city-main {
    Reemplaza al acordeón anterior (una categoría desplegada a la vez,
    detalle de partner expandido inline en la lista) — ver
    src/js/mapPartners.js. El control de activar/desactivar cada
-   categoría vive DENTRO del propio <h3> del grupo (icono
-   toggle_on/toggle_off, ver .partner-group__toggle más abajo): antes
-   hubo una barra de .category-chip separada además del título, las
-   dos mostrando el mismo icono+etiqueta — visible como duplicado en
-   pantalla, y en el aside estrecho de escritorio (~226-340px según la
-   página) esa barra se envolvía en líneas sueltas de 1+2/2+1 chips
-   justo encima del título que repetía lo mismo. Al fusionarlos ese
-   problema de maquetación desaparece por construcción: no hace falta
-   ninguna regla de wrap/overflow aparte para el título, porque nunca
-   compite por ancho con más de un elemento por línea (el layout de
-   dos columnas en sí ya vive en .city-map-columns/.map-with-list,
-   sección 6.2/7, sin cambios aquí). El detalle de un partner se abre
-   en un Sheet (src/js/ui/sheet.js), no expandido en la lista. */
+   categoría vive DENTRO del propio <h3> del grupo: es una pastilla a
+   lo ancho del aside, rellena de --pin-color cuando la categoría está
+   activa y con ese mismo color atenuado cuando no (ver
+   .partner-group__toggle más abajo) — sin icono de estado aparte, el
+   propio color ya comunica si está activa. Antes hubo una barra de
+   .category-chip separada además del título, las dos mostrando el
+   mismo icono+etiqueta — visible como duplicado en pantalla, y en el
+   aside estrecho de escritorio (~226-340px según la página) esa barra
+   se envolvía en líneas sueltas de 1+2/2+1 chips justo encima del
+   título que repetía lo mismo. Al fusionarlos ese problema de
+   maquetación desaparece por construcción: no hace falta ninguna
+   regla de wrap/overflow aparte para el título, porque nunca compite
+   por ancho con más de un elemento por línea (el layout de dos
+   columnas en sí ya vive en .city-map-columns/.map-with-list, sección
+   6.2/7, sin cambios aquí). El detalle de un partner se abre en un
+   Sheet (src/js/ui/sheet.js), no expandido en la lista. */
 
 /* Texto de recuento — sustituye al título con control cuando la
    ciudad solo tiene una categoría con partners (nada que filtrar). */
