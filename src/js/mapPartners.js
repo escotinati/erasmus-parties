@@ -2,11 +2,22 @@
 //  MAPPARTNERS.JS — Erasmus Verified / Erasmus Parties
 //
 //  Listado de categorías/partners sincronizado con pines en el mapa.
-//  Modelo de multi-selección (chips), no acordeón: un Set de
-//  categorías activas decide qué grupos aparecen en la lista y qué
-//  pines en el mapa — no hay "una categoría desplegada a la vez"
-//  como en la versión anterior. Abrir un partner ya no expande su
-//  fila inline: abre el detalle en un Sheet (src/js/ui/sheet.js).
+//  Modelo de multi-selección, no acordeón: un Set de categorías
+//  activas decide qué grupos se ven en la lista y qué pines en el
+//  mapa — no hay "una categoría desplegada a la vez" como en la
+//  versión anterior. El control de activar/desactivar cada categoría
+//  vive DENTRO del propio <h3> del grupo (icono toggle_on/toggle_off
+//  junto al icono+etiqueta de la categoría) — no hay una barra de
+//  chips separada como hubo en una rama anterior: chip y título
+//  mostraban lo mismo dos veces, y en el aside estrecho de escritorio
+//  (~226-340px) la barra se envolvía en líneas sueltas por encima de
+//  esa misma información repetida. Al fusionarlos, ese problema de
+//  maquetación desaparece por construcción, sin parche de CSS aparte.
+//  Categoría desactivada: su sección se queda en el DOM colapsada
+//  (icono+etiqueta atenuados, sin la lista de partners debajo), nunca
+//  desaparece del todo — el título sigue ahí para poder reactivarla.
+//  Abrir un partner no expande su fila inline: abre el detalle en un
+//  Sheet (src/js/ui/sheet.js).
 //
 //  Depende de: fetchPartnersByCity/groupPartnersByCategory
 //  (partnersService.js), createPartnerMarker/setMarkerExpanded/
@@ -41,8 +52,8 @@ async function mountPartnersList(listContainerId, map, city) {
     const container = document.getElementById(listContainerId);
     // No se sabe todavía cuántas categorías/partners habrá (eso lo
     // decide la respuesta), así que el skeleton es genérico: unas
-    // pocas filas sueltas, misma forma que .partner-toggle sin chips
-    // ni cabeceras de grupo encima (esos sí dependen del resultado).
+    // pocas filas sueltas, misma forma que .partner-toggle sin
+    // cabeceras de grupo encima (esas sí dependen del resultado).
     Skeleton.render(container, 4, () => Skeleton.block('skeleton--row'));
 
     const partners = await fetchPartnersByCity(city.id);
@@ -82,8 +93,9 @@ async function mountPartnersList(listContainerId, map, city) {
         return new Set(groups.map((g) => g.category));
     }
 
-    // Con una sola categoría en la ciudad no hay chips que decidan nada
-    // (regla 4): esa categoría se muestra siempre, entera.
+    // Con una sola categoría en la ciudad no hay nada que decida
+    // filtrarla (regla 4): esa categoría se muestra siempre, entera —
+    // buildGroupSection() tampoco le pone control de activar/desactivar.
     function isCategoryVisible(category) {
         return groups.length === 1 || state.activeCategories.has(category);
     }
@@ -113,114 +125,33 @@ async function mountPartnersList(listContainerId, map, city) {
         requestAnimationFrame(() => map.invalidateSize());
     }
 
-    // Reactiva todas las categorías con partners — recuperación de la
-    // regla 6 (todos los chips apagados a mano).
-    function showAllCategories() {
-        state.activeCategories = new Set(groups.map((g) => g.category));
-        syncMarkers();
-        renderList();
-        requestAnimationFrame(() => map.invalidateSize());
-    }
-
     function renderList() {
         Skeleton.clear(container);
         container.innerHTML = '';
 
         const singleCategory = groups.length === 1;
-        const allOff = !singleCategory && state.activeCategories.size === 0;
 
         if (singleCategory) {
             container.appendChild(buildCountText(groups[0]));
-        } else {
-            container.appendChild(buildChipBar());
         }
 
-        if (allOff) {
-            container.appendChild(buildAllFiltersOffState());
-            return;
-        }
-
+        // Regla 6 (todo apagado a mano): ya no hace falta un botón
+        // "ver todo" aparte — con el título siempre visible aunque
+        // colapsado (ver buildGroupSection), cada grupo apagado ya es
+        // su propia salida. Un botón de reinicio flotante habría sido
+        // OTRO control separado repitiendo lo que el propio título ya
+        // resuelve, justo el problema que motivó esta fusión.
         for (const group of groups) {
-            if (!isCategoryVisible(group.category)) continue;
             container.appendChild(buildGroupSection(group));
         }
     }
 
-    // ── Regla 4: una sola categoría con partners → sin barra de chips ──
+    // ── Regla 4: una sola categoría con partners → sin control de activar/desactivar ──
     function buildCountText(group) {
         const p = document.createElement('p');
         p.className = 'partners-count';
         p.textContent = `${group.partners.length} ${I18n.t('map.partners_count_label')} ${city.name}`;
         return p;
-    }
-
-    // ── Barra de chips (multi-selección) ──────────────────────────
-    function buildChipBar() {
-        const bar = document.createElement('div');
-        bar.className = 'partner-filters';
-
-        for (const { category, partners } of groups) {
-            const meta = CATEGORY_META[category] || {
-                label: category,
-                color: '#64748b',
-                icon: 'place',
-            };
-            const label = categoryLabel(category, meta.label);
-            const isActive = state.activeCategories.has(category);
-
-            const chip = document.createElement('button');
-            chip.type = 'button';
-            chip.className = 'category-chip' + (isActive ? ' is-active' : '');
-            chip.setAttribute('aria-pressed', String(isActive));
-            chip.style.setProperty('--pin-color', meta.color);
-
-            const icon = document.createElement('span');
-            icon.className = 'material-symbols-outlined category-chip__icon';
-            icon.setAttribute('aria-hidden', 'true');
-            icon.textContent = meta.icon;
-
-            const labelEl = document.createElement('span');
-            labelEl.className = 'category-chip__label';
-            labelEl.textContent = label;
-
-            chip.appendChild(icon);
-            chip.appendChild(labelEl);
-            chip.addEventListener('click', () => toggleCategory(category));
-            bar.appendChild(chip);
-        }
-
-        // Regla 6: chip de reinicio al final de la barra mientras todo
-        // esté apagado — equivalente al botón "ver todo" del estado
-        // vacío, no lo sustituye.
-        if (state.activeCategories.size === 0) {
-            const reset = document.createElement('button');
-            reset.type = 'button';
-            reset.className = 'category-chip category-chip--reset';
-            reset.textContent = I18n.t('map.show_all_cta');
-            reset.addEventListener('click', showAllCategories);
-            bar.appendChild(reset);
-        }
-
-        return bar;
-    }
-
-    // ── Regla 6: todos los chips apagados a mano ───────────────────
-    function buildAllFiltersOffState() {
-        const wrap = document.createElement('div');
-        wrap.className = 'partners-empty-state';
-
-        const msg = document.createElement('p');
-        msg.textContent = I18n.t('map.all_filters_off');
-        wrap.appendChild(msg);
-
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'btn-primary-pill';
-        btn.textContent = I18n.t('map.show_all_cta');
-        btn.addEventListener('click', showAllCategories);
-        wrap.appendChild(btn);
-
-        return wrap;
     }
 
     // ── Regla 5: la ciudad no tiene ningún partner activo ──────────
@@ -254,7 +185,19 @@ async function mountPartnersList(listContainerId, map, city) {
         container.appendChild(wrap);
     }
 
-    // ── Grupo de una categoría activa: cabecera + lista de partners ──
+    // ── Grupo de una categoría: cabecera + lista de partners debajo.
+    // La sección SIEMPRE está en el DOM, activa o no — cuando está
+    // apagada se queda colapsada (clase .partner-group--collapsed:
+    // oculta .partner-list) en vez de desaparecer, así la cabecera
+    // sigue siendo la forma de reactivarla. Con más de una categoría
+    // en la ciudad, la cabecera ES el control de activar/desactivar:
+    // una pastilla del color de la categoría (--pin-color) — llena
+    // cuando está activa, atenuada cuando no (mismo lenguaje visual
+    // que tenía el antiguo .category-chip, ahora en la posición del
+    // título en vez de una barra aparte). Con una sola categoría
+    // (regla 4) la cabecera es un heading simple, sin control: nada
+    // que filtrar, y apagar la única categoría dejaría la lista vacía
+    // sin otra visible que sirviera de salida. ──
     function buildGroupSection(group) {
         const { category, partners } = group;
         const meta = CATEGORY_META[category] || {
@@ -263,21 +206,59 @@ async function mountPartnersList(listContainerId, map, city) {
             icon: 'place',
         };
         const label = categoryLabel(category, meta.label);
+        const singleCategory = groups.length === 1;
+        const isActive = state.activeCategories.has(category);
 
         const section = document.createElement('div');
-        section.className = 'partner-group';
+        section.className =
+            'partner-group' + (!singleCategory && !isActive ? ' partner-group--collapsed' : '');
 
-        const heading = document.createElement('h3');
-        heading.className = 'partner-group__title';
-        heading.style.setProperty('--pin-color', meta.color);
+        function buildIcon() {
+            const icon = document.createElement('span');
+            icon.className = 'material-symbols-outlined partner-group__icon';
+            icon.setAttribute('aria-hidden', 'true');
+            icon.textContent = meta.icon;
+            return icon;
+        }
 
-        const headingIcon = document.createElement('span');
-        headingIcon.className = 'material-symbols-outlined partner-group__icon';
-        headingIcon.setAttribute('aria-hidden', 'true');
-        headingIcon.textContent = meta.icon;
-        heading.appendChild(headingIcon);
-        heading.appendChild(document.createTextNode(label));
-        section.appendChild(heading);
+        function buildLabel() {
+            const span = document.createElement('span');
+            span.className = 'partner-group__label';
+            span.textContent = label;
+            return span;
+        }
+
+        if (singleCategory) {
+            const heading = document.createElement('h3');
+            heading.className = 'partner-group__title';
+            heading.style.setProperty('--pin-color', meta.color);
+            heading.appendChild(buildIcon());
+            heading.appendChild(buildLabel());
+            section.appendChild(heading);
+        } else {
+            // <h3> envuelve al <button> en vez de sustituirlo: conserva
+            // la navegación por encabezados de un lector de pantalla,
+            // el elemento realmente interactivo (foco, Enter/Espacio,
+            // aria-pressed) es el <button> de dentro. Sin aria-label
+            // propio: el texto visible de la etiqueta ya es un nombre
+            // accesible claro, aria-pressed comunica el estado — un
+            // "Mostrar/Ocultar X" aparte sería redundante con lo que el
+            // lector de pantalla ya anuncia por sí solo.
+            const headingWrap = document.createElement('h3');
+            headingWrap.className = 'partner-group__heading';
+
+            const toggle = document.createElement('button');
+            toggle.type = 'button';
+            toggle.className = 'partner-group__toggle';
+            toggle.style.setProperty('--pin-color', meta.color);
+            toggle.setAttribute('aria-pressed', String(isActive));
+            toggle.appendChild(buildIcon());
+            toggle.appendChild(buildLabel());
+            toggle.addEventListener('click', () => toggleCategory(category));
+
+            headingWrap.appendChild(toggle);
+            section.appendChild(headingWrap);
+        }
 
         const list = document.createElement('div');
         list.className = 'partner-list';
