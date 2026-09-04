@@ -17,6 +17,7 @@
         <link rel="stylesheet" href="/src/styles/tokens.css" />
         <link rel="stylesheet" href="/src/styles/typography.css" />
         <link rel="stylesheet" href="/src/css/styles.css" />
+        <link rel="stylesheet" href="/src/css/animations.css" />
         <script src="/src/js/experience.js"></script>
     </head>
 
@@ -27,13 +28,13 @@
 
         <main style="flex: 1">
             <div class="section">
-                <span class="eyebrow eyebrow--primary" data-i18n="services.eyebrow"
+                <span class="eyebrow eyebrow--primary anim-page-enter" data-i18n="services.eyebrow"
                     >SERVICIOS VERIFICADOS</span
                 >
-                <h1 class="section-title" data-i18n="services.title">
+                <h1 class="section-title anim-page-enter" data-i18n="services.title">
                     Todo lo que necesitas para tu Erasmus
                 </h1>
-                <p class="section-sub" data-i18n="services.subtitle">
+                <p class="section-sub anim-page-enter" data-i18n="services.subtitle">
                     Una selección de SIM, cuentas bancarias y transporte probados por la comunidad
                     para que tu llegada sea lo más sencilla posible.
                 </p>
@@ -44,7 +45,7 @@
                         >TARJETA SIM</span
                     >
                     <div class="services-grid">
-                        <div class="service-card">
+                        <div class="service-card anim-fade-up anim-delay-1">
                             <div class="service-icon">
                                 <span class="material-symbols-outlined">sim_card</span>
                             </div>
@@ -68,7 +69,7 @@
                             </a>
                         </div>
 
-                        <div class="service-card">
+                        <div class="service-card anim-fade-up anim-delay-2">
                             <div class="service-icon">
                                 <span class="material-symbols-outlined">cell_tower</span>
                             </div>
@@ -92,7 +93,7 @@
                             </a>
                         </div>
 
-                        <div class="service-card">
+                        <div class="service-card anim-fade-up anim-delay-3">
                             <div class="service-icon">
                                 <span class="material-symbols-outlined">phone_iphone</span>
                             </div>
@@ -126,7 +127,7 @@
                         >CUENTA BANCARIA</span
                     >
                     <div class="services-grid services-grid--2col">
-                        <div class="service-card">
+                        <div class="service-card anim-fade-up anim-delay-4">
                             <div class="service-icon">
                                 <span class="material-symbols-outlined">account_balance</span>
                             </div>
@@ -150,7 +151,7 @@
                             </a>
                         </div>
 
-                        <div class="service-card">
+                        <div class="service-card anim-fade-up anim-delay-5">
                             <div class="service-icon">
                                 <span class="material-symbols-outlined">currency_exchange</span>
                             </div>
@@ -181,7 +182,7 @@
                         >TRANSPORTE</span
                     >
                     <div style="max-width: 420px">
-                        <div class="service-card">
+                        <div class="service-card anim-fade-up anim-delay-6">
                             <div class="service-icon">
                                 <span class="material-symbols-outlined">directions_bus</span>
                             </div>
@@ -211,7 +212,7 @@
                 </div>
 
                 <!-- Callout -->
-                <div class="info-box" style="margin-top: 64px">
+                <div class="info-box anim-fade-up" style="margin-top: 64px">
                     <span class="info-icon material-symbols-outlined">lightbulb</span>
                     <p class="info-text">
                         <strong data-i18n="services.callout_title"
@@ -239,9 +240,11 @@
         <script src="/src/utils/i18n.js"></script>
         <script src="/src/utils/translations.js"></script>
         <script src="/src/js/langSwitcher.js"></script>
+        <script src="/src/js/utils/animations.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 window.I18n.applyTranslations();
+                if (window.initScrollReveal) window.initScrollReveal();
             });
         </script>
     </body>

@@ -17,6 +17,7 @@
         <link rel="stylesheet" href="/src/styles/tokens.css" />
         <link rel="stylesheet" href="/src/styles/typography.css" />
         <link rel="stylesheet" href="/src/css/styles.css" />
+        <link rel="stylesheet" href="/src/css/animations.css" />
         <script src="/src/js/experience.js"></script>
     </head>
 
@@ -28,11 +29,13 @@
         <main style="flex: 1">
             <section class="nights-section">
                 <div class="nights-header">
-                    <span class="eyebrow eyebrow--primary" data-i18n="trips.eyebrow"
+                    <span class="eyebrow eyebrow--primary anim-page-enter" data-i18n="trips.eyebrow"
                         >VIAJES ERASMUS</span
                     >
-                    <h1 class="section-title" data-i18n="trips.title">Muévete por Europa</h1>
-                    <p class="section-sub" data-i18n="trips.subtitle">
+                    <h1 class="section-title anim-page-enter" data-i18n="trips.title">
+                        Muévete por Europa
+                    </h1>
+                    <p class="section-sub anim-page-enter" data-i18n="trips.subtitle">
                         Colaboramos con las mejores plataformas de transporte para que te muevas por
                         Europa sin complicaciones ni sorpresas.
                     </p>
@@ -43,7 +46,7 @@
                         href="https://www.flixbus.es"
                         target="_blank"
                         rel="noopener noreferrer sponsored"
-                        class="collab-card"
+                        class="collab-card anim-fade-up anim-delay-1"
                     >
                         <span class="collab-name">FlixBus</span>
                         <span class="collab-desc" data-i18n="trips.collab_flixbus_desc"
@@ -54,7 +57,7 @@
                         href="https://www.blablacar.es"
                         target="_blank"
                         rel="noopener noreferrer sponsored"
-                        class="collab-card"
+                        class="collab-card anim-fade-up anim-delay-2"
                     >
                         <span class="collab-name">BlaBlaCar</span>
                         <span class="collab-desc" data-i18n="trips.collab_blablacar_desc"
@@ -65,7 +68,7 @@
                         href="https://www.omio.es"
                         target="_blank"
                         rel="noopener noreferrer sponsored"
-                        class="collab-card"
+                        class="collab-card anim-fade-up anim-delay-3"
                     >
                         <span class="collab-name">Omio</span>
                         <span class="collab-desc" data-i18n="trips.collab_omio_desc"
@@ -76,7 +79,7 @@
                         href="https://www.rentalcars.com"
                         target="_blank"
                         rel="noopener noreferrer sponsored"
-                        class="collab-card"
+                        class="collab-card anim-fade-up anim-delay-4"
                     >
                         <span class="collab-name">Rentalcars</span>
                         <span class="collab-desc" data-i18n="trips.collab_rentalcars_desc"
@@ -85,7 +88,7 @@
                     </a>
                 </div>
 
-                <div class="collab-contact">
+                <div class="collab-contact anim-fade-up">
                     <span class="eyebrow eyebrow--primary" data-i18n="trips.company_eyebrow"
                         >¿ERES UNA EMPRESA DE TRANSPORTE?</span
                     >
@@ -116,9 +119,11 @@
         <script src="/src/utils/i18n.js"></script>
         <script src="/src/utils/translations.js"></script>
         <script src="/src/js/langSwitcher.js"></script>
+        <script src="/src/js/utils/animations.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 window.I18n.applyTranslations();
+                if (window.initScrollReveal) window.initScrollReveal();
             });
         </script>
     </body>

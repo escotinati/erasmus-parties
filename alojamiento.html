@@ -17,6 +17,7 @@
         <link rel="stylesheet" href="/src/styles/tokens.css" />
         <link rel="stylesheet" href="/src/styles/typography.css" />
         <link rel="stylesheet" href="/src/css/styles.css" />
+        <link rel="stylesheet" href="/src/css/animations.css" />
         <script src="/src/js/experience.js"></script>
         <script>
             if (window.ERASMUS_EXPERIENCE.theme === 'theme-parties') {
@@ -33,13 +34,15 @@
         <main style="flex: 1">
             <section class="nights-section">
                 <div class="nights-header">
-                    <span class="eyebrow eyebrow--primary" data-i18n="accommodation.eyebrow"
+                    <span
+                        class="eyebrow eyebrow--primary anim-page-enter"
+                        data-i18n="accommodation.eyebrow"
                         >ALOJAMIENTO VERIFICADO</span
                     >
-                    <h1 class="section-title" data-i18n="accommodation.title">
+                    <h1 class="section-title anim-page-enter" data-i18n="accommodation.title">
                         Encuentra tu hogar Erasmus
                     </h1>
-                    <p class="section-sub" data-i18n="accommodation.subtitle">
+                    <p class="section-sub anim-page-enter" data-i18n="accommodation.subtitle">
                         Colaboramos con las mejores plataformas de alojamiento para estudiantes en
                         Europa. Reserva con confianza.
                     </p>
@@ -50,7 +53,7 @@
                         href="https://www.uniplaces.com"
                         target="_blank"
                         rel="noopener noreferrer sponsored"
-                        class="collab-card"
+                        class="collab-card anim-fade-up anim-delay-1"
                     >
                         <span class="collab-name">Uniplaces</span>
                         <span class="collab-desc" data-i18n="home.collab_uniplaces_desc"
@@ -61,7 +64,7 @@
                         href="https://www.spotahome.com"
                         target="_blank"
                         rel="noopener noreferrer sponsored"
-                        class="collab-card"
+                        class="collab-card anim-fade-up anim-delay-2"
                     >
                         <span class="collab-name">Spotahome</span>
                         <span class="collab-desc" data-i18n="home.collab_spotahome_desc"
@@ -72,7 +75,7 @@
                         href="https://housinganywhere.com"
                         target="_blank"
                         rel="noopener noreferrer sponsored"
-                        class="collab-card"
+                        class="collab-card anim-fade-up anim-delay-3"
                     >
                         <span class="collab-name">HousingAnywhere</span>
                         <span class="collab-desc" data-i18n="home.collab_housinganywhere_desc"
@@ -83,7 +86,7 @@
                         href="https://badi.com"
                         target="_blank"
                         rel="noopener noreferrer sponsored"
-                        class="collab-card"
+                        class="collab-card anim-fade-up anim-delay-4"
                     >
                         <span class="collab-name">Badi</span>
                         <span class="collab-desc" data-i18n="home.collab_badi_desc"
@@ -92,7 +95,7 @@
                     </a>
                 </div>
 
-                <div class="collab-contact">
+                <div class="collab-contact anim-fade-up">
                     <span class="eyebrow eyebrow--primary" data-i18n="accommodation.company_eyebrow"
                         >¿ERES UNA EMPRESA DE ALOJAMIENTO?</span
                     >
@@ -124,9 +127,11 @@
         <script src="/src/utils/i18n.js"></script>
         <script src="/src/utils/translations.js"></script>
         <script src="/src/js/langSwitcher.js"></script>
+        <script src="/src/js/utils/animations.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 window.I18n.applyTranslations();
+                if (window.initScrollReveal) window.initScrollReveal();
             });
         </script>
     </body>
