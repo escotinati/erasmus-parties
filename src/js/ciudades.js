@@ -17,6 +17,20 @@ async function initCiudadesPage() {
     const params = new URLSearchParams(window.location.search);
     const paisName = params.get('pais') || '';
 
+    // Skeleton antes del fetch — no se sabe todavía cuántas ciudades
+    // tendrá el país, 6 es una aproximación razonable. Si el resultado
+    // acaba siendo el caso de error de más abajo, el propio
+    // document.body.innerHTML lo sustituye entero, sin dejar rastro.
+    const gridEl = document.getElementById('citiesGrid');
+    if (gridEl) {
+        Skeleton.render(gridEl, 6, () => {
+            const card = document.createElement('div');
+            card.className = 'city-card';
+            card.appendChild(Skeleton.block('skeleton--fill'));
+            return card;
+        });
+    }
+
     const allCities = await fetchAllCities();
     const cities = allCities
         .filter((c) => c.country === paisName)
@@ -69,6 +83,7 @@ async function initCiudadesPage() {
     if (count <= 3) grid.classList.add('cols-3');
     if (count === 2) grid.classList.add('cols-2');
 
+    Skeleton.clear(grid);
     grid.innerHTML = cities
         .map(
             (city, i) => `

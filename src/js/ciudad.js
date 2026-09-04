@@ -134,7 +134,7 @@ async function buildContextualSections(cityId, ciudad) {
     let html = '';
 
     html += `
-    <div class="info-box" style="margin-top:24px">
+    <div class="info-box anim-fade-up" style="margin-top:24px">
       <span class="info-icon material-symbols-outlined">apartment</span>
       <div>
         <p class="info-text" style="margin-bottom:12px">
@@ -148,8 +148,8 @@ async function buildContextualSections(cityId, ciudad) {
     if (travelPartners.length > 0) {
         const cards = travelPartners
             .map(
-                (p) => `
-        <div class="service-card">
+                (p, i) => `
+        <div class="service-card anim-fade-up anim-delay-${(i % 8) + 1}">
           <div class="service-icon"><span class="material-symbols-outlined">flight</span></div>
           <h3 class="service-name">${escapeHtml(p.name)}</h3>
           <p class="service-desc">${escapeHtml(I18n.tField(p.description))}</p>
@@ -172,6 +172,8 @@ async function buildContextualSections(cityId, ciudad) {
 
     const extra = document.getElementById('city-extra');
     if (extra) extra.innerHTML = html;
+
+    if (window.initScrollReveal) window.initScrollReveal();
 }
 
 function buildMapBlock(city) {

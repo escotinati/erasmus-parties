@@ -23,6 +23,7 @@
         <link rel="stylesheet" href="/src/styles/tokens.css" />
         <link rel="stylesheet" href="/src/styles/typography.css" />
         <link rel="stylesheet" href="/src/css/styles.css?" />
+        <link rel="stylesheet" href="/src/css/animations.css" />
         <script src="/src/js/experience.js"></script>
         <style>
             /* Alta especificidad (#map > cualquier regla de clase) para garantizar
@@ -43,8 +44,8 @@
         <script type="module" src="/src/react/mount-topbar-nav.jsx"></script>
 
         <main class="map-page-main map-with-list">
-            <div id="map" class="map-canvas"></div>
-            <aside id="partners-list" class="partners-list"></aside>
+            <div id="map" class="map-canvas anim-page-enter"></div>
+            <aside id="partners-list" class="partners-list anim-page-enter"></aside>
         </main>
 
         <!-- FOOTER (React, rama react/menu) — ver src/react/Footer.jsx -->
@@ -61,12 +62,14 @@
         <script src="/src/utils/i18n.js"></script>
         <script src="/src/utils/translations.js"></script>
         <script src="/src/js/langSwitcher.js"></script>
+        <script src="/src/js/utils/speculationRules.js"></script>
         <script src="/src/js/utils/sanitize.js"></script>
         <script src="/src/js/geocoder.js"></script>
         <script src="/src/js/map-helpers.js"></script>
         <script src="/src/js/services/partnersService.js"></script>
         <script src="/src/js/tracking.js"></script>
         <script src="/src/js/ui/sheet.js"></script>
+        <script src="/src/js/utils/skeleton.js"></script>
         <script src="/src/js/mapPartners.js"></script>
         <script src="/src/js/cityMap.js"></script>
         <script src="/src/js/mapa.js"></script>

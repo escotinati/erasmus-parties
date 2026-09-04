@@ -19,6 +19,7 @@
             rel="stylesheet"
         />
         <link rel="stylesheet" href="/src/css/styles.css?v=3" />
+        <link rel="stylesheet" href="/src/css/animations.css" />
         <script src="/src/js/experience.js"></script>
 
         <!-- NUEVO -->
@@ -42,15 +43,15 @@
         <main class="city-main">
             <div class="city-page" id="cityPage">
                 <div class="city-header">
-                    <span class="city-flag" id="cityFlag">🌍</span>
-                    <div class="city-location" id="cityLocation"></div>
-                    <h1 class="city-name" id="cityName"></h1>
-                    <p class="city-desc" data-i18n="city.desc_intro">
+                    <span class="city-flag anim-page-enter" id="cityFlag">🌍</span>
+                    <div class="city-location anim-page-enter" id="cityLocation"></div>
+                    <h1 class="city-name anim-page-enter" id="cityName"></h1>
+                    <p class="city-desc anim-page-enter" data-i18n="city.desc_intro">
                         Elige tu plataforma y únete a la comunidad Erasmus antes de llegar.
                     </p>
                 </div>
                 <div class="actions" id="actionsWrap"></div>
-                <div class="info-box">
+                <div class="info-box anim-fade-up">
                     <span class="info-icon">📌</span>
                     <p class="info-text">
                         <strong data-i18n="city.tip_label">Consejo:</strong>
@@ -78,13 +79,16 @@
         <script src="/src/utils/i18n.js"></script>
         <script src="/src/utils/translations.js"></script>
         <script src="/src/js/langSwitcher.js"></script>
+        <script src="/src/js/utils/speculationRules.js"></script>
         <script src="/src/js/services/citiesService.js"></script>
         <script src="/src/js/utils/sanitize.js"></script>
         <script src="/src/js/geocoder.js"></script>
         <script src="/src/js/map-helpers.js"></script>
         <script src="/src/js/services/partnersService.js"></script>
         <script src="/src/js/tracking.js"></script>
+        <script src="/src/js/utils/animations.js"></script>
         <script src="/src/js/ui/sheet.js"></script>
+        <script src="/src/js/utils/skeleton.js"></script>
         <script src="/src/js/mapPartners.js"></script>
         <script src="/src/js/cityMap.js"></script>
         <script src="/src/js/ciudad.js"></script>

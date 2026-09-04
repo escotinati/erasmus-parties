@@ -20,10 +20,13 @@
 async function mountCityMap(containerId, { pais, ciudad, lat, lng, interactive = true }) {
     const container = document.getElementById(containerId);
 
-    container.innerHTML = `
-    <div class="city-map-loading">
-      <p>${I18n.t('map.loading_map_prefix')} ${escapeHtml(ciudad)}…</p>
-    </div>`;
+    // Sin forma de card reconocible (es un mapa) — un único bloque
+    // relleno del contenedor. El texto "Cargando mapa de {ciudad}…"
+    // solo era necesario cuando esto tardaba (geocodeo real vía
+    // Nominatim); con lat/lng ya guardados en Supabase (el caso
+    // habitual) esta espera es casi siempre instantánea de todas
+    // formas.
+    Skeleton.render(container, 1, () => Skeleton.block('skeleton--block'));
 
     let coords = null;
 
@@ -34,6 +37,7 @@ async function mountCityMap(containerId, { pais, ciudad, lat, lng, interactive =
     }
 
     if (!coords) {
+        Skeleton.clear(container);
         container.innerHTML = `
       <div class="city-map-error">
         <span class="city-map-error__icon">🗺️</span>
@@ -42,6 +46,7 @@ async function mountCityMap(containerId, { pais, ciudad, lat, lng, interactive =
         return null;
     }
 
+    Skeleton.clear(container);
     container.innerHTML = ''; // Leaflet necesita el contenedor vacío
 
     const map = initMap(containerId, coords);
@@ -60,13 +65,17 @@ async function mountCityMap(containerId, { pais, ciudad, lat, lng, interactive =
         overlay.type = 'button';
         overlay.className = 'city-map-activate';
         overlay.textContent = I18n.t('map.tap_to_interact');
-        overlay.addEventListener('click', () => {
-            map.dragging.enable();
-            map.scrollWheelZoom.enable();
-            map.doubleClickZoom.enable();
-            map.touchZoom.enable();
-            overlay.remove();
-        }, { once: true });
+        overlay.addEventListener(
+            'click',
+            () => {
+                map.dragging.enable();
+                map.scrollWheelZoom.enable();
+                map.doubleClickZoom.enable();
+                map.touchZoom.enable();
+                overlay.remove();
+            },
+            { once: true }
+        );
 
         container.style.position = 'relative';
         container.appendChild(overlay);

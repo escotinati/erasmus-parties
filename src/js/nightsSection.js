@@ -14,8 +14,15 @@
 
 function formatEventDate(isoString) {
     const date = new Date(isoString);
-    const dayLabel = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }).format(date);
-    const timeLabel = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit' }).format(date);
+    const dayLabel = new Intl.DateTimeFormat('es-ES', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+    }).format(date);
+    const timeLabel = new Intl.DateTimeFormat('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+    }).format(date);
     const capitalized = dayLabel.charAt(0).toUpperCase() + dayLabel.slice(1);
     return `${capitalized} · ${timeLabel}h`;
 }
@@ -98,7 +105,10 @@ const currentFilters = { cityId: null, theme: null, dateRange: null, partnerId: 
 
 function hasActiveFilters() {
     return Boolean(
-        currentFilters.cityId || currentFilters.theme || currentFilters.dateRange || currentFilters.partnerId
+        currentFilters.cityId ||
+        currentFilters.theme ||
+        currentFilters.dateRange ||
+        currentFilters.partnerId
     );
 }
 
@@ -113,7 +123,8 @@ function extractFilterOptions(events) {
     const themes = new Set();
     const partners = new Map();
     events.forEach((event) => {
-        if (event.city) cities.set(event.city.id, `${event.city.flag || ''} ${event.city.name}`.trim());
+        if (event.city)
+            cities.set(event.city.id, `${event.city.flag || ''} ${event.city.name}`.trim());
         if (event.theme) themes.add(event.theme);
         if (event.partner) partners.set(event.partner.id, event.partner.name);
     });
@@ -250,6 +261,7 @@ function renderEventCards(events) {
     const scroll = document.querySelector('.nights-section .events-scroll');
     if (!scroll) return;
 
+    Skeleton.clear(scroll);
     scroll.innerHTML = '';
 
     if (events.length === 0) {
@@ -268,7 +280,8 @@ function renderEventCards(events) {
     // arbitrario). Se recalcula sobre cada resultado filtrado, no solo
     // sobre la carga inicial.
     const maxPriority = Math.max(...events.map((event) => event.priority || 0));
-    const featuredEvent = maxPriority > 0 ? events.find((event) => event.priority === maxPriority) : null;
+    const featuredEvent =
+        maxPriority > 0 ? events.find((event) => event.priority === maxPriority) : null;
 
     events.forEach((event, index) => {
         const card = buildNightCard(event, index);
@@ -289,10 +302,30 @@ async function applyFilters() {
     renderEventCards(events);
 }
 
+// Misma forma que .event-card real: imagen 4:3 + título + venue + fecha.
+function renderEventsSkeleton(scroll) {
+    Skeleton.render(scroll, 3, () => {
+        const card = document.createElement('div');
+        card.className = 'event-card';
+        const imgWrap = document.createElement('div');
+        imgWrap.className = 'event-img-wrap';
+        imgWrap.appendChild(Skeleton.block('skeleton--fill'));
+        const body = document.createElement('div');
+        body.className = 'event-body';
+        body.appendChild(Skeleton.block('skeleton--text skeleton--text-title'));
+        body.appendChild(Skeleton.block('skeleton--text-sm'));
+        body.appendChild(Skeleton.block('skeleton--text-sm'));
+        card.append(imgWrap, body);
+        return card;
+    });
+}
+
 async function initNightsSection() {
     const scroll = document.querySelector('.nights-section .events-scroll');
     const header = document.querySelector('.nights-section .nights-header');
     if (!scroll || !header) return;
+
+    renderEventsSkeleton(scroll);
 
     // Única query inicial, sin filtros: sirve tanto para poblar las
     // opciones de los selects como para el primer render.
