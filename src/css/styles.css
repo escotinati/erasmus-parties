@@ -4812,3 +4812,51 @@ body.alojamiento-page {
     background-color: var(--color-surface);
     border-color: var(--color-border);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   11. VIEW TRANSITIONS ENTRE PÁGINAS
+   ─────────────────────────────────────────────────────── */
+
+/* Arquitectura multipágina, no SPA: cada tap del bottom-nav sigue
+   siendo una navegación completa (recarga de documento). Esta única
+   regla activa las view transitions nativas entre documentos del
+   mismo origen — sin ella, cada navegación es la recarga en blanco de
+   siempre. Degradación limpia donde no hay soporte (Safari, Firefox a
+   fecha de esta rama): la regla se ignora sin errores, la navegación
+   sigue funcionando exactamente igual que antes.
+
+   Dentro de @media (prefers-reduced-motion: no-preference) a
+   propósito — no una regla base + un @view-transition{navigation:none}
+   bajo reduced-motion encima: sin esta condición, "auto" es el valor
+   por defecto y habría que desactivarlo explícitamente después
+   (más frágil, depende de qué regla gane la cascada). Así, view
+   transitions solo existen en absoluto cuando el usuario no pidió
+   reducir movimiento — patrón recomendado por la propia spec para
+   esta at-rule. */
+@media (prefers-reduced-motion: no-preference) {
+    @view-transition {
+        navigation: auto;
+    }
+}
+
+/* view-transition-name ancla el header y el bottom-nav para que el
+   motor los anime como el MISMO elemento entre el documento saliente
+   y el entrante (en vez de fundir la página entera de golpe, que es
+   el comportamiento por defecto de navigation:auto) — así el cromo
+   permanente se percibe fijo mientras solo cambia el contenido. Los
+   tres patrones de header (.topnav, header.topbar, .hero-legacy
+   .topbar — ver navegación en CLAUDE.md) comparten el mismo nombre a
+   propósito: aunque son elementos DOM distintos según la página, el
+   nombre común es lo único que el motor necesita para emparejarlos.
+   Todos son position:fixed/sticky/absolute ya de por sí, así que
+   asignarles view-transition-name no introduce ningún salto de
+   layout nuevo. */
+.topnav,
+header.topbar,
+.hero-legacy .topbar {
+    view-transition-name: site-header;
+}
+
+.app-bottom-nav {
+    view-transition-name: app-bottom-nav;
+}
