@@ -1304,6 +1304,94 @@ dialog.sheet.sheet--visible::backdrop {
     }
 }
 
+/* ── 2.7 Skeleton (loading) ────────────────────────────────────
+   Sustituye a los textos "Cargando…" y a los contenedores vacíos
+   mientras se espera Supabase — src/js/utils/skeleton.js genera los
+   nodos, siempre dentro de las mismas clases CSS reales del contenido
+   final (accordion-card, partner-card, city-card…) para que el layout
+   no salte al llegar los datos. Un único primitivo (.skeleton) para
+   todas las páginas — nada de un sistema de shimmer copiado por
+   archivo. Timing con los tokens --anim-* ya existentes
+   (animations.css): mismo --anim-easing-standard, duración derivada
+   de --anim-duration-slow (el shimmer es un loop, no una transición
+   de una sola vez, por eso no hay un token --anim-* que encaje tal
+   cual — se deriva del que más se le parece en vez de inventar un
+   número suelto). */
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--surface-container-low) 25%,
+        var(--surface-container) 37%,
+        var(--surface-container-low) 63%
+    );
+    background-size: 400% 100%;
+    animation: skeleton-shimmer calc(var(--anim-duration-slow) * 3) var(--anim-easing-standard)
+        infinite;
+    border-radius: var(--radius-md);
+}
+
+@keyframes skeleton-shimmer {
+    from {
+        background-position: 100% 50%;
+    }
+    to {
+        background-position: 0% 50%;
+    }
+}
+
+/* Relleno de imagen dentro de un contenedor position:relative
+   (accordion-card, city-card, partner-card-img-wrap) — mismo patrón
+   que el <img>/.card-img-placeholder real que sustituye. */
+.skeleton--fill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+}
+
+/* Líneas de texto (nombre/descripción) */
+.skeleton--text {
+    height: 14px;
+    margin: 6px 0;
+    border-radius: var(--radius-sm);
+}
+
+.skeleton--text-title {
+    height: 16px;
+    width: 65%;
+}
+
+.skeleton--text-sm {
+    height: 12px;
+    width: 40%;
+}
+
+/* Fila simple sin imagen (mapPartners.js: lista de partners) */
+.skeleton--row {
+    height: var(--tap-min);
+    margin-bottom: 6px;
+}
+
+/* Bloque suelto de ancho/alto completo (mapa embebido) */
+.skeleton--block {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    /* "Opacidad fija, sin animación" tal cual, no solo el shimmer
+       congelado en un frame intermedio (que seguiría enseñando la
+       textura del degradado, apagada pero visible) — se sustituye el
+       fondo entero por un color plano. El bloque global de
+       animations.css ya neutraliza animation-duration a todo el sitio,
+       pero esta regla es la que de verdad cambia lo que se ve. */
+    .skeleton {
+        animation: none;
+        background: var(--surface-container-low);
+    }
+}
+
 /* ═══════════════════════════════════════════════════════════
    3. LAYOUT GLOBAL
    ─────────────────────────────────────────────────────── */
@@ -4070,7 +4158,6 @@ main.city-main {
     position: relative;
 }
 
-.city-map-loading,
 .city-map-error {
     display: flex;
     flex-direction: column;

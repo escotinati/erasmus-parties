@@ -297,6 +297,7 @@
         <script src="/src/js/services/citiesService.js"></script>
         <script src="/src/js/utils/sanitize.js"></script>
         <script src="/src/js/utils/animations.js"></script>
+        <script src="/src/js/utils/skeleton.js"></script>
         <script>
             (async function () {
                 // Mismo criterio anti-XSS que el resto del proyecto (admin.js):
@@ -316,6 +317,28 @@
                             })[ch]
                     );
                 }
+
+                // Skeleton antes del fetch, con la misma estructura
+                // .letter-group > .city-items-grid que usa renderGroups() más
+                // abajo — así ese mismo
+                // section.querySelectorAll('.letter-group').forEach(remove)
+                // lo limpia solo, sin lógica de limpieza aparte.
+                (function renderCitiesSkeleton() {
+                    const section = document.getElementById('citiesSection');
+                    if (!section) return;
+                    const group = document.createElement('div');
+                    group.className = 'letter-group';
+                    const itemsGrid = document.createElement('div');
+                    itemsGrid.className = 'city-items-grid';
+                    Skeleton.render(itemsGrid, 8, () => {
+                        const card = document.createElement('a');
+                        card.className = 'city-card';
+                        card.appendChild(Skeleton.block('skeleton--fill'));
+                        return card;
+                    });
+                    group.appendChild(itemsGrid);
+                    section.appendChild(group);
+                })();
 
                 // ── Build flat city list sorted alphabetically ──────────────
                 // Directorio completo (fetchAllCities, sin filtro active=true):

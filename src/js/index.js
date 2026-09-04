@@ -353,6 +353,7 @@ function renderPartnersSection(allPartnersForCity) {
         ? inScope.filter((p) => p.category === activeCategory)
         : inScope;
 
+    Skeleton.clear(grid);
     grid.innerHTML = '';
 
     if (filtered.length === 0) {
@@ -372,6 +373,32 @@ function renderPartnersSection(allPartnersForCity) {
     );
 
     if (window.initScrollReveal) window.initScrollReveal();
+}
+
+// Skeleton del grid de partners — se pinta ANTES de esperar a
+// Supabase (ver DOMContentLoaded), no dentro de selectCity: hoy esa
+// sección se queda completamente vacía (ni texto) mientras se espera
+// fetchPartnersByCity, sin ningún aviso. Misma forma que .partner-card
+// real: imagen 4:3 + nombre + descripción.
+function renderPartnerGridSkeleton() {
+    const grid = document.getElementById('partnerGrid');
+    const empty = document.getElementById('partnersEmpty');
+    if (!grid) return;
+    grid.hidden = false;
+    if (empty) empty.hidden = true;
+    Skeleton.render(grid, MAX_VISIBLE_PARTNERS, () => {
+        const card = document.createElement('div');
+        card.className = 'partner-card';
+        const imgWrap = document.createElement('div');
+        imgWrap.className = 'partner-card-img-wrap';
+        imgWrap.appendChild(Skeleton.block('skeleton--fill'));
+        const body = document.createElement('div');
+        body.className = 'partner-card-body';
+        body.appendChild(Skeleton.block('skeleton--text skeleton--text-title'));
+        body.appendChild(Skeleton.block('skeleton--text'));
+        card.append(imgWrap, body);
+        return card;
+    });
 }
 
 // ── 5. TICKER ─────────────────────────────────────────────────
@@ -519,6 +546,7 @@ function renderAccordion(grid, cities, animate = false) {
 
     setTimeout(
         () => {
+            Skeleton.clear(grid);
             grid.innerHTML = cities
                 .map((item, i) => {
                     const isMain = i === 0;
@@ -557,13 +585,29 @@ function renderAccordion(grid, cities, animate = false) {
     );
 }
 
+// Skeleton del accordion — se pinta ANTES de esperar a Supabase (ver
+// DOMContentLoaded), no dentro de initAccordion: para cuando esa
+// función corre, `cities` ya llegó (se espera antes de llamarla), así
+// que un placeholder puesto ahí nunca cubriría la espera real de red,
+// solo un parpadeo interno de un tick. Misma forma que el accordion
+// real: 4 .accordion-card en fila, la primera --main.
+function renderAccordionSkeleton() {
+    const grid = document.getElementById('citiesAccordion');
+    if (!grid) return;
+    Skeleton.render(grid, 4, (i) => {
+        const card = document.createElement('div');
+        card.className = 'accordion-card' + (i === 0 ? ' accordion-card--main' : '');
+        card.appendChild(Skeleton.block('skeleton--fill'));
+        return card;
+    });
+}
+
 async function initAccordion(cities) {
     const grid = document.getElementById('citiesAccordion');
     if (!grid) return;
 
-    grid.innerHTML = `<p style="color:var(--text-muted);padding:40px;text-align:center">${I18n.t('home.loading_cities')}</p>`;
-
     if (cities.length === 0) {
+        Skeleton.clear(grid);
         grid.innerHTML = `<p style="color:var(--text-muted);padding:40px;text-align:center">${I18n.t('home.more_cities_coming_soon')}</p>`;
         return;
     }
@@ -656,6 +700,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     initCitiesScrollEffect();
     initBottomNav();
     initStudentsStat();
+
+    // Skeletons ANTES de los fetches, no dentro de las funciones que
+    // pintan el contenido real — así cubren la espera de red de
+    // verdad, no un parpadeo interno de un tick.
+    renderAccordionSkeleton();
+    renderPartnerGridSkeleton();
 
     const [activeCities, searchIndex] = await Promise.all([
         fetchActiveCities(),

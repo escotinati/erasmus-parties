@@ -39,7 +39,11 @@ function categoryLabel(category, fallbackLabel) {
 
 async function mountPartnersList(listContainerId, map, city) {
     const container = document.getElementById(listContainerId);
-    container.innerHTML = `<p class="partners-list-loading">${I18n.t('map.loading_partners')}</p>`;
+    // No se sabe todavía cuántas categorías/partners habrá (eso lo
+    // decide la respuesta), así que el skeleton es genérico: unas
+    // pocas filas sueltas, misma forma que .partner-toggle sin chips
+    // ni cabeceras de grupo encima (esos sí dependen del resultado).
+    Skeleton.render(container, 4, () => Skeleton.block('skeleton--row'));
 
     const partners = await fetchPartnersByCity(city.id);
     const groups = groupPartnersByCategory(partners); // ya filtra categorías sin partners (regla 3)
@@ -119,6 +123,7 @@ async function mountPartnersList(listContainerId, map, city) {
     }
 
     function renderList() {
+        Skeleton.clear(container);
         container.innerHTML = '';
 
         const singleCategory = groups.length === 1;
@@ -225,6 +230,7 @@ async function mountPartnersList(listContainerId, map, city) {
     // hay whatsapp_url, o no es válida, el botón no se renderiza: se
     // deja solo el mensaje, nunca un enlace muerto.
     function renderNoPartnersState() {
+        Skeleton.clear(container);
         container.innerHTML = '';
 
         const wrap = document.createElement('div');
