@@ -4869,3 +4869,16 @@ header.topbar,
 .app-bottom-nav {
     view-transition-name: app-bottom-nav;
 }
+
+/* Complemento de esta sección, no CSS: src/js/utils/speculationRules.js
+   precarga (prefetch, no prerender) las rutas del bottom-nav para que
+   la transición de arriba no se note lenta en 3G. No busques un
+   <script type="speculationrules"> literal en el HTML de ninguna
+   página — no existe como texto estático en ningún archivo del repo,
+   a propósito: el script lo inyecta en tiempo de ejecución
+   (document.createElement) porque cada página debe excluirse a sí
+   misma de la lista de rutas a precargar, y una etiqueta estática por
+   página habría exigido 8 bloques JSON casi idénticos (uno por página,
+   cada uno omitiendo su propia ruta) en vez de una única lista en JS.
+   HTMLScriptElement.supports() comprueba soporte antes de inyectar
+   nada — degradación limpia donde no hay soporte. */
