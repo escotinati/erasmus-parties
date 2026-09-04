@@ -77,7 +77,19 @@ async function mountCityMap(containerId, { pais, ciudad, lat, lng, interactive =
             { once: true }
         );
 
-        container.style.position = 'relative';
+        // No forzar position:relative aquí: .city-map-embed ya es
+        // position:sticky en móvil (styles.css, .city-map-columns
+        // .city-map-embed) — sticky es tan válido como relative como
+        // contexto de posicionamiento para el overlay absolute de
+        // abajo, y forzarlo a mano por encima del sticky vía inline
+        // style (mayor especificidad que cualquier regla de la hoja)
+        // lo rompía: el mapa se dibujaba desplazado top abajo de su
+        // sitio en el flujo normal, tapando el primer bloque de la
+        // lista de partners. Bug real, no teórico — confirmado en
+        // iPhone 15 Pro (393×852): con interactive:false por fin en
+        // uso (antes ninguna página lo activaba), position:relative
+        // + el top heredado de la regla sticky desplazaba el mapa
+        // ~71px sobre su sitio.
         container.appendChild(overlay);
     }
 
