@@ -2,6 +2,16 @@
 //  CIUDAD.JS — Erasmus Verified
 // ─────────────────────────────────────────────────────────────
 
+// Lee --bp-md de tokens.css en vez de hardcodear 900 aquí — mismo
+// patrón que isDesktopLayout() en src/js/ui/sheet.js, así el punto de
+// corte del gesto del mapa se queda sincronizado con el mismo token
+// que decide, en CSS, el resto del layout de dos columnas.
+function isDesktopLayout() {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue('--bp-md');
+    const bpMd = parseFloat(raw) || 900;
+    return window.matchMedia('(min-width: ' + bpMd + 'px)').matches;
+}
+
 (async function () {
     const params = new URLSearchParams(window.location.search);
     const cityId = parseInt(params.get('ciudad'), 10);
@@ -62,7 +72,15 @@
         ciudad: city.name,
         lat: city.lat,
         lng: city.lng,
-        interactive: true,
+        // Por debajo de --bp-md, el mapa arranca bloqueado (ver
+        // cityMap.js: interactive:false activa el overlay "Toca para
+        // interactuar" que ya existía en el código, sin usar hasta
+        // ahora en ninguna página) — el primer gesto sobre el mapa
+        // hace scroll de página con normalidad en vez de moverlo; un
+        // tap explícito lo activa. En desktop (columna de mapa fija,
+        // aspect-ratio propio) no compite con el scroll de la misma
+        // forma, así que sigue interactivo desde el primer toque.
+        interactive: isDesktopLayout(),
     }).then(async (mapInstance) => {
         if (mapInstance) {
             await mountPartnersList('city-partners-list', mapInstance, city);
