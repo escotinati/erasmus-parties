@@ -4315,6 +4315,14 @@ main.city-main {
     gap: 8px;
     justify-content: space-between;
     margin: 0 0 8px;
+    /* Reserva el mismo hueco que .partner-group__toggle roba con su
+       margen negativo (ver más abajo): sin esto, el toggle — pegado al
+       borde derecho por space-between — asoma 12px fuera de este
+       título y genera scroll horizontal real en el aside estrecho de
+       escritorio (~226px en ciudad.html). Con el hueco reservado, el
+       área táctil completa sigue cayendo dentro del título, solo que
+       ahora la usa en vez de desbordarlo. */
+    padding-right: calc((var(--tap-min) - 20px) / 2);
     font-family: var(--font-body);
     font-size: 12px;
     font-weight: 700;
@@ -4337,19 +4345,23 @@ main.city-main {
 }
 
 /* Control de activar/desactivar fusionado en el título — sustituye al
-   antiguo .category-chip. Icono visual pequeño (20px, igual que
-   .category-chip__icon antes) pero área táctil completa: el
-   padding+margin negativos a continuación expanden el hit-area a
-   --tap-min sin que el <h3> crezca de alto por un botón de 44px
-   incrustado en una línea de texto de 12px. */
+   antiguo .category-chip. Botón de --tap-min completo (área táctil
+   real, el icono de 20px solo se centra dentro por flex) con margen
+   negativo para que su HUECO EN EL FLUJO se quede en 20px — así el
+   <h3> no crece de alto por un botón de 44px incrustado en una línea
+   de texto de 12px. Con box-sizing:border-box global (línea 30), el
+   ancho tenía que fijarse en var(--tap-min) directamente, no vía
+   padding: padding+width:20px pedía un content-box negativo, que el
+   navegador no puede dar — el resultado real era una caja de 24px, no
+   44px, así que el área táctil prometida en el commit original
+   (feature/merge-category-toggle-title) no se estaba cumpliendo. */
 .partner-group__toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-    padding: calc((var(--tap-min) - 20px) / 2);
+    width: var(--tap-min);
+    height: var(--tap-min);
     margin: calc((var(--tap-min) - 20px) / -2);
     background: none;
     border: none;
