@@ -4265,87 +4265,26 @@ main.city-main {
     }
 }
 
-/* ── 6.3 Partners list (chips multi-selección + Sheet) ─────────
+/* ── 6.3 Partners list (título de grupo fusionado + Sheet) ──────
    Reemplaza al acordeón anterior (una categoría desplegada a la vez,
    detalle de partner expandido inline en la lista) — ver
-   src/js/mapPartners.js. Modelo nuevo: chips multi-selección deciden
-   qué categorías se ven (mobile-first: tira horizontal con scroll;
-   revierte a envolver en varias líneas en --bp-md, ver el @media al
-   final de esta sección — el layout de dos columnas en sí ya vive en
-   .city-map-columns/.map-with-list, sección 6.2/7, sin cambios aquí)
-   y el detalle de un partner se abre en un Sheet (src/js/ui/sheet.js),
-   no expandido en la lista. */
+   src/js/mapPartners.js. El control de activar/desactivar cada
+   categoría vive DENTRO del propio <h3> del grupo (icono
+   toggle_on/toggle_off, ver .partner-group__toggle más abajo): antes
+   hubo una barra de .category-chip separada además del título, las
+   dos mostrando el mismo icono+etiqueta — visible como duplicado en
+   pantalla, y en el aside estrecho de escritorio (~226-340px según la
+   página) esa barra se envolvía en líneas sueltas de 1+2/2+1 chips
+   justo encima del título que repetía lo mismo. Al fusionarlos ese
+   problema de maquetación desaparece por construcción: no hace falta
+   ninguna regla de wrap/overflow aparte para el título, porque nunca
+   compite por ancho con más de un elemento por línea (el layout de
+   dos columnas en sí ya vive en .city-map-columns/.map-with-list,
+   sección 6.2/7, sin cambios aquí). El detalle de un partner se abre
+   en un Sheet (src/js/ui/sheet.js), no expandido en la lista. */
 
-/* Barra de chips de categoría */
-
-.partner-filters {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    /* proximity, no mandatory: a diferencia de .events-scroll (cards
-       de 320px, donde mandatory tiene sentido — quieres que cada card
-       quede perfectamente encuadrada), esto es una barra de filtros —
-       forzar el salto tras cualquier arrastre, por pequeño que sea,
-       se sentiría pegajoso en un control de acción. proximity solo
-       encaja si el usuario ya se para cerca de un punto de snap. */
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding-bottom: 2px;
-    margin-bottom: 16px;
-}
-
-.partner-filters::-webkit-scrollbar {
-    display: none;
-}
-
-.category-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    scroll-snap-align: start;
-    min-height: var(--tap-min);
-    padding: 0 14px;
-    background: var(--surface);
-    border: 1px solid var(--outline-variant);
-    border-radius: var(--radius-full);
-    font-family: var(--font-body);
-    font-weight: 600;
-    font-size: 13px;
-    color: var(--on-surface-variant);
-    cursor: pointer;
-    transition:
-        background var(--duration-fast) var(--ease-out),
-        border-color var(--duration-fast) var(--ease-out),
-        color var(--duration-fast) var(--ease-out);
-}
-
-/* Activo = color de la propia categoría (el mismo --pin-color que ya
-   usan sus pines en el mapa) — coherencia visual entre chip y pin, no
-   un lenguaje de color nuevo. Apagado: sin atenuar (regla de negocio:
-   nada de pines grises), directamente fuera del mapa y de la lista. */
-.category-chip.is-active {
-    background: var(--pin-color);
-    border-color: var(--pin-color);
-    color: #fffbff;
-}
-
-.category-chip__icon {
-    font-size: 18px;
-}
-
-/* Chip de reinicio: mismo alto/forma que el resto, tratamiento propio
-   (discontinuo) para que se lea como "acción", no como una categoría
-   más — solo aparece con todos los chips apagados (ver mapPartners.js). */
-.category-chip--reset {
-    border-style: dashed;
-    color: var(--primary);
-}
-
-/* Texto de recuento — sustituye a la barra de chips cuando la ciudad
-   solo tiene una categoría con partners (nada que filtrar). */
+/* Texto de recuento — sustituye al título con control cuando la
+   ciudad solo tiene una categoría con partners (nada que filtrar). */
 .partners-count {
     margin: 0 0 16px;
     font-size: 14px;
@@ -4353,9 +4292,7 @@ main.city-main {
     color: var(--on-surface-variant);
 }
 
-/* Estado vacío compartido: ciudad sin ningún partner activo, y todos
-   los chips apagados a mano — mismo contenedor, mensaje/botón propios
-   de cada caso (ver mapPartners.js). */
+/* Estado vacío: ciudad sin ningún partner activo (ver mapPartners.js). */
 .partners-empty-state {
     display: flex;
     flex-direction: column;
@@ -4366,7 +4303,7 @@ main.city-main {
     font-size: 14px;
 }
 
-/* Cabecera de un grupo de categoría activa */
+/* Cabecera de un grupo de categoría */
 
 .partner-group {
     margin-bottom: 20px;
@@ -4376,6 +4313,7 @@ main.city-main {
     display: flex;
     align-items: center;
     gap: 8px;
+    justify-content: space-between;
     margin: 0 0 8px;
     font-family: var(--font-body);
     font-size: 12px;
@@ -4383,11 +4321,78 @@ main.city-main {
     text-transform: uppercase;
     letter-spacing: 0.02em;
     color: var(--on-surface-variant);
+    transition: opacity var(--duration-fast) var(--ease-out);
 }
 
 .partner-group__icon {
     font-size: 16px;
     color: var(--pin-color);
+    flex-shrink: 0;
+}
+
+.partner-group__label {
+    /* Empuja el toggle al extremo derecho del título con space-between
+       de arriba, sea cual sea la longitud de la etiqueta. */
+    flex: 1;
+}
+
+/* Control de activar/desactivar fusionado en el título — sustituye al
+   antiguo .category-chip. Icono visual pequeño (20px, igual que
+   .category-chip__icon antes) pero área táctil completa: el
+   padding+margin negativos a continuación expanden el hit-area a
+   --tap-min sin que el <h3> crezca de alto por un botón de 44px
+   incrustado en una línea de texto de 12px. */
+.partner-group__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    padding: calc((var(--tap-min) - 20px) / 2);
+    margin: calc((var(--tap-min) - 20px) / -2);
+    background: none;
+    border: none;
+    border-radius: var(--radius-full);
+    color: var(--on-surface-variant);
+    cursor: pointer;
+    transition:
+        background var(--duration-fast) var(--ease-out),
+        color var(--duration-fast) var(--ease-out);
+}
+
+.partner-group__toggle:hover {
+    background: var(--surface-container-low);
+}
+
+.partner-group__toggle:focus-visible {
+    box-shadow: var(--shadow-focus);
+    outline: none;
+}
+
+.partner-group__toggle-icon {
+    font-size: 20px;
+}
+
+/* Activo = color de la propia categoría (el mismo --pin-color que ya
+   usan sus pines en el mapa) — coherencia visual con el pin, no un
+   lenguaje de color nuevo. La FORMA del icono (toggle_on/toggle_off,
+   ver mapPartners.js) es la señal principal de estado, no solo el
+   color — se distingue incluso sin percepción de color. */
+.partner-group__toggle[aria-pressed='true'] .partner-group__toggle-icon {
+    color: var(--pin-color);
+}
+
+/* Categoría apagada a mano: la sección se queda en el DOM colapsada,
+   no desaparece — el título (icono+etiqueta atenuados, control
+   siempre nítido para poder reactivarla) sigue siendo la salida. */
+.partner-group--collapsed .partner-group__icon,
+.partner-group--collapsed .partner-group__label {
+    opacity: 0.5;
+}
+
+.partner-group--collapsed .partner-list {
+    display: none;
 }
 
 /* Lista de partners dentro de un grupo */
@@ -4459,20 +4464,6 @@ main.city-main {
         'opsz' 24;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
     transition: font-size 0.2s;
-}
-
-@media (min-width: 900px) {
-    /* --bp-md (regla de negocio 8): la lista ya tiene su propio scroll
-       en dos columnas desde antes (.city-map-columns/.map-with-list,
-       sección 6.2/7) — lo único nuevo aquí es que los chips dejan de
-       deslizarse en horizontal y se envuelven en varias líneas, ya
-       que hay ancho de sobra en la columna de la lista. El HTML de
-       mapPartners.js no cambia por breakpoint, solo este contenedor. */
-    .partner-filters {
-        flex-wrap: wrap;
-        overflow-x: visible;
-        scroll-snap-type: none;
-    }
 }
 
 /* ═══════════════════════════════════════════════════════════
