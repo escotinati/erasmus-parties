@@ -13,7 +13,7 @@ La misma web sirve **dos marcas** desde un solo código: "Erasmus Verified" (la 
 **Stack**: HTML + CSS + JS vanilla (sin ES Modules, todo con `<script>` clásicos y funciones/objetos globales), más:
 
 - **Vite** como build tool — ya no se abre `index.html` directamente, se usa `npm run dev` para desarrollar y `npm run build` para generar la carpeta `dist/` que se despliega.
-- **Supabase** como backend — base de datos (Postgres) + login de administrador. Sustituye poco a poco a los datos estáticos de `data.js` (ver sección de Backend).
+- **Supabase** como backend — base de datos (Postgres) + login de administrador. Todas las páginas piden los datos de ciudades y partners a Supabase; no queda ningún dato estático de países/ciudades en el código (ver sección de Backend).
 - **React** (`src/react/*`, vía `@vitejs/plugin-react`) — **única excepción** a "sin ES Modules": el menú compartido de las 8 páginas públicas está montado como isla de React dentro de HTML/scripts clásicos. Ver [Navegación](#navegación) para el detalle completo; no se ha migrado nada más del proyecto a React, es deliberadamente una pieza aislada.
 
 **Herramientas de desarrollo**: Prettier instalado como devDependency (`npm install` para instalar). Configuración en `.prettierrc`: 4 espacios, comillas simples, semi. Un hook de Claude Code formatea automáticamente JS/CSS/HTML tras cada edición — no hace falta ejecutarlo manualmente.
@@ -47,7 +47,6 @@ Todo el JS de páginas y módulos compartidos vive ahora en `src/js/` (antes era
 
 ### Módulos compartidos (cargados donde se necesitan)
 
-- `src/js/data.js` — objeto global `COUNTRIES` con todos los países y ciudades. **En proceso de sustitución por Supabase**: hoy solo lo usan `ciudades.js` y el inline de `ciudades-todas.html` (el listado completo por país). El resto de páginas (home, ciudad, mapa, admin) ya piden los datos a Supabase.
 - `src/js/lib/supabaseClient.js` — crea `window.supabaseClient`, el cliente de Supabase que usan todos los demás scripts para hablar con la base de datos.
 - `src/js/services/citiesService.js` — funciones `fetchActiveCities()`, `fetchCityById(id)`, `fetchAllCities()` para leer ciudades desde Supabase.
 - `src/js/services/partnersService.js` — función `fetchPartnersByCity(cityId)` (trae partners + sus links) y `groupPartnersByCategory(partners)`.
@@ -61,7 +60,7 @@ Todo el JS de páginas y módulos compartidos vive ahora en `src/js/` (antes era
 
 ## Backend (Supabase)
 
-La base de datos y el panel de administración viven en un proyecto de Supabase (Postgres + Auth). Las ciudades y partners nuevos ya **no se añaden editando código** — se hace desde el panel de administración en `/admin` (ver sección siguiente). Editar `data.js` a mano solo tiene sentido para las páginas que todavía no están migradas.
+La base de datos y el panel de administración viven en un proyecto de Supabase (Postgres + Auth). Las ciudades y partners **no se añaden editando código** — se hace desde el panel de administración en `/admin` (ver sección siguiente).
 
 ### Tablas principales
 
@@ -105,17 +104,7 @@ En la experiencia "Parties" además se ocultan los enlaces a Servicios/Alojamien
 
 ## Cómo añadir datos
 
-### Nueva ciudad o partner (forma normal)
-
-Usar el panel de administración en `/admin` (ver sección de arriba). Es la forma recomendada: los datos quedan en Supabase y aparecen automáticamente en home, ciudad y mapa.
-
-### Nueva ciudad o país (páginas todavía no migradas)
-
-Para `ciudades.html` y `ciudades-todas.html`, que aún leen de `data.js`:
-
-1. En `src/js/data.js`, añadir al objeto `COUNTRIES` siguiendo el patrón: `{ flag, heroImg, cardImg, cities: [{ name, img }] }`. Las imágenes son URLs de Unsplash.
-2. En `ciudad.html`, añadir la ciudad al objeto `links` al inicio del script inline: `"Nombre Ciudad": { wa: "url_o_null", tg: "url_o_null" }`.
-3. Si ambos son `null`, aparece automáticamente el mensaje "Próximamente".
+Nueva ciudad o partner: usar el panel de administración en `/admin` (ver sección de arriba) — es la única forma, no hay ninguna página que siga leyendo de un archivo estático. Los datos quedan en Supabase y aparecen automáticamente en home, ciudad, ciudades del país, listado completo y mapa. Ver los skills `/add-city` y `/add-partner` si quieres que Claude te guíe paso a paso con los campos exactos del formulario.
 
 ## Mapa interactivo
 
