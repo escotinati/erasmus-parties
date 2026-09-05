@@ -461,9 +461,11 @@ function renderPartnersSection(allPartnersForCity) {
 
     grid.hidden = false;
     empty.hidden = true;
+    // El propio SummaryCardGrid dispara initScrollReveal() en un
+    // useEffect tras cada render suyo (ver SummaryCardGrid.jsx) —
+    // llamarlo aquí también corría antes de que React comprometiera
+    // las tarjetas nuevas al DOM, dejándolas en opacity:0 para siempre.
     partnerCardsRoot.render(selectVisiblePartners(filtered), 'partner', getPartnerCardProps);
-
-    if (window.initScrollReveal) window.initScrollReveal();
 }
 
 // Skeleton del grid de partners — se pinta ANTES de esperar a
