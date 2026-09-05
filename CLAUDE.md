@@ -68,6 +68,7 @@ La base de datos y el panel de administración viven en un proyecto de Supabase 
 - `cities` — ciudades: nombre, país, bandera, descripción, imagen, coordenadas, link de WhatsApp, si está activa, prioridad de orden.
 - `partners` — partners de una ciudad: nombre, categoría, descripción, imagen, coordenadas, si está activo, prioridad.
 - `partner_links` — los enlaces de cada partner (web, entradas, WhatsApp, etc.), ligados a `partners` por `partner_id`.
+- `partner_events` — eventos/noches de un partner (título, descripción, imagen, fecha, precio, enlace de entradas), ligados a `partners` por `partner_id`. Alimentan la sección "Trending nights" (Parties) y el home.
 - `cta_clicks` — un registro por cada clic en un enlace de partner, para saber qué se usa más. Se alimenta desde `tracking.js`.
 - `admins` — lista de usuarios (por `user_id` de Supabase Auth) que tienen permiso para escribir en las tablas de arriba. **Esto es lo único que decide quién puede editar datos** — no basta con iniciar sesión, hay que estar en esta tabla.
 
