@@ -7,8 +7,8 @@
 //  este archivo.
 //
 //  Expuesto como funciones globales (sin export/import) para mantener
-//  consistencia con el resto del proyecto: data.js, coords.js y mapa.js
-//  son scripts clásicos, no ES Modules.
+//  consistencia con el resto del proyecto: son scripts clásicos, no ES
+//  Modules (salvo las dos islas de React en src/react/, ver CLAUDE.md).
 // ─────────────────────────────────────────────────────────────
 
 let map = null;

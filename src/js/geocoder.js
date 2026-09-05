@@ -1,15 +1,14 @@
 // ─────────────────────────────────────────────────────────────
 //  GEOCODER.JS — Erasmus Parties
 //
-//  Sustituye a CITY_COORDS (coords.js). En lugar de mantener a mano
-//  las coordenadas de las 491 ciudades de data.js, las pedimos a
-//  Nominatim (OpenStreetMap, gratuito) la primera vez y las guardamos
-//  en localStorage. Las siguientes visitas a esa ciudad son instantáneas
-//  y no hacen ninguna petición de red.
+//  Solo hace falta como último recurso: cityMap.js intenta primero usar
+//  las coordenadas ya guardadas en la ciudad de Supabase, y solo si no
+//  las tiene pide unas nuevas a Nominatim (OpenStreetMap, gratuito) y
+//  las guarda en localStorage. Las siguientes visitas a esa ciudad son
+//  instantáneas y no hacen ninguna petición de red.
 //
-//  Expuesto como función global getCityCoords(), igual que el resto
-//  de helpers del proyecto (data.js, map-helpers.js): scripts clásicos,
-//  sin import/export.
+//  Expuesto como función global getCityCoords(), igual que el resto de
+//  helpers del proyecto: script clásico, sin import/export.
 // ─────────────────────────────────────────────────────────────
 
 const COORDS_CACHE_KEY = 'erasmus_city_coords_v1';
