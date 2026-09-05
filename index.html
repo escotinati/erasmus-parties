@@ -178,11 +178,12 @@
                 </div>
 
                 <div class="events-scroll">
-                    <!-- JS (nightsSection.js) renderiza aquí los eventos reales de partner_events desde Supabase. Ver fetchUpcomingEvents() en services/partnersService.js. -->
+                    <!-- JS (nightsSection.js) monta aquí el SummaryCardGrid (React) de eventos reales de partner_events desde Supabase. Ver fetchUpcomingEvents() en services/partnersService.js. -->
                     <p class="events-loading" id="nightsLoading" data-i18n="nights.loading">
                         Cargando fiestas…
                     </p>
                 </div>
+                <p class="events-loading" id="nightsEmpty" hidden></p>
             </section>
 
             <!-- ── ALOJAMIENTO ───────────────────────────────────────── -->
