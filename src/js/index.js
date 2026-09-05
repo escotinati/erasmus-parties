@@ -18,6 +18,10 @@ let allCitiesCache = [];
 let selectedCity = null;
 let cityPartnersCache = new Map(); // cityId -> partners (fetchPartnersByCity)
 let activeCategory = null; // null = "Todo"
+// Root de React (SummaryCardGrid) sobre #partnerGrid — se crea una única
+// vez (ver renderPartnersSection) y se reutiliza en cada cambio de
+// filtro con .render(), nunca se destruye/recrea.
+let partnerCardsRoot = null;
 
 // Categorías reales que existen hoy en partners.category, mapeadas a
 // las etiquetas que pide cada experiencia. "Comunidad"/"Grupos" y
@@ -372,55 +376,34 @@ function selectVisiblePartners(list) {
     return ordered.slice(0, MAX_VISIBLE_PARTNERS);
 }
 
-function buildPartnerCard(partner, index) {
+// Reconstruye exactamente lo que pintaba buildPartnerCard(), pero como
+// props de <SummaryCard variant="partner">: sanitizeUrl() de
+// imageUrl/ctaHref ahora vive dentro del propio componente.
+function getPartnerCardProps(partner, index) {
     const categories = getHomeCategories();
     const catMeta = categories.find((c) => c.key === partner.category);
-
-    const card = document.createElement('div');
-    card.className = `partner-card anim-slam anim-delay-${(index % 8) + 1}`;
-
-    const safeImageUrl = sanitizeUrl(partner.image_url);
     const primaryLink = partner.links && partner.links[0];
-    const safeLinkUrl = primaryLink ? sanitizeUrl(primaryLink.url) : '';
 
-    card.innerHTML = `
-        <div class="partner-card-img-wrap">
-            ${
-                safeImageUrl
-                    ? `<img src="${safeImageUrl}" alt="" loading="lazy" />`
-                    : `<div class="card-img-placeholder"></div>`
-            }
-            ${catMeta ? `<span class="partner-card-category">${escapeHtml(I18n.t(catMeta.pillKey))}</span>` : ''}
-        </div>
-        <div class="partner-card-body">
-            <h3 class="partner-card-name"></h3>
-            <p class="partner-card-desc"></p>
-        </div>
-    `;
-
-    card.querySelector('.partner-card-name').textContent = partner.name;
-    card.querySelector('.partner-card-desc').textContent = partner.description || '';
-
-    if (safeLinkUrl) {
-        const cta = document.createElement('a');
-        cta.className = 'partner-card-cta';
-        cta.href = safeLinkUrl;
-        cta.target = '_blank';
-        cta.rel = 'noopener noreferrer';
-        cta.textContent = primaryLink.label || I18n.t('home.partners_cta_default');
-        cta.addEventListener('click', (e) => {
-            e.stopPropagation();
-            trackEvent('partner_card_click', {
-                partnerId: partner.id,
-                partnerName: partner.name,
-                category: partner.category,
-                url: primaryLink.url,
-            });
-        });
-        card.querySelector('.partner-card-body').appendChild(cta);
-    }
-
-    return card;
+    return {
+        imageUrl: partner.image_url,
+        badgeText: catMeta ? I18n.t(catMeta.pillKey) : '',
+        name: partner.name,
+        description: partner.description || '',
+        ctaLabel: primaryLink ? primaryLink.label || I18n.t('home.partners_cta_default') : '',
+        ctaHref: primaryLink ? primaryLink.url : '',
+        onCtaClick: primaryLink
+            ? (e) => {
+                  e.stopPropagation();
+                  trackEvent('partner_card_click', {
+                      partnerId: partner.id,
+                      partnerName: partner.name,
+                      category: partner.category,
+                      url: primaryLink.url,
+                  });
+              }
+            : undefined,
+        animClassName: `anim-slam anim-delay-${(index % 8) + 1}`,
+    };
 }
 
 function updatePartnersHeader() {
@@ -448,6 +431,13 @@ function renderPartnersSection(allPartnersForCity) {
     const empty = document.getElementById('partnersEmpty');
     if (!grid || !empty) return;
 
+    // Root de SummaryCardGrid — se crea una única vez sobre #partnerGrid.
+    // mountSummaryCards() vacía el grid antes de crear el root (createRoot
+    // NO borra el skeleton de renderPartnerGridSkeleton por sí solo, a
+    // diferencia de la antigua ReactDOM.render() — ver el comentario de
+    // mount-summary-cards.jsx), así que no hace falta repetirlo aquí.
+    if (!partnerCardsRoot) partnerCardsRoot = mountSummaryCards(grid);
+
     updatePartnersHeader();
 
     const availableKeys = getHomeCategories().map((c) => c.key);
@@ -457,7 +447,6 @@ function renderPartnersSection(allPartnersForCity) {
         : inScope;
 
     Skeleton.clear(grid);
-    grid.innerHTML = '';
 
     if (filtered.length === 0) {
         grid.hidden = true;
@@ -466,14 +455,13 @@ function renderPartnersSection(allPartnersForCity) {
             inScope.length === 0
                 ? I18n.t('home.partners_empty_city')
                 : I18n.t('home.partners_empty_category');
+        partnerCardsRoot.render([], 'partner', getPartnerCardProps);
         return;
     }
 
     grid.hidden = false;
     empty.hidden = true;
-    selectVisiblePartners(filtered).forEach((partner, i) =>
-        grid.appendChild(buildPartnerCard(partner, i))
-    );
+    partnerCardsRoot.render(selectVisiblePartners(filtered), 'partner', getPartnerCardProps);
 
     if (window.initScrollReveal) window.initScrollReveal();
 }

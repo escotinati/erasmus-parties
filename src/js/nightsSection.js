@@ -27,77 +27,10 @@ function formatEventDate(isoString) {
     return `${capitalized} · ${timeLabel}h`;
 }
 
-function buildNightCard(event, index = 0) {
-    const cityLabel = event.city ? `${event.city.flag || ''} ${event.city.name}`.trim() : '';
-    const venueLabel = event.partner ? event.partner.name : '';
-    const locationLabel = [venueLabel, cityLabel].filter(Boolean).join(' — ');
-
-    const card = document.createElement('div');
-    card.className = `event-card anim-fade-up card-hoverable anim-delay-${(index % 8) + 1}`;
-
-    const safeImageUrl = sanitizeUrl(event.image_url);
-
-    card.innerHTML = `
-    <div class="event-img-wrap">
-      ${
-          safeImageUrl
-              ? `<img src="${safeImageUrl}" alt="${escapeHtml(I18n.tField(event.title))}" loading="lazy" />`
-              : `<div class="card-img-placeholder"></div>`
-      }
-      <span class="event-badge event-badge--primary"></span>
-    </div>
-    <div class="event-body">
-      <h4 class="event-name"></h4>
-      <p class="event-venue">
-        <span class="material-symbols-outlined">location_on</span>
-        <span class="event-venue-text"></span>
-      </p>
-      <p class="event-date"></p>
-      ${I18n.tField(event.price_label) ? '<p class="event-price"></p>' : ''}
-      <p class="event-desc"></p>
-      <div class="event-footer"></div>
-    </div>
-  `;
-
-    // textContent para todo dato de BD: mismo criterio anti-XSS que en admin.js
-    card.querySelector('.event-badge--primary').textContent = event.theme || 'Fiesta';
-    card.querySelector('.event-name').textContent = I18n.tField(event.title);
-    card.querySelector('.event-venue-text').textContent = locationLabel;
-    card.querySelector('.event-date').textContent = formatEventDate(event.starts_at);
-
-    const priceEl = card.querySelector('.event-price');
-    if (priceEl) priceEl.textContent = I18n.tField(event.price_label);
-
-    card.querySelector('.event-desc').textContent = I18n.tField(event.description) || '';
-
-    // El CTA de compra es la acción principal de un evento (a diferencia
-    // del partner-card, aquí no se oculta hasta el hover — en táctil no
-    // hay hover, y esconder "comprar entrada" tras un gesto que en móvil
-    // no existe sería empeorar la conversión, no una mejora de UX). Enlace
-    // de texto en vez de botón lleno: visible siempre, sin el peso de un
-    // bloque de color a ancho completo.
-    const safeTicketUrl = sanitizeUrl(event.ticket_url);
-    if (safeTicketUrl) {
-        const btn = document.createElement('a');
-        btn.className = 'event-cta-btn';
-        btn.href = safeTicketUrl;
-        btn.target = '_blank';
-        btn.rel = 'noopener noreferrer';
-        btn.innerHTML = `<span></span><span class="material-symbols-outlined">arrow_forward</span>`;
-        btn.querySelector('span:first-child').textContent = I18n.t('nights.view_event_cta');
-        btn.addEventListener('click', () => {
-            trackEvent('event_ticket_click', {
-                eventId: event.id,
-                eventTitle: I18n.tField(event.title),
-                partnerId: event.partner?.id,
-                ticketUrl: event.ticket_url,
-            });
-        });
-        card.querySelector('.event-footer').appendChild(btn);
-    }
-
-    return card;
-}
+// Root de React (SummaryCardGrid) sobre .events-scroll — se crea una
+// única vez (ver renderEventCards) y se reutiliza en cada cambio de
+// filtro con .render(), nunca se destruye/recrea.
+let eventCardsRoot = null;
 
 // Filtros activos de la barra — se combinan entre sí, cada cambio
 // dispara una nueva consulta a Supabase (sin cacheo en cliente).
@@ -259,20 +192,35 @@ function buildFilterBar(cities, themes, partners) {
 // entre la carga inicial y cada cambio de filtro.
 function renderEventCards(events) {
     const scroll = document.querySelector('.nights-section .events-scroll');
-    if (!scroll) return;
+    // #nightsEmpty es un <p> hermano de .events-scroll (mismo patrón que
+    // #partnersEmpty junto a #partnerGrid en index.html): desde que
+    // .events-scroll tiene un root de React montado encima, ya no se
+    // puede seguir inyectando el mensaje de "sin resultados" como hijo
+    // suyo con DOM imperativo — React es dueño de esos hijos.
+    const empty = document.getElementById('nightsEmpty');
+    if (!scroll || !empty) return;
+
+    // Root de SummaryCardGrid — se crea una única vez sobre .events-scroll.
+    // mountSummaryCards() vacía scroll antes de crear el root (createRoot
+    // NO borra el skeleton de renderEventsSkeleton por sí solo, a
+    // diferencia de la antigua ReactDOM.render() — ver el comentario de
+    // mount-summary-cards.jsx), así que no hace falta repetirlo aquí.
+    if (!eventCardsRoot) eventCardsRoot = mountSummaryCards(scroll);
 
     Skeleton.clear(scroll);
-    scroll.innerHTML = '';
 
     if (events.length === 0) {
-        const empty = document.createElement('p');
-        empty.className = 'events-loading';
+        scroll.hidden = true;
+        empty.hidden = false;
         empty.textContent = hasActiveFilters()
             ? I18n.t('nights.no_results_filtered')
             : I18n.t('nights.no_results_empty');
-        scroll.appendChild(empty);
+        eventCardsRoot.render([], 'event', getEventCardProps);
         return;
     }
+
+    scroll.hidden = false;
+    empty.hidden = true;
 
     // Solo destaca si hay una prioridad editorial real (> 0); en empate
     // a máximo, gana el primero del array (ya viene ordenado por
@@ -283,11 +231,38 @@ function renderEventCards(events) {
     const featuredEvent =
         maxPriority > 0 ? events.find((event) => event.priority === maxPriority) : null;
 
-    events.forEach((event, index) => {
-        const card = buildNightCard(event, index);
-        if (event === featuredEvent) card.classList.add('event-card--featured');
-        scroll.appendChild(card);
-    });
+    // Cierra sobre featuredEvent (se recalcula en cada llamada) para poder
+    // seguir marcando la card destacada con event-card--featured sin que
+    // SummaryCard/SummaryCardGrid necesiten saber qué es un "evento
+    // destacado" — es la misma clase que ya existía, solo se añade al
+    // animClassName que ya se calcula fuera del componente.
+    function getEventCardProps(event, index) {
+        const cityLabel = event.city ? `${event.city.flag || ''} ${event.city.name}`.trim() : '';
+        const venueLabel = event.partner ? event.partner.name : '';
+        const metaLine = [venueLabel, cityLabel].filter(Boolean).join(' — ');
+        const anim = `anim-fade-up anim-delay-${(index % 8) + 1}`;
+
+        return {
+            imageUrl: event.image_url,
+            badgeText: event.theme || 'Fiesta',
+            name: I18n.tField(event.title),
+            metaLine,
+            dateLine: formatEventDate(event.starts_at),
+            priceLabel: I18n.tField(event.price_label) || '',
+            ctaLabel: I18n.t('nights.view_event_cta'),
+            ctaHref: event.ticket_url,
+            onCtaClick: () =>
+                trackEvent('event_ticket_click', {
+                    eventId: event.id,
+                    eventTitle: I18n.tField(event.title),
+                    partnerId: event.partner?.id,
+                    ticketUrl: event.ticket_url,
+                }),
+            animClassName: event === featuredEvent ? `${anim} event-card--featured` : anim,
+        };
+    }
+
+    eventCardsRoot.render(events, 'event', getEventCardProps);
 
     // Las cards se regeneran por completo en cada cambio de filtro — hay
     // que volver a observarlas cada vez, si no las nuevas quedarían con
