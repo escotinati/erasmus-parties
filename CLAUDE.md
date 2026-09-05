@@ -14,7 +14,7 @@ La misma web sirve **dos marcas** desde un solo código: "Erasmus Verified" (la 
 
 - **Vite** como build tool — ya no se abre `index.html` directamente, se usa `npm run dev` para desarrollar y `npm run build` para generar la carpeta `dist/` que se despliega.
 - **Supabase** como backend — base de datos (Postgres) + login de administrador. Sustituye poco a poco a los datos estáticos de `data.js` (ver sección de Backend).
-- **React** (`src/react/*`, vía `@vitejs/plugin-react`) — **única excepción** a "sin ES Modules": el menú compartido de las 8 páginas públicas está montado como isla de React dentro de HTML/scripts clásicos. Ver [Navegación](#navegación) para el detalle completo; no se ha migrado nada más del proyecto a React, es deliberadamente una pieza aislada.
+- **React** (`src/react/*`, vía `@vitejs/plugin-react`) — **única excepción** a "sin ES Modules": son islas de React dentro de HTML/scripts clásicos, no una migración completa. Dos islas hoy: el menú compartido de las 8 páginas públicas (ver [Navegación](#navegación)) y las tarjetas de partners/eventos del home (ver [Tarjetas de resumen](#tarjetas-de-resumen-summarycard)) — esta segunda es la primera vez que React pinta contenido real de datos, no solo chrome de página.
 
 **Herramientas de desarrollo**: Prettier instalado como devDependency (`npm install` para instalar). Configuración en `.prettierrc`: 4 espacios, comillas simples, semi. Un hook de Claude Code formatea automáticamente JS/CSS/HTML tras cada edición — no hace falta ejecutarlo manualmente.
 
@@ -29,7 +29,7 @@ La misma web sirve **dos marcas** desde un solo código: "Erasmus Verified" (la 
 
 ## Arquitectura
 
-Todo el JS de páginas y módulos compartidos vive ahora en `src/js/` (antes era `js/`). El CSS vive en `src/css/`. Sigue sin haber ES Modules: todo son `<script>` clásicos con funciones y objetos globales, para mantener coherencia entre archivos — salvo `src/react/` (el menú, ver Stack arriba y [Navegación](#navegación)), la única carpeta con JSX/ES Modules de verdad.
+Todo el JS de páginas y módulos compartidos vive ahora en `src/js/` (antes era `js/`). El CSS vive en `src/css/`. Sigue sin haber ES Modules: todo son `<script>` clásicos con funciones y objetos globales, para mantener coherencia entre archivos — salvo `src/react/` (las dos islas de React, ver Stack arriba, [Navegación](#navegación) y [Tarjetas de resumen](#tarjetas-de-resumen-summarycard)), la única carpeta con JSX/ES Modules de verdad.
 
 ### Páginas y sus scripts
 
@@ -58,6 +58,7 @@ Todo el JS de páginas y módulos compartidos vive ahora en `src/js/` (antes era
 - `src/js/cityMap.js` — módulo reutilizable `mountCityMap(containerId, { pais, ciudad, interactive })`; devuelve una Promise con la instancia del mapa. Primero intenta usar coordenadas ya guardadas en Supabase antes de llamar al geocoder.
 - `src/js/mapPartners.js` — UI de la lista de partners + sincronización con marcadores del mapa. Los partners ahora vienen de `partnersService.js` (Supabase), no de un array estático.
 - `src/react/Nav.jsx`, `TopbarNav.jsx`, `navShared.jsx` — el menú compartido, en React. Ver [Navegación](#navegación) para el detalle completo (qué página usa cuál, por qué existe, y una regla de arquitectura importante sobre `DOMContentLoaded` que aplica a todo lo que interactúe con estos componentes desde fuera).
+- `src/react/SummaryCard.jsx`, `SummaryCardGrid.jsx`, `mount-summary-cards.jsx` — las tarjetas de partners (home) y eventos (fiestas), en React. Ver [Tarjetas de resumen](#tarjetas-de-resumen-summarycard) para el detalle completo y dos bugs reales ya corregidos ahí que conviene no repetir.
 
 ## Backend (Supabase)
 
@@ -143,6 +144,27 @@ CARTO Light (`light_all`) vía CDN. La atribución a OpenStreetMap + CARTO es **
 
 - **Proveedor gratuito sin cuenta** (Esri "World Light Gray Base" u OpenStreetMap estándar): sin key ni registro, pero cambia ligeramente el aspecto visual (gris en vez del blanco actual) y depende de las políticas de uso gratuito de ese proveedor, que también podrían cambiar sin aviso.
 - **Migrar a Google Maps JavaScript API**: Google no ofrece tiles sueltas compatibles con Leaflet (no hay URL de tiles oficial tipo `.../{z}/{x}/{y}.png`, solo su propia librería `google.maps.Map`) — usar sus tiles con Leaflet requeriría URLs no oficiales que incumplen sus términos de servicio. La vía legítima implicaría sustituir Leaflet por la Google Maps JS API (cambio de código más grande, aunque contenido en `map-helpers.js` por diseño) y una cuenta de Google Cloud con facturación activada (tarjeta), con ~$200/mes gratis y pago por uso después.
+
+## Tarjetas de resumen (SummaryCard)
+
+El grid de partners del home (sección "Descubre partners") y la sección "Trending nights" (fiestas) ya no construyen sus tarjetas a mano con `innerHTML` — usan un componente React compartido. Es la **segunda isla de React** del proyecto (la primera es el menú, ver [Navegación](#navegación) más abajo) y la primera que pinta contenido real de datos, no solo chrome de página.
+
+### Qué hace cada archivo
+
+| Archivo | Qué hace |
+| --- | --- |
+| `src/react/SummaryCard.jsx` | Componente presentacional de **una** tarjeta (sin fetch ni estado propio). Prop `variant: 'partner' \| 'event'` decide qué campos mostrar — la variante evento **nunca** muestra descripción, aunque el dato venga relleno desde Supabase — y si el CTA está siempre visible o solo al hacer hover (`ctaAlwaysVisible`, resuelto reutilizando las clases `.partner-card-cta`/`.event-cta-btn` que ya existían en `styles.css`, sin CSS nuevo). Sanea `imageUrl`/`ctaHref` con `sanitizeUrl()` antes de usarlos en `src`/`href`. |
+| `src/react/SummaryCardGrid.jsx` | Itera una lista de `items` y monta un `<SummaryCard>` por cada uno. No sabe qué es un partner ni un evento — esa traducción la hace `getCardProps(item, index)`, una función que le pasa el padre (`getPartnerCardProps`/`getEventCardProps`, ver abajo). |
+| `src/react/mount-summary-cards.jsx` | Expone `window.mountSummaryCards(containerEl)` — el puente para que `index.js`/`nightsSection.js` (scripts clásicos, sin `import`) creen un root de React sobre `#partnerGrid`/`.events-scroll` **una única vez** y vuelvan a pintar sobre ESE MISMO root en cada cambio de filtro, sin destruirlo y recrearlo. Es el primer puente module→script-clásico del proyecto: hizo falta porque, a diferencia del nav (que se monta una vez y no vuelve a renderizarse), estas tarjetas sí necesitan repintarse repetidamente desde código clásico. |
+
+`renderPartnersSection()` (`index.js`) y `renderEventCards()` (`nightsSection.js`) arman las props de cada tarjeta con `getPartnerCardProps()`/`getEventCardProps()` y llaman a `.render(items, variant, getCardProps)` sobre el root creado la primera vez.
+
+### Dos bugs reales ya corregidos aquí — no los repitas en la próxima isla de React
+
+1. **`mountSummaryCards()` vacía el contenedor a mano** (`containerEl.innerHTML = ''`) antes de `createRoot()`. `createRoot()` (React 18) **no** borra los hijos preexistentes del contenedor al montarse — eso solo pasaba con la antigua `ReactDOM.render()` (React ≤17). Sin este vaciado explícito, el esqueleto de carga (`Skeleton.render()`, DOM imperativo pintado ANTES de que exista el root) se quedaba mezclado para siempre con las tarjetas reales.
+2. **`initScrollReveal()` se dispara dentro de `SummaryCardGrid.jsx`, en un `useEffect`** — nunca justo después de llamar a `.render()` desde `index.js`/`nightsSection.js`. Un `root.render()` sobre un root **ya montado** es una actualización normal de React, no el mount inicial, y esas actualizaciones no se comprometen al DOM de forma síncrona. Un script clásico que llamara a `initScrollReveal()` en la línea siguiente podía correr antes de que las tarjetas nuevas existieran de verdad — su `querySelectorAll` no encontraba nada que observar, y esas tarjetas se quedaban con la clase `anim-slam`/`anim-fade-up` pero sin `is-visible`, en `opacity: 0` para siempre.
+
+**Regla general para la próxima isla de React que se añada**: cualquier efecto que dependa de que el DOM ya refleje el último render (medirlo, leerlo, engancharle un `IntersectionObserver`...) va DENTRO del componente (`useEffect`/`useLayoutEffect`), nunca en el script clásico que llama a `.render()` justo después. Es el mismo tipo de carrera que la regla de `DOMContentLoaded` del nav (ver más abajo) — misma solución: resolverlo dentro de React, no confiar en que un script externo acierte el timing.
 
 ## Navegación
 
@@ -261,8 +283,8 @@ Vía CDN, sin instalación:
 Instaladas vía npm (ver `package.json`):
 
 - `vite` + `vite-plugin-static-copy` — build tool
-- `@vitejs/plugin-react` — transforma el JSX de `src/react/*` (ver [Navegación](#navegación))
-- `react` + `react-dom` — solo para el menú compartido, no hay más React en el proyecto
+- `@vitejs/plugin-react` — transforma el JSX de `src/react/*` (ver [Navegación](#navegación) y [Tarjetas de resumen](#tarjetas-de-resumen-summarycard))
+- `react` + `react-dom` — para las dos islas de React del proyecto (menú y tarjetas de resumen), no hay más React fuera de `src/react/`
 - `@supabase/supabase-js` — cliente de Supabase (aunque en el navegador se usa la versión CDN cargada como `<script>`, no este paquete)
 - `prettier` — formateo de código
 
