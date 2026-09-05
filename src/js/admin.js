@@ -172,9 +172,15 @@ document.addEventListener('DOMContentLoaded', function () {
             if (e.key === 'Enter') login();
         });
     });
-    document.getElementById('confirm-modal-close').addEventListener('click', () => closeConfirmModal(false));
-    document.getElementById('confirm-modal-cancel').addEventListener('click', () => closeConfirmModal(false));
-    document.getElementById('confirm-modal-confirm').addEventListener('click', () => closeConfirmModal(true));
+    document
+        .getElementById('confirm-modal-close')
+        .addEventListener('click', () => closeConfirmModal(false));
+    document
+        .getElementById('confirm-modal-cancel')
+        .addEventListener('click', () => closeConfirmModal(false));
+    document
+        .getElementById('confirm-modal-confirm')
+        .addEventListener('click', () => closeConfirmModal(true));
     document
         .querySelector('#confirm-modal .admin-modal__backdrop')
         .addEventListener('click', () => closeConfirmModal(false));
@@ -404,7 +410,9 @@ function renderPartnersTable(partners) {
 
     if (list.length === 0) {
         wrap.innerHTML = `<p class="admin-empty">${
-            partnersTab === 'inactive' ? 'No hay partners inactivos.' : 'No hay partners activos todavía.'
+            partnersTab === 'inactive'
+                ? 'No hay partners inactivos.'
+                : 'No hay partners activos todavía.'
         }</p>`;
         return;
     }
@@ -527,7 +535,10 @@ async function togglePartnerActive(id, currentActive) {
     }
 
     partner.updated_at = data.updated_at;
-    showToast(`"${partner.name}" ${newActive ? 'activado' : 'desactivado'} correctamente.`, 'success');
+    showToast(
+        `"${partner.name}" ${newActive ? 'activado' : 'desactivado'} correctamente.`,
+        'success'
+    );
 }
 
 async function populateCitySelect(selectId, selectedCityId = null) {
@@ -558,35 +569,35 @@ async function openModal(partnerId) {
     await populateCitySelect('f-city-id');
 
     if (partnerId) {
-    const { data: partner } = await window.supabaseClient
-        .from('partners')
-        .select('*')
-        .eq('id', partnerId)
-        .single();
+        const { data: partner } = await window.supabaseClient
+            .from('partners')
+            .select('*')
+            .eq('id', partnerId)
+            .single();
 
-    const { data: links } = await window.supabaseClient
-        .from('partner_links')
-        .select('*')
-        .eq('partner_id', partnerId)
-        .order('sort_order');
+        const { data: links } = await window.supabaseClient
+            .from('partner_links')
+            .select('*')
+            .eq('partner_id', partnerId)
+            .order('sort_order');
 
-    document.getElementById('f-name').value = partner.name;
-    document.getElementById('f-category').value = partner.category;
-    document.getElementById('f-description-es').value = partner.description?.es ?? '';
-    document.getElementById('f-description-en').value = partner.description?.en ?? '';
-    document.getElementById('f-image').value = partner.image_url || '';
-    document.getElementById('f-lat').value = partner.lat || '';
-    document.getElementById('f-lng').value = partner.lng || '';
-    document.getElementById('f-priority').value = partner.priority;
-    document.getElementById('f-active').checked = partner.active;
+        document.getElementById('f-name').value = partner.name;
+        document.getElementById('f-category').value = partner.category;
+        document.getElementById('f-description-es').value = partner.description?.es ?? '';
+        document.getElementById('f-description-en').value = partner.description?.en ?? '';
+        document.getElementById('f-image').value = partner.image_url || '';
+        document.getElementById('f-lat').value = partner.lat || '';
+        document.getElementById('f-lng').value = partner.lng || '';
+        document.getElementById('f-priority').value = partner.priority;
+        document.getElementById('f-active').checked = partner.active;
 
-    const citySelect = document.getElementById('f-city-id');
-    if (partner.city_id) citySelect.value = partner.city_id;
+        const citySelect = document.getElementById('f-city-id');
+        if (partner.city_id) citySelect.value = partner.city_id;
 
-    for (const link of links || []) {
-        addLinkRow(link);
+        for (const link of links || []) {
+            addLinkRow(link);
+        }
     }
-}
 
     document.getElementById('partner-modal').hidden = false;
 }
@@ -665,9 +676,31 @@ function addLinkRow(link = {}) {
 async function savePartner() {
     const name = document.getElementById('f-name').value.trim();
     const cityId = parseInt(document.getElementById('f-city-id').value, 10);
+    const imageUrl = document.getElementById('f-image').value.trim();
 
     if (!name || !cityId) {
         showToast('Nombre y ciudad son obligatorios.', 'error');
+        return;
+    }
+    if (!isValidOptionalHttpsUrl(imageUrl)) {
+        showToast('La URL de la imagen debe empezar por https://', 'error');
+        return;
+    }
+
+    const links = Array.from(document.querySelectorAll('.admin-link-row'))
+        .map((row, i) => ({
+            type: row.querySelector('.link-type').value,
+            label: {
+                es: row.querySelector('.link-label-es').value.trim(),
+                en: row.querySelector('.link-label-en').value.trim(),
+            },
+            url: row.querySelector('.link-url').value.trim(),
+            sort_order: i,
+        }))
+        .filter((l) => l.label.es && l.url);
+
+    if (links.some((l) => !isValidOptionalHttpsUrl(l.url))) {
+        showToast('Todos los enlaces del partner deben empezar por https://', 'error');
         return;
     }
 
@@ -679,7 +712,7 @@ async function savePartner() {
             es: document.getElementById('f-description-es').value.trim(),
             en: document.getElementById('f-description-en').value.trim(),
         },
-        image_url: document.getElementById('f-image').value.trim() || '',
+        image_url: imageUrl,
         lat: parseFloat(document.getElementById('f-lat').value) || null,
         lng: parseFloat(document.getElementById('f-lng').value) || null,
         priority: parseInt(document.getElementById('f-priority').value) || 0,
@@ -711,29 +744,13 @@ async function savePartner() {
 
     await window.supabaseClient.from('partner_links').delete().eq('partner_id', savedId);
 
-    const linkRows = document.querySelectorAll('.admin-link-row');
-    if (linkRows.length > 0) {
-        const links = Array.from(linkRows)
-            .map((row, i) => ({
-                partner_id: savedId,
-                type: row.querySelector('.link-type').value,
-                label: {
-                    es: row.querySelector('.link-label-es').value.trim(),
-                    en: row.querySelector('.link-label-en').value.trim(),
-                },
-                url: row.querySelector('.link-url').value.trim(),
-                sort_order: i,
-            }))
-            .filter((l) => l.label.es && l.url);
-
-        if (links.length > 0) {
-            const { error: linksError } = await window.supabaseClient
-                .from('partner_links')
-                .insert(links);
-            if (linksError) {
-                showToast('Error guardando links: ' + linksError.message, 'error');
-                return;
-            }
+    if (links.length > 0) {
+        const { error: linksError } = await window.supabaseClient
+            .from('partner_links')
+            .insert(links.map((l) => ({ ...l, partner_id: savedId })));
+        if (linksError) {
+            showToast('Error guardando links: ' + linksError.message, 'error');
+            return;
         }
     }
 
@@ -903,7 +920,9 @@ async function populateEventPartnerSelect(selectedPartnerId = null) {
     for (const partner of partners || []) {
         const opt = document.createElement('option');
         opt.value = partner.id;
-        opt.textContent = partner.cities?.name ? `${partner.name} — ${partner.cities.name}` : partner.name;
+        opt.textContent = partner.cities?.name
+            ? `${partner.name} — ${partner.cities.name}`
+            : partner.name;
         if (selectedPartnerId !== null && partner.id === selectedPartnerId) opt.selected = true;
         select.appendChild(opt);
     }
@@ -990,7 +1009,20 @@ function clearEventForm() {
     document.getElementById('ef-partner-id').value = '';
     document.getElementById('ef-priority').value = '0';
     document.getElementById('ef-active').checked = true;
-    ['ef-title-es', 'ef-partner-id', 'ef-starts-at'].forEach((id) => setFieldError(id, ''));
+    ['ef-title-es', 'ef-partner-id', 'ef-starts-at', 'ef-image', 'ef-ticket-url'].forEach((id) =>
+        setFieldError(id, '')
+    );
+}
+
+// Replica en el cliente el guardarraíl de formato de las CHECK
+// constraints https:// de la base de datos (ver migraciones
+// 20260904000000/20260905000000): '' es válido (campo opcional sin
+// rellenar todavía), cualquier otro valor debe empezar por https://.
+// Sin esto, un admin que teclee http:// o una URL sin esquema solo se
+// entera de que algo fue mal al recibir el mensaje crudo de Postgres
+// tras el INSERT/UPDATE.
+function isValidOptionalHttpsUrl(value) {
+    return value === '' || value.startsWith('https://');
 }
 
 // Muestra (o limpia, si message es '') un error específico bajo el
@@ -1010,15 +1042,28 @@ async function saveEvent() {
     const titleEn = document.getElementById('ef-title-en').value.trim();
     const partnerId = parseInt(document.getElementById('ef-partner-id').value, 10);
     const startsAtLocal = document.getElementById('ef-starts-at').value;
+    const imageUrl = document.getElementById('ef-image').value.trim();
+    const ticketUrl = document.getElementById('ef-ticket-url').value.trim();
 
     // Se recalcula en cada intento: si el usuario corrige un campo y
     // vuelve a guardar, el mensaje de ESE campo desaparece aunque los
-    // otros dos sigan sin rellenar.
+    // otros sigan sin rellenar.
     setFieldError('ef-title-es', titleEs ? '' : 'El título (español) es obligatorio.');
     setFieldError('ef-partner-id', partnerId ? '' : 'Selecciona un partner.');
     setFieldError('ef-starts-at', startsAtLocal ? '' : 'La fecha y hora son obligatorias.');
+    setFieldError('ef-image', isValidOptionalHttpsUrl(imageUrl) ? '' : 'Debe empezar por https://');
+    setFieldError(
+        'ef-ticket-url',
+        isValidOptionalHttpsUrl(ticketUrl) ? '' : 'Debe empezar por https://'
+    );
 
-    if (!titleEs || !partnerId || !startsAtLocal) {
+    if (
+        !titleEs ||
+        !partnerId ||
+        !startsAtLocal ||
+        !isValidOptionalHttpsUrl(imageUrl) ||
+        !isValidOptionalHttpsUrl(ticketUrl)
+    ) {
         return;
     }
 
@@ -1030,13 +1075,13 @@ async function saveEvent() {
             en: document.getElementById('ef-description-en').value.trim(),
         },
         theme: document.getElementById('ef-theme').value.trim(),
-        image_url: document.getElementById('ef-image').value.trim() || '',
+        image_url: imageUrl,
         starts_at: localDateTimeToISO(startsAtLocal),
         price_label: {
             es: document.getElementById('ef-price-label-es').value.trim(),
             en: document.getElementById('ef-price-label-en').value.trim(),
         },
-        ticket_url: document.getElementById('ef-ticket-url').value.trim(),
+        ticket_url: ticketUrl,
         priority: parseInt(document.getElementById('ef-priority').value) || 0,
         active: document.getElementById('ef-active').checked,
     };
@@ -1218,6 +1263,7 @@ async function saveCity() {
     const name = document.getElementById('cf-name').value.trim();
     const country = document.getElementById('cf-country').value.trim();
     const whatsappUrl = document.getElementById('cf-whatsapp-url').value.trim();
+    const imageUrl = document.getElementById('cf-image').value.trim();
 
     if (!name || !country) {
         showToast('Nombre y país son obligatorios.', 'error');
@@ -1225,6 +1271,14 @@ async function saveCity() {
     }
     if (!whatsappUrl) {
         showToast('El grupo de WhatsApp es obligatorio.', 'error');
+        return;
+    }
+    if (!isValidOptionalHttpsUrl(whatsappUrl)) {
+        showToast('El enlace del grupo de WhatsApp debe empezar por https://', 'error');
+        return;
+    }
+    if (!isValidOptionalHttpsUrl(imageUrl)) {
+        showToast('La URL de la imagen debe empezar por https://', 'error');
         return;
     }
 
@@ -1244,7 +1298,7 @@ async function saveCity() {
             es: document.getElementById('cf-description-es').value.trim(),
             en: document.getElementById('cf-description-en').value.trim(),
         },
-        image_url: document.getElementById('cf-image').value.trim(),
+        image_url: imageUrl,
         lat: parseFloat(document.getElementById('cf-lat').value) || null,
         lng: parseFloat(document.getElementById('cf-lng').value) || null,
         whatsapp_url: whatsappUrl,

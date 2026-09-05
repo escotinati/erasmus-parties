@@ -123,11 +123,7 @@
                 <!-- DASHBOARD (vista de entrada tras login) -->
                 <div id="dashboard-view">
                     <div class="admin-dashboard-cards">
-                        <button
-                            type="button"
-                            class="admin-dashboard-card"
-                            data-goto="partners"
-                        >
+                        <button type="button" class="admin-dashboard-card" data-goto="partners">
                             <span class="material-symbols-outlined admin-dashboard-card__icon"
                                 >storefront</span
                             >
@@ -304,7 +300,11 @@
                         <div class="i18n-field">
                             <div class="i18n-field__lang">
                                 <label>Español</label>
-                                <textarea id="f-description-es" class="i18n-input" rows="3"></textarea>
+                                <textarea
+                                    id="f-description-es"
+                                    class="i18n-input"
+                                    rows="3"
+                                ></textarea>
                             </div>
                             <div class="i18n-field__actions">
                                 <button
@@ -319,7 +319,11 @@
                             </div>
                             <div class="i18n-field__lang">
                                 <label>English</label>
-                                <textarea id="f-description-en" class="i18n-input" rows="3"></textarea>
+                                <textarea
+                                    id="f-description-en"
+                                    class="i18n-input"
+                                    rows="3"
+                                ></textarea>
                             </div>
                         </div>
                     </div>
@@ -366,7 +370,7 @@
                             <input id="f-lng" type="number" step="any" />
                         </div>
                     </div>
-                    <p class="admin-hint" style="margin-top:4px">
+                    <p class="admin-hint" style="margin-top: 4px">
                         💡 Clic derecho en
                         <a href="https://maps.google.com" target="_blank" rel="noopener">
                             Google Maps
@@ -449,11 +453,20 @@
                         </div>
                     </div>
                     <div class="admin-field">
-                        <label>Descripción <span class="admin-hint">(solo se ve en la card grande del inicio)</span></label>
+                        <label
+                            >Descripción
+                            <span class="admin-hint"
+                                >(solo se ve en la card grande del inicio)</span
+                            ></label
+                        >
                         <div class="i18n-field">
                             <div class="i18n-field__lang">
                                 <label>Español</label>
-                                <textarea id="cf-description-es" class="i18n-input" rows="2"></textarea>
+                                <textarea
+                                    id="cf-description-es"
+                                    class="i18n-input"
+                                    rows="2"
+                                ></textarea>
                             </div>
                             <div class="i18n-field__actions">
                                 <button
@@ -468,7 +481,11 @@
                             </div>
                             <div class="i18n-field__lang">
                                 <label>English</label>
-                                <textarea id="cf-description-en" class="i18n-input" rows="2"></textarea>
+                                <textarea
+                                    id="cf-description-en"
+                                    class="i18n-input"
+                                    rows="2"
+                                ></textarea>
                             </div>
                         </div>
                     </div>
@@ -512,8 +529,16 @@
                         </div>
                     </div>
                     <div class="admin-field">
-                        <label>Grupo de WhatsApp <span class="admin-hint">(URL obligatoria)</span></label>
-                        <input id="cf-whatsapp-url" type="url" placeholder="https://chat.whatsapp.com/..." required />
+                        <label
+                            >Grupo de WhatsApp
+                            <span class="admin-hint">(URL obligatoria)</span></label
+                        >
+                        <input
+                            id="cf-whatsapp-url"
+                            type="url"
+                            placeholder="https://chat.whatsapp.com/..."
+                            required
+                        />
                     </div>
                     <div class="admin-field admin-field--row">
                         <div>
@@ -562,7 +587,10 @@
                 <div class="admin-field-group">
                     <div class="admin-field-group__title">Información básica</div>
                     <div class="admin-field">
-                        <label>Partner <span class="admin-hint">(solo locales de nightlife)</span></label>
+                        <label
+                            >Partner
+                            <span class="admin-hint">(solo locales de nightlife)</span></label
+                        >
                         <select id="ef-partner-id">
                             <option value="">— Selecciona partner —</option>
                         </select>
@@ -614,7 +642,11 @@
                         <div class="i18n-field">
                             <div class="i18n-field__lang">
                                 <label>Español</label>
-                                <textarea id="ef-description-es" class="i18n-input" rows="3"></textarea>
+                                <textarea
+                                    id="ef-description-es"
+                                    class="i18n-input"
+                                    rows="3"
+                                ></textarea>
                             </div>
                             <div class="i18n-field__actions">
                                 <button
@@ -629,13 +661,18 @@
                             </div>
                             <div class="i18n-field__lang">
                                 <label>English</label>
-                                <textarea id="ef-description-en" class="i18n-input" rows="3"></textarea>
+                                <textarea
+                                    id="ef-description-en"
+                                    class="i18n-input"
+                                    rows="3"
+                                ></textarea>
                             </div>
                         </div>
                     </div>
                     <div class="admin-field">
                         <label>URL de imagen <span class="admin-hint">(opcional)</span></label>
                         <input id="ef-image" type="url" placeholder="https://..." />
+                        <p class="admin-error" id="ef-image-error"></p>
                     </div>
                 </div>
 
@@ -672,13 +709,19 @@
                             </div>
                         </div>
                         <div>
-                            <label>URL de entradas <span class="admin-hint">(opcional)</span></label>
+                            <label
+                                >URL de entradas <span class="admin-hint">(opcional)</span></label
+                            >
                             <input id="ef-ticket-url" type="url" placeholder="https://..." />
+                            <p class="admin-error" id="ef-ticket-url-error"></p>
                         </div>
                     </div>
                     <div class="admin-field admin-field--row">
                         <div>
-                            <label>Prioridad <span class="admin-hint">(mayor = destacado)</span></label>
+                            <label
+                                >Prioridad
+                                <span class="admin-hint">(mayor = destacado)</span></label
+                            >
                             <input id="ef-priority" type="number" value="0" />
                         </div>
                         <div class="admin-field--check" style="margin-top: 24px">
@@ -689,10 +732,18 @@
                 </div>
 
                 <div class="admin-modal__actions">
-                    <button type="button" id="event-modal-cancel" class="admin-btn admin-btn--ghost">
+                    <button
+                        type="button"
+                        id="event-modal-cancel"
+                        class="admin-btn admin-btn--ghost"
+                    >
                         Cancelar
                     </button>
-                    <button type="button" id="event-modal-save" class="admin-btn admin-btn--primary">
+                    <button
+                        type="button"
+                        id="event-modal-save"
+                        class="admin-btn admin-btn--primary"
+                    >
                         Guardar
                     </button>
                 </div>
@@ -758,10 +809,18 @@
                 </div>
 
                 <div class="admin-modal__actions">
-                    <button type="button" id="confirm-modal-cancel" class="admin-btn admin-btn--ghost">
+                    <button
+                        type="button"
+                        id="confirm-modal-cancel"
+                        class="admin-btn admin-btn--ghost"
+                    >
                         Cancelar
                     </button>
-                    <button type="button" id="confirm-modal-confirm" class="admin-btn admin-btn--primary">
+                    <button
+                        type="button"
+                        id="confirm-modal-confirm"
+                        class="admin-btn admin-btn--primary"
+                    >
                         Confirmar
                     </button>
                 </div>
