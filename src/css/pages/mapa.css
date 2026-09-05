@@ -1,0 +1,81 @@
+/* ═══════════════════════════════════════════════════════════
+   7. MAPA.HTML
+   ─────────────────────────────────────────────────────── */
+
+.map-page-main {
+    flex: 1;
+    padding: 0;
+    display: block;
+}
+
+.map-canvas {
+    /* Mobile-first: 65px (alto real de header.topbar en móvil) es el
+       valor por defecto, revierte a --header-h (desktop) en --bp-md.
+       65px se queda literal — no hay token para la altura de
+       header.topbar en móvil (ver docs/mobile-audit.md sección b). */
+    height: calc(100dvh - 65px);
+    width: 100%;
+}
+
+/* Pin de Leaflet por divIcon — icono "pin" de Material Symbols */
+
+.erasmus-pin__icon {
+    display: block;
+    font-size: 32px;
+    color: var(--pin-color, var(--primary));
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+}
+
+@media (min-width: 900px) {
+    /* --bp-md */
+    .map-canvas {
+        height: calc(100dvh - var(--header-h));
+    }
+}
+
+/* Layout mapa + listado lateral */
+
+.map-with-list {
+    display: flex;
+    flex-direction: column;
+    /* 64px literal — no hay token, ver docs/mobile-audit.md sección b */
+    height: calc(100dvh - 64px);
+}
+
+.map-with-list .map-canvas {
+    flex: 1;
+    min-height: 280px;
+}
+
+.map-with-list .partners-list {
+    overflow-y: auto;
+    padding: 16px;
+    background: var(--surface-container-low);
+    border-top: 1px solid var(--outline-variant);
+}
+
+@media (min-width: 900px) {
+    /* --bp-md */
+    .map-with-list {
+        flex-direction: row;
+        height: calc(100dvh - var(--header-h));
+    }
+    .map-with-list .map-canvas {
+        flex: 1;
+        height: calc(100dvh - var(--header-h));
+    }
+    .map-with-list .partners-list {
+        width: 340px;
+        flex-shrink: 0;
+        height: calc(100dvh - var(--header-h));
+        overflow-y: scroll;
+        border-top: none;
+        border-left: 1px solid var(--outline-variant);
+    }
+}
+

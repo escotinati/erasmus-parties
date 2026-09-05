@@ -1,0 +1,1417 @@
+/* ═══════════════════════════════════════════════════════════
+   4. INDEX.HTML
+   ─────────────────────────────────────────────────────── */
+
+/* ── 4.-1 Nav desktop (rediseño) ───────────────────────────────
+   Escapado bajo .topnav/.topbar (los dos elementos que renderizan
+   Nav.jsx/TopbarNav.jsx, rama react/menu) en vez de bajo .home-page:
+   antes esto vivía solo bajo body.home-page (solo index.html), pero
+   el rediseño del nav ya es el mismo en las 8 páginas públicas, así
+   que el hover tiene que serlo también. .topbar-nav a / .lang-switcher
+   son selectores COMPARTIDOS con el resto de páginas, pero como aquí
+   ya vamos scopeados a .topnav/.topbar no hace falta nada más. */
+
+.topnav::after,
+.topbar::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--indigo), var(--burgundy));
+    opacity: 0.3;
+    transition: opacity var(--anim-duration-base) var(--anim-easing-standard);
+}
+
+.topnav.scrolled::after,
+.topbar.scrolled::after {
+    opacity: 0.65;
+}
+
+/* .brand (Nav.jsx) y .logo (TopbarNav.jsx) son el mismo elemento con
+   nombre distinto según el patrón — mismo motivo que arriba. */
+.topnav .brand,
+.topbar .logo {
+    transition: opacity var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.topnav .brand:hover,
+.topbar .logo:hover {
+    opacity: 0.75;
+}
+
+/* Subrayado que crece desde el centro en hover/foco — mismo degradado
+   que el CTA y el titular del hero, para que el nav se sienta parte
+   del mismo sistema en vez de un componente genérico aparte. */
+.topnav .topbar-nav a,
+.topnav .lang-switcher,
+.topbar .topbar-nav a,
+.topbar .lang-switcher {
+    position: relative;
+}
+
+.topnav .topbar-nav a::after,
+.topnav .lang-switcher::after,
+.topbar .topbar-nav a::after,
+.topbar .lang-switcher::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -8px;
+    height: 2px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg, var(--indigo), var(--burgundy));
+    transform: scaleX(0);
+    transition: transform var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.topnav .lang-switcher::after,
+.topbar .lang-switcher::after {
+    bottom: -6px;
+}
+
+.topnav .topbar-nav a:hover::after,
+.topnav .topbar-nav a:focus-visible::after,
+.topnav .topbar-nav a.is-active::after,
+.topnav .lang-switcher:hover::after,
+.topnav .lang-switcher:focus-visible::after,
+.topbar .topbar-nav a:hover::after,
+.topbar .topbar-nav a:focus-visible::after,
+.topbar .topbar-nav a.is-active::after,
+.topbar .lang-switcher:hover::after,
+.topbar .lang-switcher:focus-visible::after {
+    transform: scaleX(1);
+}
+
+/* "Fiestas ↗" (Verified) y "Verified ↗" (Parties, añadido por
+   experience.js) ya llevan su propio acento — el subrayado usa ese
+   mismo color en vez del degradado indigo/burgundy por defecto. */
+.topnav .topbar-nav a.nav-parties::after,
+.topbar .topbar-nav a.nav-parties::after {
+    background: #e1147b;
+}
+
+.topnav .topbar-nav a.nav-verified::after,
+.topbar .topbar-nav a.nav-verified::after {
+    background: #4648d4;
+}
+
+/* ── 4.-1b Bottom nav móvil (rediseño, solo home-page) ─────────
+   .app-bottom-nav / .app-bottom-nav-item son compartidos con el resto
+   de páginas públicas — todo escapado bajo .home-page. Mismo
+   tratamiento visual para los 4 ítems (los 3 enlaces + el botón de
+   cuenta): cristal a juego con el nav de escritorio, píldora + icono
+   relleno en el ítem activo (Material Symbols soporta el eje FILL
+   0↔1, igual que el "tab" que se rellena al seleccionarlo en apps
+   como Instagram). El botón de cuenta nunca lleva --active (no
+   navega a ninguna página todavía), así que se queda siempre en su
+   estado de reposo. */
+
+.home-page .app-bottom-nav {
+    background: rgba(var(--surface-rgb), 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(199, 196, 215, 0.35);
+    box-shadow: 0 -8px 24px rgba(19, 27, 46, 0.06);
+    /* iOS: reserva el hueco de la home indicator sin recortar los
+       ítems ni encogerlos — el padding vive DEBAJO de su altura
+       normal, así el contenido flex sigue centrado en --nav-bottom-h. */
+    height: var(--nav-bottom-total);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.home-page .app-bottom-nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    transition:
+        background var(--anim-duration-fast) var(--anim-easing-standard),
+        transform var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.home-page .app-bottom-nav-item:active .app-bottom-nav-icon {
+    transform: scale(0.9);
+}
+
+.home-page .app-bottom-nav-item .material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+    transition: font-variation-settings var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.home-page .app-bottom-nav-label {
+    transition: font-weight var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+/* Ítem activo (JS ya marca --active según la página, ver script inline) */
+.home-page .app-bottom-nav-item--active .app-bottom-nav-icon {
+    background: rgba(70, 72, 212, 0.12);
+}
+
+.home-page .app-bottom-nav-item--active .material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 500,
+        'GRAD' 0,
+        'opsz' 24;
+}
+
+.home-page .app-bottom-nav-item--active .app-bottom-nav-label {
+    font-weight: 700;
+}
+
+/* Fiestas: acento magenta ya era permanente (no depende de --active);
+   ahora también lleva píldora e icono relleno siempre, como el único
+   ítem "siempre encendido" de la barra. */
+.home-page .app-bottom-nav-item--parties .app-bottom-nav-icon {
+    background: rgba(225, 20, 123, 0.1);
+}
+
+.home-page .app-bottom-nav-item--parties .material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 500,
+        'GRAD' 0,
+        'opsz' 24;
+}
+
+.home-page .app-bottom-nav-item--parties .app-bottom-nav-label {
+    font-weight: 700;
+}
+
+/* ── 4.0 Hero extras: tipografía slab, ticker, chip, stats,
+        pills de categoría y grid de partners (rediseño home) ──── */
+
+/* Placeholder genérico para accordion-card / event-img-wrap / partner-card-img-wrap
+   cuando el partner/ciudad no tiene image_url — los tres contenedores son
+   position:relative con altura definida, así que un inset:0 absoluto
+   siempre encaja. (Existía como clase referenciada en JS desde antes de
+   esta rama sin ninguna regla CSS detrás — quedaba invisible en vez de
+   mostrar un placeholder.) */
+.card-img-placeholder {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--surface-container-low), var(--outline-variant));
+}
+
+/* Archivo Black — SOLO H1 del hero y números de stats (ver
+   comentario en index.html sobre por qué no se extiende al resto
+   de la tipografía todavía). */
+.font-slab {
+    font-family: 'Archivo Black', var(--font-display), sans-serif;
+}
+
+/* Envoltorio de palabra individual del H1 — creado en runtime por
+   initHeroTitleAnim() (index.js), nunca en el HTML estático. */
+.word-anim {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(6px);
+    transition:
+        opacity var(--anim-duration-base) var(--anim-easing-enter),
+        transform var(--anim-duration-base) var(--anim-easing-enter),
+        filter var(--anim-duration-base) var(--anim-easing-enter);
+}
+.word-anim.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+}
+
+/* Stats del hero (contador animado, ver initStatsCounters en index.js) —
+   bloque independiente dentro de .hero-panel, con su propia superficie
+   (mismo trato que .search-bar, pero como tarjeta plana en vez de
+   píldora: es una fila ancha con 3 cifras, no un control de una línea). */
+.home-stats {
+    display: flex;
+    flex-wrap: wrap;
+    /* Mobile-first: center/20px/18px 16px/22px es el valor por defecto
+       (móvil, ver antes en max-width:600/768/900 — con 3 stats en un
+       panel estrecho, space-between hace wrap a 2+1 y deja el primer
+       par pegado a los bordes; center + gap fijo da lo mismo entre
+       cualquier par, se reparta como se reparta el wrap). Escritorio
+       (>=--bp-sm y >=--bp-md más abajo) revierte a los valores
+       originales de desktop. */
+    justify-content: center;
+    gap: 20px;
+    padding: 18px 16px;
+    background: var(--surface-container-low);
+    border-radius: 22px;
+    box-shadow: 0 4px 24px rgba(70, 72, 212, 0.06);
+}
+
+.home-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.home-stat-num {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.01em;
+}
+
+.home-stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--on-surface-variant);
+}
+
+/* Ticker — franja de marquee CSS puro, contenido duplicado en el
+   propio track (ver initTicker en index.js) para loop continuo sin
+   salto. TODO: sustituir el contenido estático por datos reales
+   (recuento de cta_clicks, nº de partners activos…) en una fase
+   posterior. */
+.ticker {
+    overflow: hidden;
+    background: var(--surface-container-low);
+    border-top: 1px solid var(--outline-variant);
+    border-bottom: 1px solid var(--outline-variant);
+    padding: 14px 0;
+}
+
+.ticker-track {
+    display: flex;
+    width: max-content;
+    animation: ticker-scroll 26s linear infinite;
+}
+
+.ticker-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 28px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--on-surface-variant);
+    white-space: nowrap;
+}
+
+.ticker-item::after {
+    content: '•';
+    margin-left: 28px;
+    color: var(--outline);
+}
+
+@keyframes ticker-scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        /* -50% porque el contenido está duplicado una vez en el track */
+        transform: translateX(-50%);
+    }
+}
+
+/* Pills de categoría del grid de partners */
+.category-pills {
+    display: flex;
+    flex-wrap: wrap;
+    /* Mobile-first: 8px es el valor móvil (por defecto), pasa a 10px
+       en --bp-sm — ver @media más abajo. */
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.category-pill {
+    /* Mobile-first: 36px/6px 14px/13px son los valores móviles (por
+       defecto) — en desktop min-height:44px es el tamaño de objetivo
+       táctil recomendado, pero en móvil con varias categorías la fila
+       hace wrap a 2-3 líneas y ocupa demasiado; 36px sigue siendo un
+       objetivo táctil razonable para un filtro secundario (no es la
+       acción principal de la pantalla). Revierte a 44px/8px 20px/14px
+       en --bp-sm, ver @media más abajo. */
+    min-height: 36px;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--outline-variant);
+    background: var(--surface);
+    color: var(--on-surface-variant);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background var(--anim-duration-fast) var(--anim-easing-standard),
+        color var(--anim-duration-fast) var(--anim-easing-standard),
+        border-color var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.category-pill:hover {
+    border-color: var(--primary);
+}
+
+.category-pill.is-active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--on-primary);
+}
+
+/* Grid de partners — sin borde/sombra en reposo; en hover eleva,
+   la imagen hace zoom y el CTA aparece con fade+slide. */
+.partners-section {
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
+}
+
+/* .nights-header trae su propio max-width/padding pensado para secciones
+   full-bleed (nights-section, sin la clase .section) — aquí ya estamos
+   dentro de .section, que ya centra y da el padding lateral, así que se
+   anula para que "Tu ciudad" quede al mismo ancho que "Destinos"
+   (.section-head, sin padding propio). */
+.partners-section .nights-header {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.partner-grid {
+    margin: 40px 0 0;
+    display: grid;
+    /* Mobile-first: 1 columna es el valor por defecto (móvil); pasa a
+       2 en --bp-sm y a 3 en --bp-md, ver los @media más abajo. */
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+/* La regla de clase de arriba (display:grid) empataría en especificidad
+   con el [hidden] del stylesheet del navegador y ganaría por venir de
+   una hoja de autor — hay que ocultarlo explícitamente. */
+.partner-grid[hidden] {
+    display: none;
+}
+
+.partners-empty {
+    margin: 40px 0 0;
+    padding-bottom: 8px;
+    color: var(--on-surface-variant);
+    font-size: 15px;
+}
+
+.partners-empty[hidden] {
+    display: none;
+}
+
+.partner-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--surface);
+    text-decoration: none;
+    transition:
+        transform var(--anim-duration-fast) var(--anim-easing-standard),
+        box-shadow var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.partner-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--anim-shadow-hover);
+}
+
+.partner-card-img-wrap {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--surface-container-low);
+}
+
+.partner-card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--anim-duration-slow) var(--anim-easing-standard);
+}
+
+.partner-card:hover .partner-card-img-wrap img {
+    transform: scale(1.06);
+}
+
+.partner-card-category {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    background: rgba(19, 27, 46, 0.72);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.partner-card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.partner-card-name {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--on-surface);
+}
+
+.partner-card-desc {
+    font-size: 13px;
+    color: var(--on-surface-variant);
+    line-height: 1.5;
+}
+
+/* Visible por defecto (móvil/táctil no tiene :hover — un CTA oculto
+   ahí sería un objetivo invisible pero tocable, peor que no animarlo).
+   El fade+slide-on-hover solo se activa en dispositivos con hover de
+   verdad y puntero fino (ratón/trackpad), dentro del media query de
+   abajo. */
+.partner-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .partner-card-cta {
+        opacity: 0;
+        transform: translateY(6px);
+        transition:
+            opacity var(--anim-duration-fast) var(--anim-easing-standard),
+            transform var(--anim-duration-fast) var(--anim-easing-standard);
+    }
+
+    .partner-card:hover .partner-card-cta,
+    .partner-card:focus-within .partner-card-cta {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (min-width: 600px) {
+    /* --bp-sm */
+    .partner-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 900px) {
+    /* --bp-md */
+    .partner-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .home-stats {
+        justify-content: space-between;
+        gap: 32px;
+    }
+}
+
+@media (min-width: 600px) {
+    /* --bp-sm */
+    .category-pills {
+        gap: 10px;
+    }
+
+    .category-pill {
+        min-height: 44px;
+        padding: 8px 20px;
+        font-size: 14px;
+    }
+
+    .home-stats {
+        padding: 24px;
+        border-radius: 28px;
+    }
+}
+
+@media (min-width: 600px) {
+    /* --bp-sm */
+    .countries-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+    .cities-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+    }
+    .cities-grid.cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .hero {
+        min-height: 870px;
+        padding: 100px var(--margin-mobile) 80px;
+    }
+    .hero-title {
+        font-size: clamp(40px, 7vw, 64px);
+        margin-top: 0;
+    }
+    .hero-sub {
+        font-size: 18px;
+    }
+    .search-bar {
+        padding: 8px;
+    }
+    .search-bar-input input {
+        /* font-size: 18px — recupera el valor desktop de main */
+        font-size: 18px;
+        padding-right: 0;
+    }
+    .search-bar-btn {
+        position: static;
+        transform: none;
+        width: auto;
+        height: auto;
+        padding: 14px 32px;
+        gap: 8px;
+        justify-content: flex-start;
+        overflow: visible;
+    }
+    .search-bar-btn .material-symbols-outlined {
+        font-size: inherit;
+    }
+    .search-bar-btn .btn-text {
+        display: inline;
+    }
+    .cta-card {
+        padding: 48px 32px;
+    }
+    main.city-main {
+        padding: 60px 20px 80px;
+    }
+}
+
+/* ── 4.1 Accordion grid (ciudades destacadas, ensanchamiento en hover) ── */
+
+/* Mismo padding que .hero, a petición — sustituye al de .section
+   (var(--space-16) var(--margin-desktop)) que traía por defecto. */
+.cities-section {
+    padding: 100px var(--margin-mobile) 80px;
+}
+
+/* Efecto "pin & scrub" al estilo Apple — solo desktop (>=1000px, el
+   mismo corte que el accordion en fila) y solo con movimiento real.
+   .cities-scroll-stage da scroll "extra" (200vh); mientras se
+   recorre, .cities-pin se queda fijo en pantalla (sticky) y ese
+   scroll — no un timeline propio — controla la animación vía una
+   única custom property (--cities-progress, la escribe
+   initCitiesScrollEffect en index.js sobre .cities-scroll-stage y
+   hereda a sus hijos). Solo transform/opacity: nunca se anima layout,
+   todo va por compositor. En móvil y con prefers-reduced-motion no se
+   define stage/pin como sticky — la sección es el .section-head +
+   .accordion-grid de siempre, estáticos. */
+.cities-scroll-stage {
+    --cities-progress: 0;
+}
+
+@media (min-width: 1000px) {
+    .cities-scroll-stage {
+        position: relative;
+        /* Alto del pin (~100vh) + margen de scroll real para el scrub.
+           Antes 200vh (100vh de scrub) se notaba largo hasta que
+           aparecían las cards; 150vh deja 50vh de scrub, la mitad. */
+        height: 150vh;
+    }
+
+    .cities-pin {
+        position: sticky;
+        /* 80px = alto de .topnav (fixed) — si no, el contenido se
+           metería debajo de la cabecera al fijarse. */
+        top: 80px;
+        height: calc(100vh - 80px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    /* El título arranca más grande y se encoge a su tamaño real
+       (scale(1) = la posición/tamaño natural del layout, sin offset
+       ninguno, cualquiera que sea el pico) — "queda como está" de
+       verdad, no una aproximación. El pico es RESPONSIVE, no un
+       número fijo: es una frase larga (no una palabra suelta como en
+       las páginas de producto de Apple) y a 1000px (el límite
+       estrecho de este breakpoint) el margen hasta desbordar el
+       contenedor es de apenas ~15% — comprobado empujando el
+       escalado hasta desbordar y retrocediendo. A partir de 1000px
+       hay cada vez más aire (contenedor más ancho, mismo texto), así
+       que el pico crece con el viewport hasta un tope en 1500px+
+       (1.12 a 1000px → 1.5 a 1500px+), en vez de dejar la misma
+       cantidad fija de "aire" desperdiciado en pantallas anchas o
+       arriesgar el corte en las estrechas. transform-origin a la
+       izquierda: se encoge hacia donde ya vive el texto (alineado a
+       la izquierda), no hacia el centro del bloque. */
+    .cities-pin .section-title {
+        --cities-title-peak: clamp(1.12, calc(1.12 + (100vw - 1000px) * 0.00076 / 1px), 1.5);
+        transform-origin: left center;
+        transform: scale(
+            calc(var(--cities-title-peak) - (var(--cities-title-peak) - 1) * var(--cities-progress))
+        );
+        will-change: transform;
+    }
+
+    /* El grid ya ocupa su sitio en el layout desde el principio (nunca
+       se anima su altura/reflow) — solo aparece: opacity + un ligero
+       translateY/scale de "materializarse" en vez de un fundido plano. */
+    .cities-pin .accordion-grid {
+        opacity: var(--cities-progress);
+        transform: translateY(calc((1 - var(--cities-progress)) * 40px))
+            scale(calc(0.96 + 0.04 * var(--cities-progress)));
+        will-change: transform, opacity;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    /* No basta con anular transform/opacity del título y el grid: si
+       el sticky+200vh de arriba siguiera activo, quedaría una "zona de
+       scroll muerta" — la página no avanza visualmente un buen tramo,
+       pero tampoco pasa nada, que es justo la clase de desorientación
+       que prefers-reduced-motion pide evitar. Se anula el pin entero,
+       igual que en el layout apilado (<1000px, ver arriba). */
+    .cities-scroll-stage {
+        height: auto;
+    }
+
+    .cities-pin {
+        position: static;
+        height: auto;
+        overflow: visible;
+    }
+
+    .cities-pin .section-title {
+        transform: none;
+    }
+
+    .cities-pin .accordion-grid {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* Fila con una card protagonista + 3 que se estrechan y muestran cada
+   vez menos información (imagen+flag+nombre+descripción en la
+   protagonista; solo imagen+flag+nombre en las demás) — patrón tomado
+   de "la web de ejemplo" (sección "AI Music Video Workflow": card
+   grande con texto completo + 3 card angostas solo con etiqueta). */
+
+.accordion-grid {
+    display: flex;
+    align-items: stretch;
+    gap: 20px;
+    height: 440px;
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s ease;
+}
+
+.accordion-grid.accordion-exit {
+    opacity: 0;
+    transform: translateY(6px);
+}
+
+.accordion-grid.accordion-enter {
+    opacity: 0;
+    transform: translateY(-6px);
+}
+
+.accordion-card {
+    position: relative;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    min-width: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    text-decoration: none;
+    display: block;
+}
+
+/* Proporción más cercana a la web de ejemplo (protagonista bastante
+   más ancha, no solo el doble) que el 2.2:1 del primer intento. */
+.accordion-card--main {
+    flex-grow: 2.6;
+}
+
+/* Acordeón en hover — solo con hover real (en móvil ya es un
+   carrusel de ancho fijo, esto no aplica ni tiene sentido ahí):
+   cualquier card bajo el cursor "roba" el sitio a la protagonista y
+   crece a su tamaño; las demás (protagonista incluida) se encogen al
+   ancho angosto mientras dure el hover. flex-grow es un <number>,
+   así que sí se puede transicionar de verdad, a diferencia de un
+   grid-template-columns. */
+@media (hover: hover) and (pointer: fine) {
+    /* Selector descendiente (.accordion-grid .accordion-card, especificidad 0-2-0)
+       a propósito: .anim-fade-up (animations.css, cargado después de este
+       archivo) declara su propio `transition` (opacity + transform) con la
+       misma especificidad que un simple ".accordion-card" (0-1-0) — al ser
+       shorthand, quien gane el empate sustituye la propiedad entera, no se
+       fusiona con las demás. Sin este empujón de especificidad ganaba
+       .anim-fade-up y flex-grow no se animaba (salto brusco sin transición).
+       Sin lift en hover (se quitó .card-hoverable del markup, index.js): la
+       card solo cambia de ancho, no se eleva. */
+    .accordion-grid .accordion-card {
+        /* flex-grow: misma curva que la web de ejemplo, duración recortada
+           a propósito (más ágil que los 0.7s originales). */
+        transition:
+            opacity var(--anim-duration-base) var(--anim-easing-enter),
+            transform var(--anim-duration-base) var(--anim-easing-enter),
+            flex-grow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .accordion-grid:hover .accordion-card {
+        flex-grow: 1;
+    }
+
+    .accordion-grid:hover .accordion-card:hover {
+        flex-grow: 2.6;
+    }
+
+    /* Sin esto, al hacer hover deja de aplicar el guard
+       .anim-fade-up.is-visible:not(:hover) (animations.css) y la card
+       "cae" al valor base de .anim-fade-up (translateY(var(--anim-translate-md)))
+       durante el hover, en vez de quedarse fija — antes lo evitaba de rebote
+       el :hover de .card-hoverable, que ya no lleva esta card. */
+    .accordion-grid .accordion-card:hover {
+        transform: translateY(0);
+    }
+}
+
+.accordion-card img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Zoom en hover — como el ensanchado de la card (más arriba), solo
+   con hover real. En táctil no solo "no tiene sentido": el :hover de
+   CSS se queda pegado tras el tap hasta el siguiente toque en otro
+   sitio, así que la imagen se quedaría ampliada sin motivo. */
+@media (hover: hover) and (pointer: fine) {
+    .accordion-card img {
+        transition: transform 0.7s ease;
+    }
+
+    .accordion-card:hover img {
+        transform: scale(1.08);
+    }
+}
+
+.accordion-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(19, 27, 46, 0.92) 0%,
+        rgba(19, 27, 46, 0.25) 45%,
+        transparent 100%
+    );
+}
+
+/* Las angostas solo llevan bandera+nombre (una línea) — un scrim tan
+   alto como el de la protagonista tapaba imagen sin necesidad. Igual
+   que en la web de ejemplo, donde las cards angostas dejan ver casi
+   toda la foto y el texto vive en una franja baja y ajustada. */
+.accordion-card:not(.accordion-card--main) .accordion-card-overlay {
+    background: linear-gradient(to top, rgba(19, 27, 46, 0.88) 0%, transparent 55%);
+}
+
+.accordion-card-body {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 22px;
+}
+
+.accordion-card-flag {
+    font-size: 1.3rem;
+    display: block;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+    line-height: 1;
+}
+
+.accordion-card-body h3 {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 3px;
+    letter-spacing: -0.3px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Tamaño "protagonista" de bandera/nombre: por defecto en
+   .accordion-card--main. En hover real, "viaja" a la card bajo el cursor
+   (igual que el ancho, más arriba) — y si el hover cae en OTRA card,
+   la protagonista real vuelve al tamaño angosto mientras dure. */
+.accordion-card--main .accordion-card-flag {
+    font-size: 2.2rem;
+}
+.accordion-card--main .accordion-card-body h3 {
+    font-size: 26px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .accordion-card-flag,
+    .accordion-card-body h3 {
+        transition: font-size 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .accordion-grid:hover .accordion-card--main:not(:hover) .accordion-card-flag {
+        font-size: 1.3rem;
+    }
+    .accordion-grid:hover .accordion-card--main:not(:hover) .accordion-card-body h3 {
+        font-size: 15px;
+    }
+
+    .accordion-grid:hover .accordion-card:hover .accordion-card-flag {
+        font-size: 2.2rem;
+    }
+    .accordion-grid:hover .accordion-card:hover .accordion-card-body h3 {
+        font-size: 26px;
+    }
+
+    /* La descripción sigue la misma regla que el tamaño de bandera/nombre
+       de arriba: solo se ve en la card ancha del momento (la protagonista
+       en reposo, o la que tiene el cursor encima). display, no opacity,
+       para que al ocultarse no deje un hueco reservado bajo el título en
+       las cards angostas. */
+    .accordion-grid:hover .accordion-card--main:not(:hover) .accordion-card-body p {
+        display: none;
+    }
+    .accordion-grid:hover .accordion-card:hover .accordion-card-body p {
+        display: -webkit-box;
+    }
+}
+
+/* Oculta por defecto — cada ciudad puede tener descripción en Supabase,
+   pero solo se muestra en la card que está ancha (ver excepción de abajo
+   para la protagonista en reposo, y el bloque de hover más arriba). */
+.accordion-card-body p {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.65);
+    font-weight: 500;
+    display: none;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.accordion-card--main .accordion-card-body p {
+    display: -webkit-box;
+}
+
+/* Bajo 1000px, cada card en vertical, una encima de otra — nada de
+   carrusel horizontal ni de reservar hueco para el acordeón (ese
+   efecto vive por completo dentro de @media (hover:hover), así que
+   aquí ni se carga). flex: none + height fija en vez de flex-grow/
+   flex-basis:0 (pensados para repartir ANCHO en el acordeón real):
+   con .accordion-grid en column y height:auto no hay "espacio extra"
+   que repartir, pero dejar flex-grow activo es frágil — mejor
+   desactivarlo del todo. Height fija (no aspect-ratio) a propósito:
+   con aspect-ratio la card se hacía cada vez más alta cuanto más
+   ancha (cerca de los 1000px llegaba a rondar los 700px de alto);
+   350px fijos evitan eso sea cual sea el ancho dentro de este rango. */
+@media (max-width: 1000px) {
+    .accordion-grid {
+        flex-direction: column;
+        height: auto;
+        gap: 16px;
+    }
+
+    .accordion-card,
+    .accordion-card--main {
+        flex: none;
+        width: 100%;
+        height: 350px;
+    }
+}
+
+/* ── 4.2 Nights section ─────────────────────────────────────── */
+
+.nights-section {
+    background: var(--surface-container-low);
+    max-width: 100%;
+    /* padding-block, no el shorthand `padding`: con `padding: X 0` esta
+       regla y la de `.section` (misma especificidad, 0,1,0) empatan, y
+       gana la que esté más abajo en el archivo — aquí siempre esta,
+       poniendo el eje horizontal a 0 pase lo que pase. padding-block
+       deja el eje horizontal fuera de esta declaración por completo, así
+       que la corrección de `.section`/`.cta-section`/etc. (--bp-lg más
+       abajo) puede aplicar sin que esta regla la pise en 768-1199px
+       (hallazgo B, ver docs/mobile-audit.md fila 22). */
+    padding-block: var(--space-16);
+}
+
+.nights-header {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    /* Mobile-first: margen lateral móvil por defecto hasta --bp-lg */
+    padding: 0 var(--margin-mobile);
+    margin-bottom: 64px;
+}
+
+/* Barra de filtros (ciudad / tema / fecha / partner) — compartida por
+   Verified y Parties, misma nights-section. Una columna en móvil (un
+   select por fila, área de toque a ancho completo); fila con
+   flex-wrap desde tablet, sin cambios respecto a como ya estaba. */
+.nights-filters {
+    /* Mobile-first: grid de 1 columna es el valor móvil por defecto,
+       revierte a flex en fila en --bp-md */
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+@media (min-width: 900px) {
+    /* --bp-md */
+    .nights-filters {
+        display: flex;
+        flex-wrap: wrap;
+    }
+}
+
+.nights-filter {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.nights-filter__icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--on-surface-variant);
+    pointer-events: none;
+}
+
+.nights-filter-select {
+    width: 100%;
+    min-height: 44px;
+    background: var(--surface);
+    color: var(--on-surface);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-full);
+    padding: 10px 36px 10px 40px;
+    font-family: var(--font-body);
+    /* 16px de mínimo (no 14px) a propósito: por debajo, iOS Safari
+       hace zoom automático al enfocar un <select> y descoloca el
+       layout. */
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    /* Flecha nativa reemplazada por un chevron propio (mismo trazo que
+       el resto del set de iconos), para poder darle el color correcto
+       en cada tema — background-image no hereda currentColor. */
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23464554' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.theme-parties .nights-filter-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a09cc0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.nights-filter-select:hover {
+    border-color: var(--primary);
+}
+
+.nights-filter-select:focus-visible {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-fixed);
+}
+
+.nights-filter-clear {
+    min-height: 44px;
+    background: none;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-full);
+    padding: 10px 16px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.nights-filter-clear:hover {
+    border-color: var(--primary);
+    background: var(--primary-fixed);
+}
+
+/* Layout de eventos — columna apilada en móvil, grid de 2 columnas
+   desde tablet. Único para Verified y Parties (se abandonó el scroll
+   horizontal con snap que tenía Verified: decisión de negocio, ambas
+   experiencias se comportan igual a partir de ahora). */
+.events-scroll {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    /* Mobile-first: carrusel horizontal es el valor móvil por defecto
+       (flex-direction/gap/overflow-x/scroll-snap), revierte a grid en
+       --bp-md, ver @media más abajo. padding-left/right: var(--margin-
+       mobile) hasta --bp-lg, igual que .section/.cta-section/etc. —
+       ver el bloque compartido en la sección 11 más abajo. El
+       padding-right:40px que tenía el carrusel original NO se
+       replica: en el CSS de origen quedaba siempre pisado por esa
+       misma regla de 1024px (misma especificidad, ella va después en
+       el archivo), así que nunca llegaba a aplicarse — no es un
+       cambio de comportamiento, es fidelidad al original. */
+    padding: 0 var(--margin-mobile) 48px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+/* Oculta el scrollbar del carrusel móvil — a partir de --bp-md ya no
+   hay overflow-x (el layout pasa a grid), así que esta regla no
+   necesita variante de escritorio: no tiene efecto donde no aplica. */
+.events-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* Mobile-first: 82% de ancho (una card + fragmento de la siguiente,
+   típico de carrusel) es el valor móvil por defecto, revierte a 0
+   (el grid controla el ancho) en --bp-md. */
+.events-scroll .event-card {
+    flex: 0 0 82%;
+    min-width: 82%;
+}
+
+/* Mismo grid que .partner-grid (2 → 3 columnas a partir de 900px, mismo
+   gap de 24px), para que las cards de eventos midan lo mismo que las
+   de partners en cada ancho. Por debajo de 768px sigue apilado en
+   columna, igual que el resto de la página cambia a móvil en ese
+   mismo punto. */
+@media (min-width: 900px) {
+    /* --bp-md */
+    .events-scroll {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        flex-direction: column;
+        overflow-x: visible;
+        scroll-snap-type: none;
+    }
+}
+
+@media (min-width: 900px) {
+    /* --bp-md */
+    .events-scroll {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ── Experiencia Parties: secciones ocultas ────────────────────
+   Erasmus Parties solo trabaja la categoría nightlife — alojamiento
+   y servicios pertenecen a la experiencia Verified. Se oculta por
+   CSS (no JS) porque .theme-parties ya se aplica de forma síncrona
+   en <html> antes de que el body se pinte (ver experience.js) — así
+   no hay parpadeo de la sección visible un instante antes de ocultarse. */
+.theme-parties .alojamiento-section,
+.theme-parties .services-section {
+    display: none;
+}
+
+.theme-parties .cities-section {
+    display: none;
+}
+
+/* Tarjetas compactas — solo dentro del scroll de la home. La regla base
+   .event-card (§2.3) está reservada para reactivarse en viajes.html, así
+   que este rediseño se aísla con el selector descendiente .events-scroll
+   en vez de tocarla, para no heredar el tamaño reducido si eso ocurre. */
+.events-scroll .event-card {
+    width: 100%;
+    min-width: 100%;
+    /* Mismo tratamiento que .partner-card (grid de la ciudad activa):
+       plana en reposo, eleva + sombra en hover — sustituye al lift
+       genérico de .card-hoverable (misma cascada, más específico por
+       venir de .events-scroll) para igualar el valor exacto. */
+    border-radius: 20px;
+    box-shadow: none;
+    transition:
+        transform var(--anim-duration-fast) var(--anim-easing-standard),
+        box-shadow var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.events-scroll .event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--anim-shadow-hover);
+}
+
+.events-scroll .event-img-wrap {
+    height: auto;
+    aspect-ratio: 4 / 3;
+}
+
+.events-scroll .event-img-wrap img {
+    transition: transform var(--anim-duration-slow) var(--anim-easing-standard);
+}
+
+.events-scroll .event-card:hover .event-img-wrap img {
+    transform: scale(1.06);
+}
+
+/* Badge de tema — mismo estilo oscuro translúcido que .partner-card-category */
+.events-scroll .event-badge--primary {
+    background: rgba(19, 27, 46, 0.72);
+    color: #fff;
+}
+
+.events-scroll .event-badge {
+    padding: 3px 10px;
+    font-size: 12px;
+    top: 12px;
+    left: 12px;
+}
+
+/* Fecha + precio en una sola línea de texto (sin icono, sin chip de
+   color) — antes eran una fila con icono de calendario y un chip de
+   precio aparte, dos piezas decorativas para un dato que es solo
+   texto. Misma información, un único elemento. */
+.events-scroll .event-date {
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Precio en su propia línea, debajo de la fecha — texto plano, no el
+   chip de color que traía la regla base (§2.2), para no reintroducir
+   una pieza decorativa más en la card. */
+.events-scroll .event-price {
+    margin-top: 2px;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--on-surface-variant);
+}
+
+.events-scroll .event-body {
+    padding: 20px;
+}
+
+.events-scroll .event-name {
+    font-size: 18px;
+}
+
+.events-scroll .event-venue {
+    font-size: 12px;
+}
+
+.events-scroll .event-desc {
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+.events-scroll .event-footer {
+    margin-top: 14px;
+}
+
+/* CTA siempre visible (ver comentario en nightsSection.js) — mismo
+   botón exacto que .search-bar-btn del hero, ver §2.4 (se añade ahí
+   al selector para no duplicar la regla). Sin width:100%, así que se
+   ajusta a su contenido y queda alineado a la derecha del footer. */
+
+/* Móvil: carrusel horizontal con scroll-snap en vez de columna apilada
+   — esta sección se llama .events-scroll desde antes de esta rama
+   porque ya tuvo scroll horizontal alguna vez (se unificó con Verified
+   en una decisión de negocio anterior). Lo recupero solo aquí, solo
+   en móvil: el resto del rediseño (elevar+zoom en hover, CTA con
+   degradado) depende de :hover, que el táctil no tiene, así que sin
+   esto las cards se quedan indistinguibles de una lista plana. Cada
+   card ocupa el 82% del ancho — el 18% restante deja asomar la
+   siguiente, que es la señal visual de "hay más, desliza". */
+/* .events-scroll y .events-scroll .event-card: valores móviles ya
+   son el base (mobile-first, ver reglas sin @media más arriba) — no
+   hace falta repetirlos aquí. */
+
+/* El resto del rediseño (plano en reposo, sombra/zoom solo en :hover)
+   asume que hay hover de verdad — en táctil, donde nunca se dispara,
+   las cards se quedarían sin ninguna presencia visual en reposo. Un
+   único ajuste para touch: una sombra sutil permanente, sin necesidad
+   de replicar toda la lógica de :hover. Mismo criterio en .partner-card. */
+@media (hover: none) {
+    .events-scroll .event-card,
+    .partner-card {
+        box-shadow: 0 2px 14px rgba(19, 27, 46, 0.08);
+    }
+}
+
+@media (min-width: 900px) {
+    /* --bp-md */
+    .events-scroll .event-card {
+        min-width: 0;
+    }
+
+    /* Evento con mayor priority (> 0): ocupa las 2 columnas y se
+       coloca primero visualmente, aunque no sea el primero por fecha. */
+    .events-scroll .event-card--featured {
+        grid-column: span 2;
+        order: -1;
+    }
+}
+
+/* ── 4.3 Alojamiento section ────────────────────────────────── */
+
+.alojamiento-section {
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
+}
+
+.alojamiento-section .collab-grid {
+    margin-top: 32px;
+}
+
+.alojamiento-section-footer {
+    margin-top: 32px;
+    text-align: center;
+}
+
+/* ── 4.4 Services section ───────────────────────────────────── */
+
+.services-section {
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
+}
+
+.services-grid {
+    display: grid;
+    /* Mobile-first: 1 columna es el valor móvil por defecto, revierte
+       a 3 en --bp-md. gap:20px hasta --bp-lg, luego 32px. */
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-top: 64px;
+}
+
+/* ── 4.4 CTA section ────────────────────────────────────────── */
+
+.cta-section {
+    /* Mobile-first: margen lateral móvil por defecto hasta --bp-lg */
+    padding: var(--space-16) var(--margin-mobile);
+}
+
+.cta-card {
+    background: var(--inverse-surface);
+    border-radius: 24px;
+    /* Mobile-first: valor por debajo de --bp-sm, revierte a 48px 32px
+       en --bp-sm, a 48px 40px en --bp-md y a 80px en --bp-lg. */
+    padding: 40px 24px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    justify-content: space-between;
+    gap: 48px;
+}
+
+.cta-text {
+    position: relative;
+    z-index: 2;
+    /* Mobile-first: 100% es el valor móvil por defecto, revierte a
+       520px en --bp-md */
+    max-width: 100%;
+}
+
+.cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 20px;
+}
+
+.cta-sub {
+    font-size: 18px;
+    color: var(--inverse-on-surface);
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+.cta-actions {
+    display: flex;
+    /* Mobile-first: centrado es el valor móvil por defecto, revierte
+       a flex-start en --bp-md */
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.cta-avatars {
+    position: relative;
+    z-index: 2;
+    /* Mobile-first: oculto por defecto, revierte a flex en --bp-md */
+    display: none;
+    gap: 16px;
+    transform: rotate(12deg);
+    flex-shrink: 0;
+}
+
+.cta-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cta-col--up {
+    margin-top: -48px;
+}
+
+.cta-col--down {
+    margin-top: 48px;
+}
+
+.cta-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    object-fit: cover;
+}
+

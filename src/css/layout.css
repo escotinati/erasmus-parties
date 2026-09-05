@@ -1,0 +1,1029 @@
+/* ═══════════════════════════════════════════════════════════
+   3. LAYOUT GLOBAL
+   ─────────────────────────────────────────────────────── */
+
+/* ── 3.1 Top nav / header ───────────────────────────────────── */
+
+/* .topnav — index.html y ciudades-todas.html */
+
+.topnav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* Mobile-first: 200 (por encima del dropdown) es el valor móvil
+       por defecto, revierte a 50 en --bp-md */
+    z-index: 200;
+    height: 80px;
+    background: rgba(var(--surface-rgb), 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(199, 196, 215, 0.3);
+    transition: box-shadow 0.2s;
+}
+
+.topnav.scrolled {
+    box-shadow: 0 1px 12px rgba(70, 72, 212, 0.08);
+}
+
+/* Grid de 3 columnas (no flex + justify-content:space-between) a
+   propósito: con pocos ítems de nav, .topbar-nav necesita quedar
+   centrado en TODO el ancho de la barra, no solo en el hueco que deja
+   .topnav-left. Las dos columnas 1fr siempre miden lo mismo entre sí
+   (por definición de fr), así que la columna central (auto) queda
+   centrada de verdad sin importar que .topnav-left/.topnav-right
+   tengan anchos de contenido distintos. */
+.topnav-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    height: 100%;
+    /* Mobile-first: margen móvil por defecto, revierte a --gutter en
+       --bp-md */
+    padding: 0 var(--margin-mobile);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+}
+
+.topnav-left {
+    grid-column: 1;
+    display: flex;
+    align-items: center;
+    justify-self: start;
+}
+
+/* grid-column explícito en las tres, aquí incluido, a propósito: en
+   móvil .topbar-nav pasa a display:none (bottom-nav lo sustituye) y
+   el auto-placement de grid, al quitarla de en medio, reubicaba
+   .topnav-right en la columna central (la vacía) en vez de dejarla
+   en la derecha — quedaba con hueco muerto a su lado en vez de pegada
+   al borde. Fijar la columna de cada bloque evita que la ausencia de
+   uno mueva a los demás. */
+.topnav-inner > .topbar-nav {
+    grid-column: 2;
+    justify-self: center;
+}
+
+.topnav-right {
+    grid-column: 3;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    justify-self: end;
+}
+
+.brand {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+}
+
+.topnav-links {
+    /* Mobile-first: oculto por defecto (el bottom-nav resuelve la
+       navegación en móvil), revierte a flex en --bp-md */
+    display: none;
+    gap: 32px;
+}
+
+.nav-link {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--on-surface-variant);
+    text-decoration: none;
+    padding-bottom: 4px;
+    border-bottom: 2px solid transparent;
+    transition:
+        color 0.15s,
+        border-color 0.15s;
+}
+
+.nav-link:hover {
+    color: var(--primary);
+}
+
+.nav-link--active {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* header.topbar — ciudad.html, mapa.html, servicios.html, viajes.html */
+
+/* Mismo truco de grid de 3 columnas que .topnav-inner (línea 1073):
+   logo/topbar-nav/topbar-right como hijos directos de .topbar, para que
+   los links queden centrados en TODO el ancho de la barra en vez de
+   pegados al logo. grid-column explícito en las tres, por el mismo
+   motivo documentado en .topnav-inner > .topbar-nav: evita que al
+   ocultarse .topbar-nav en móvil, el auto-placement reubique
+   .topbar-right en la columna central. */
+.topbar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+    z-index: 10;
+    transition: box-shadow var(--duration-base) var(--ease-out);
+}
+
+.topbar > .logo {
+    grid-column: 1;
+    justify-self: start;
+}
+
+.topbar > .topbar-nav {
+    grid-column: 2;
+    justify-self: center;
+}
+
+.topbar > .topbar-right {
+    grid-column: 3;
+    justify-self: end;
+}
+
+header.topbar {
+    /* Mobile-first: padding móvil por defecto, revierte en --bp-md */
+    padding: 16px var(--margin-mobile);
+    border-bottom: 1px solid var(--outline-variant);
+    position: sticky;
+    top: 0;
+    background: rgba(var(--surface-rgb), 0.9);
+    backdrop-filter: blur(16px);
+    /* z-index alto: queda por encima de los tiles de Leaflet */
+    z-index: 1001;
+}
+
+/* .topbar.scrolled — mismo patrón que .topnav.scrolled (línea 950);
+   toggle añadido en experience.js */
+.topbar.scrolled {
+    box-shadow: var(--shadow-md);
+}
+
+[data-brand='parties'] .topbar.scrolled {
+    box-shadow: 0 4px 12px rgba(225, 20, 123, 0.12);
+}
+
+.logo {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    text-decoration: none;
+    color: var(--on-surface);
+}
+
+.logo-dot {
+    color: var(--primary);
+}
+
+.topbar-nav {
+    /* Mobile-first: oculto por defecto (el bottom-nav resuelve la
+       navegación en móvil), revierte a flex en --bp-md */
+    display: none;
+    align-items: center;
+    gap: 28px;
+}
+
+.topbar-nav a {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--on-surface-variant);
+    text-decoration: none;
+    transition: color var(--duration-base) var(--ease-out);
+}
+
+.topbar-nav a:hover {
+    color: var(--primary);
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Ítem activo */
+
+.topbar-nav a.is-active {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.mobile-nav-links a.is-active {
+    color: var(--primary);
+    /* Mobile-first: valor móvil por defecto, revierte a 800 (el peso
+       base del link) en --bp-md */
+    font-weight: 700;
+}
+
+/* Ítem "Fiestas" — acento cálido (#e1147b) y flecha ↗ de enlace externo */
+
+.topbar-nav a.nav-parties,
+.topbar-nav a.nav-parties:visited {
+    color: #e1147b;
+    font-weight: 600;
+}
+
+.topbar-nav a.nav-parties:hover {
+    color: #c00d6a;
+}
+
+.mobile-nav-links a.nav-parties {
+    color: #e1147b;
+}
+
+.mobile-nav-links a.nav-parties:hover {
+    /* Mobile-first: valores móviles por defecto — en --bp-md no hay
+       tratamiento propio para este hover, hereda el genérico
+       .mobile-nav-links a:hover (color primary, sin fondo), ver
+       @media más abajo. */
+    color: #c00d6a;
+    background: var(--surface-container-low);
+}
+
+/* Ítem "Verified ↗" — añadido dinámicamente por experience.js en theme-parties.
+   Usa el azul de Verified (#4648d4) como color de acento, igual que
+   "Fiestas ↗" usa el magenta de Parties en theme-verified. */
+
+.nav-verified,
+.topbar-nav a.nav-verified,
+.mobile-nav-links a.nav-verified {
+    color: #4648d4;
+    font-weight: 600;
+}
+
+.topbar-nav a.nav-verified:hover,
+.mobile-nav-links a.nav-verified:hover {
+    color: #2c2faa;
+}
+
+.app-bottom-nav-item.nav-verified {
+    color: #4648d4;
+}
+
+/* Selector de idioma — discreto a propósito, mismo tamaño que un link
+   del nav pero sin fondo/borde por defecto, para no competir con
+   "Fiestas ↗"/"Verified ↗" que sí llevan acento de color. */
+.lang-switcher {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--on-surface-variant);
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.lang-switcher:hover {
+    color: var(--primary);
+}
+
+/* Back button y breadcrumb */
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(70, 72, 212, 0.08);
+    border: 1px solid rgba(70, 72, 212, 0.18);
+    border-radius: var(--radius-full);
+    padding: 8px 16px;
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.15s;
+}
+
+.back-btn:hover {
+    background: rgba(70, 72, 212, 0.14);
+}
+
+.breadcrumb {
+    /* Mobile-first: oculto por defecto, revierte a flex en --bp-md */
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--on-surface-variant);
+}
+
+.breadcrumb a {
+    color: var(--on-surface-variant);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.breadcrumb a:hover {
+    color: var(--primary);
+}
+
+.breadcrumb .sep {
+    opacity: 0.4;
+}
+
+.breadcrumb .current {
+    color: var(--on-surface);
+    font-weight: 600;
+}
+
+/* Hamburger button */
+
+.hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+}
+
+.hamburger-btn span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--on-surface);
+    border-radius: 2px;
+    transition:
+        transform 0.28s,
+        opacity 0.2s;
+    transform-origin: center;
+}
+
+.hamburger-btn.is-open span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger-btn.is-open span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.hamburger-btn.is-open span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile nav overlay / dropdown */
+
+.mobile-nav {
+    position: fixed;
+    inset: 0;
+    background: rgba(var(--surface-rgb), 0.97);
+    backdrop-filter: blur(24px);
+    z-index: 150;
+    /* Mobile-first: oculto por defecto (la navegación en móvil la
+       resuelve el bottom-nav, no este overlay) — !important porque
+       compite con el mismo empate de especificidad que su propio
+       toggle de apertura (opacity/pointer-events). Revierte a flex
+       (gobernado por ese toggle) en --bp-md, ver @media más abajo. */
+    display: none !important;
+    flex-direction: column;
+    align-items: center;
+    /* Mobile-first: dropdown compacto pegado al header por defecto
+       (justify-content/bottom/height/padding/box-shadow/border-bottom),
+       revierte a overlay fullscreen centrado en --bp-md */
+    justify-content: flex-start;
+    bottom: auto;
+    height: auto;
+    padding: var(--topbar-h, 80px) 0 20px;
+    box-shadow: 0 8px 24px rgba(70, 72, 212, 0.1);
+    border-bottom: 1px solid var(--outline-variant);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition:
+        opacity 0.3s,
+        transform 0.3s;
+}
+
+.mobile-nav.is-open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+}
+
+.mobile-nav-close {
+    position: absolute;
+    top: 22px;
+    right: 22px;
+    background: var(--surface-container);
+    border: 1px solid var(--outline-variant);
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    /* Mobile-first: innecesario en el dropdown compacto móvil,
+       revierte a flex en --bp-md */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--on-surface-variant);
+    transition:
+        background 0.15s,
+        color 0.15s;
+}
+
+.mobile-nav-close:hover {
+    background: var(--primary-fixed);
+    color: var(--primary);
+}
+
+.mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    /* Mobile-first: valores de dropdown compacto móvil por defecto,
+       revierte a overlay fullscreen centrado en --bp-md */
+    align-items: stretch;
+    width: 100%;
+    gap: 0;
+}
+
+.mobile-nav-links a {
+    /* Mobile-first: tipografía/color/padding del dropdown compacto
+       móvil por defecto, revierte al estilo "hero" fullscreen en
+       --bp-md */
+    font-family: var(--font-body);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--on-surface);
+    text-decoration: none;
+    letter-spacing: 0;
+    padding: 12px 28px;
+    line-height: 1.4;
+    border-bottom: 1px solid var(--outline-variant);
+    transition: color 0.15s;
+}
+
+.mobile-nav-links a:last-child {
+    border-bottom: none;
+}
+
+.mobile-nav-links a:hover {
+    color: var(--primary);
+    background: var(--surface-container-low);
+}
+
+@media (min-width: 900px) {
+    /* --bp-md — overlay fullscreen centrado (en vez del dropdown
+       compacto pegado al header de móvil) */
+    .topnav {
+        z-index: 50;
+    }
+
+    .mobile-nav {
+        bottom: 0;
+        height: auto;
+        justify-content: center;
+        padding: 0;
+        box-shadow: none;
+        border-bottom: none;
+    }
+
+    .mobile-nav-close {
+        display: flex;
+    }
+
+    .mobile-nav-links {
+        align-items: center;
+        width: auto;
+        gap: 4px;
+    }
+
+    .mobile-nav-links a {
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 10vw, 2.8rem);
+        font-weight: 800;
+        letter-spacing: -2px;
+        padding: 10px 28px;
+        line-height: 1.1;
+        color: var(--on-surface-variant);
+        border-bottom: none;
+    }
+
+    .mobile-nav-links a:hover {
+        background: none;
+    }
+
+    .mobile-nav-links a.is-active {
+        font-weight: 800;
+    }
+
+    .mobile-nav-links a.nav-parties:hover {
+        color: var(--primary);
+        background: none;
+    }
+}
+
+/* ciudades.html — topbar sobre imagen hero-legacy
+   (.logo y .topbar-nav a usan colores oscuros → se sobreescriben con
+   blanco para mantener legibilidad sobre la foto oscurecida) */
+
+.hero-legacy .logo {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.hero-legacy .logo-dot {
+    color: #e1147b; /* acento cálido, visible sobre imagen oscura */
+}
+
+.hero-legacy .topbar-nav a {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.hero-legacy .topbar-nav a:hover {
+    color: #fff;
+}
+
+.hero-legacy .topbar-nav a.is-active {
+    color: #fff;
+}
+
+.hero-legacy .topbar-nav a.nav-parties {
+    color: #e1147b;
+}
+
+.hero-legacy .topbar-nav a.nav-parties:hover {
+    color: #ff3d9a;
+}
+
+/* Líneas del hamburger → blancas sobre la imagen (móvil) */
+.hero-legacy .hamburger-btn span {
+    background: #fff;
+}
+
+/* Icono de cuenta → mismo tratamiento que .back-btn sobre la foto */
+.hero-legacy .icon-btn {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.hero-legacy .icon-btn:hover {
+    color: #fff;
+}
+
+/* ── 3.2 Footer ───────────────────────────────────────────────
+   Rediseñada para hablar el mismo idioma visual que el resto de la
+   página en vez de los tokens legacy de tokens.css (--space-*,
+   --color-*, --text-small a secas quedaban "en otro dialecto" del
+   sistema y con un ancho de contenedor distinto al del resto de
+   secciones — por eso desentonaba). Ahora usa exactamente los mismos
+   tokens que el header/hero/CTA: --container-max + --margin-desktop
+   para que los bordes cuadren con la .cta-card de justo encima,
+   --anim-duration-fast/--anim-easing-standard para las transiciones
+   (idénticos a los que ya usa el subrayado del nav). */
+
+.site-footer {
+    position: relative;
+    background: var(--surface-container-low);
+    overflow: hidden;
+}
+
+/* Remate en degradado indigo→burgundy — mismo recurso que el título
+   del hero (§3.3) y el subrayado del nav (§4.-1), aquí a modo de
+   remate: el hero abre la página con el degradado, el footer la
+   cierra con él. --primary/--secondary (no --indigo/--burgundy fijos)
+   a propósito: a diferencia del titular del hero, esta franja sí
+   debe reaccionar al tema Parties. */
+.site-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+
+.footer-inner {
+    display: grid;
+    /* Mobile-first: 1 columna/40px/padding móvil es el valor por
+       defecto — revierte a 3 columnas/gutter/padding desktop en
+       --bp-md, ver @media más abajo. */
+    grid-template-columns: 1fr;
+    gap: 40px;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 48px var(--margin-mobile) 32px;
+}
+
+.footer-brand {
+    /* Mobile-first: 0 es el valor móvil por defecto, revierte a 48px
+       en --bp-md */
+    padding-right: 0;
+}
+
+.footer-logo {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.footer-tagline {
+    font-size: 15px;
+    color: var(--on-surface-variant);
+    line-height: 1.6;
+    /* Mobile-first: 100% es el valor móvil por defecto, revierte a
+       300px en --bp-md */
+    max-width: 100%;
+}
+
+.footer-col-title {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--on-surface);
+    margin-bottom: 20px;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Subrayado que crece desde la izquierda en hover/foco — mismo
+   recurso y misma curva que el nav (.topnav/.topbar, §4.-1), solo que
+   aquí crece desde el borde en vez de desde el centro: encaja mejor
+   con una lista vertical de un solo enlace por línea. */
+.footer-col ul a {
+    position: relative;
+    display: inline-block;
+    font-size: 15px;
+    color: var(--on-surface-variant);
+    text-decoration: none;
+    transition: color var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.footer-col ul a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 1.5px;
+    background: var(--primary);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.footer-col ul a:hover,
+.footer-col ul a:focus-visible {
+    color: var(--on-surface);
+}
+
+.footer-col ul a:hover::after,
+.footer-col ul a:focus-visible::after {
+    transform: scaleX(1);
+}
+
+.footer-col ul a:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+}
+
+.footer-bottom {
+    border-top: 1px solid var(--outline-variant);
+    max-width: var(--container-max);
+    margin: 0 auto;
+    /* Mobile-first: padding móvil es el valor por defecto, revierte a
+       desktop en --bp-md */
+    padding: 20px var(--margin-mobile);
+}
+
+.footer-bottom p {
+    font-size: 13px;
+    color: var(--on-surface-variant);
+}
+
+@media (min-width: 900px) {
+    /* --bp-md */
+    .footer-inner {
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: var(--gutter);
+        padding: 64px var(--margin-desktop) 48px;
+    }
+
+    .footer-brand {
+        padding-right: 48px;
+    }
+
+    .footer-tagline {
+        max-width: 300px;
+    }
+
+    .footer-bottom {
+        padding: 24px var(--margin-desktop);
+    }
+}
+
+/* ── 3.3 Hero ───────────────────────────────────────────────── */
+
+/* Hero principal — index.html */
+
+.hero {
+    position: relative;
+    /* Mobile-first: min-height/padding móviles por defecto, revierten
+       en --bp-sm */
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 80px var(--margin-mobile) 60px;
+    background:
+        radial-gradient(circle at top right, rgba(70, 72, 212, 0.1), transparent 50%),
+        radial-gradient(circle at bottom left, rgba(169, 51, 73, 0.05), transparent 50%),
+        var(--background);
+}
+
+.hero-bg {
+    display: none;
+}
+
+/* reservado para futuro uso */
+
+.hero-inner {
+    max-width: var(--container-max);
+    width: 100%;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-title {
+    font-family: var(--font-display);
+    /* Mobile-first: valores móviles por defecto, revierten en --bp-sm */
+    font-size: clamp(32px, 9vw, 48px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--on-surface);
+    margin-top: 60px;
+    margin-bottom: 28px;
+}
+
+/* Degradado también repetido en los .word-anim anidados: el texto se
+   trocea en un span por palabra (initHeroTitleAnim, index.js), y
+   background/background-clip no se heredan — cada palabra necesita su
+   propio degradado para quedar coloreada tras la animación. El mismo
+   JS ajusta luego background-size/background-position de cada palabra
+   (inline) para que las rebanadas encajen y se vea un único degradado
+   continuo en todo "hero-title-gradient", no uno repetido por palabra. */
+.hero-title-gradient,
+.hero-title-gradient .word-anim {
+    background: linear-gradient(90deg, var(--indigo), var(--burgundy));
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.hero-sub {
+    /* Mobile-first: valor móvil por defecto, revierte en --bp-sm */
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--on-surface-variant);
+    max-width: 640px;
+    margin: 0 auto 48px;
+}
+
+/* Hero legacy — ciudades.html (foto de portada de país) */
+
+.hero-legacy {
+    position: relative;
+    width: 100%;
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 0 48px;
+    overflow: hidden;
+}
+
+.hero-bg-img {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center 40%;
+    filter: brightness(0.5);
+}
+
+.hero-bg-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(250, 248, 255, 0.3) 0%,
+        rgba(250, 248, 255, 0.1) 40%,
+        rgba(19, 27, 46, 0.85) 75%,
+        rgba(19, 27, 46, 1) 100%
+    );
+}
+
+.hero-content-legacy {
+    position: relative;
+    z-index: 2;
+    /* Mobile-first: margen lateral móvil por defecto hasta --bp-lg */
+    padding: 0 var(--margin-mobile);
+}
+
+.hero-breadcrumb-legacy {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--secondary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hero-breadcrumb-legacy a {
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.hero-breadcrumb-legacy a:hover {
+    color: #fff;
+}
+
+.hero-breadcrumb-legacy .sep {
+    opacity: 0.4;
+}
+
+.hero-h1-legacy {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+
+.hero-flag-legacy {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+}
+
+.hero-sub-legacy {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.75);
+    max-width: 440px;
+    line-height: 1.6;
+}
+
+/* Topbar heredado — sobre foto hero (ciudades.html) */
+
+.hero-legacy .topbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* Mobile-first: padding móvil por defecto, revierte en --bp-md */
+    padding: 18px var(--margin-mobile);
+}
+
+/* Back button sobre foto */
+
+.hero-legacy .back-btn {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.hero-legacy .back-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Stats del hero legacy */
+
+.hero-stats {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    gap: 40px;
+    /* Mobile-first: margen lateral móvil por defecto hasta --bp-lg */
+    padding: 0 var(--margin-mobile);
+    margin-top: 32px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.stat-num {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: #fff;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.65);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+}
+
+/* ── 3.4 Section wrappers ───────────────────────────────────── */
+
+/* Contenedor de sección compartido */
+
+.section {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    /* Mobile-first: margen lateral móvil por defecto hasta --bp-lg,
+       ver @media compartido en la sección 11 más abajo. */
+    padding: var(--space-16) var(--margin-mobile);
+}
+
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    /* Mobile-first: valores móviles por defecto, revierte en --bp-md */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 40px;
+}
+
+/* Section header heredado — ciudades.html */
+
+.section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    /* Mobile-first: margen lateral móvil por defecto hasta --bp-lg */
+    padding: 48px var(--margin-mobile) 24px;
+}
+
+.section-count {
+    font-size: 13px;
+    color: var(--on-surface-variant);
+}
+
+/* Grids de países y ciudades — ciudades.html */
+
+.countries-grid {
+    display: grid;
+    /* Mobile-first: 2 columnas/gap:12px es el valor móvil por
+       defecto, pasa a 3 col en --bp-sm (gap vuelve a 16px) y a 4 col
+       en --bp-md. */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 0 var(--margin-mobile) 80px;
+}
+
+.cities-grid {
+    display: grid;
+    /* Mobile-first: 2 columnas/gap:10px es el valor móvil por
+       defecto, pasa a 3 col en --bp-sm (gap vuelve a 14px) y a 4 col
+       en --bp-md. */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 0 var(--margin-mobile) 80px;
+}
+
+.cities-grid.cols-3 {
+    /* Mobile-first: forzado a 2 columnas por debajo de --bp-sm (no
+       caben 3 con comodidad), revierte a 3 en --bp-sm */
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.cities-grid.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+

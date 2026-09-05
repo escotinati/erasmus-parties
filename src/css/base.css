@@ -1,0 +1,267 @@
+/* ═══════════════════════════════════════════════════════════
+   1. DESIGN SYSTEM — Erasmus Verified
+   Tokens, variables, reset, utilidades, tipografía base
+   ─────────────────────────────────────────────────────── */
+
+/* Custom property registrada — necesario para que el navegador pueda
+   transicionarla como un <percentage> real. Usada por .search-bar-btn
+   (§2.4) para animar el stop de var(--burgundy) dentro del degradado.
+   Sin soporte de @property (navegadores muy antiguos) simplemente no
+   anima: salta directo al valor final, degradación aceptable. */
+@property --burgundy-stop {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 0%;
+}
+
+/* Intensidad del burgundy en ese mismo degradado: al empezar el hover
+   (stop en 0%, burgundy cubriendo todo el botón) se mezcla con indigo
+   para que no entre a plena saturación de golpe; al llegar a su
+   posición final (stop en 100%) ya es burgundy puro. */
+@property --burgundy-mix {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 45%;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ── Variables ─────────────────────────────────────────────── */
+
+:root {
+    /* Colores core */
+    --primary: #4648d4;
+    --primary-container: #6063ee;
+    --primary-fixed: #e1e0ff;
+    --on-primary: #ffffff;
+    --on-primary-container: #fffbff;
+    --secondary: #a93349;
+    --secondary-container: #fe7488;
+    --on-secondary: #ffffff;
+    --on-secondary-container: #730425;
+    --background: #faf8ff;
+    --surface: #faf8ff;
+    --surface-bright: #faf8ff;
+    --surface-container-low: #f2f3ff;
+    --surface-container: #eaedff;
+    --surface-container-high: #e2e7ff;
+    --surface-variant: #dae2fd;
+    --inverse-surface: #283044;
+    --inverse-on-surface: #eef0ff;
+    --on-surface: #131b2e;
+    --on-surface-variant: #464554;
+    --on-background: #131b2e;
+    --outline: #767586;
+    --outline-variant: #c7c4d7;
+    /* Nombres fijos (no reactivos a tema) para el degradado de texto del
+       hero — mismos hex que --primary/--secondary base, pero con nombre
+       propio porque no deben cambiar si el tema activo es Parties. */
+    --indigo: #4648d4;
+    --burgundy: #a93349;
+    /* Tipografía */
+    --font-display: 'Syne', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    /* Radios */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-full: 9999px;
+    /* Espaciado */
+    --gutter: 24px;
+    --margin-desktop: 64px;
+    --margin-mobile: 20px;
+    --container-max: 1280px;
+    /* Legacy aliases para ciudades.html / ciudad.html */
+    --bg: var(--background);
+    --text: var(--on-surface);
+    --text-muted: var(--on-surface-variant);
+    --accent: var(--primary);
+    --accent-dim: rgba(70, 72, 212, 0.12);
+    --surface-2: var(--surface-container);
+    --border: var(--outline-variant);
+    --radius: var(--radius-lg);
+    --wa: #1daa61;
+    --tg: #2aabee;
+    /* Componentes RGB del color de superficie — para backgrounds con alpha
+       que no se pueden expresar con var() directamente en rgba() */
+    --surface-rgb: 250, 248, 255;
+}
+
+/* ── Theme: Erasmus Parties (erasmusparties.org) ──────────── */
+
+.theme-parties {
+    --background: #0a0a0f;
+    --surface: #13131a;
+    --surface-container-low: #1a1a24;
+    --surface-container: #1e1e2a;
+    --on-surface: #f0eeff;
+    --on-surface-variant: #a09cc0;
+    --primary: #e1147b;
+    --primary-fixed: rgba(225, 20, 123, 0.15);
+    --on-primary: #ffffff;
+    --outline: #2a2a3a;
+    --outline-variant: #222230;
+    /* Aliases legacy */
+    --bg: #0a0a0f;
+    --accent-dim: rgba(225, 20, 123, 0.12);
+    /* RGB del surface para backgrounds con alpha */
+    --surface-rgb: 19, 19, 26;
+
+    /* Tokens de animación — más rápidos y con más recorrido que Verified,
+       coherente con el carácter nocturno/energético de esta experiencia. */
+    --anim-duration-fast: 180ms;
+    --anim-duration-base: 300ms;
+    --anim-duration-slow: 480ms;
+    --anim-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    --anim-easing-enter: cubic-bezier(0, 0, 0.15, 1);
+    --anim-translate-sm: 14px;
+    --anim-translate-md: 24px;
+    --anim-scale-hover: 1.028;
+    --anim-shadow-hover: 0 8px 32px rgba(225, 20, 123, 0.18);
+}
+
+/* ── Theme: Erasmus Verified (por defecto) ──────────────────
+   La clase .theme-verified ya se aplica en <html> vía experience.js;
+   hasta ahora no necesitaba reglas propias porque :root ya define el
+   look institucional por defecto. Los tokens de animación sí son
+   exclusivos de tema (más lentos/sutiles que Parties), así que este
+   es el primer bloque que la necesita. */
+
+.theme-verified {
+    --anim-duration-fast: 250ms;
+    --anim-duration-base: 450ms;
+    --anim-duration-slow: 650ms;
+    --anim-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --anim-easing-enter: cubic-bezier(0, 0, 0.2, 1);
+    --anim-translate-sm: 10px;
+    --anim-translate-md: 18px;
+    --anim-scale-hover: 1.018;
+    --anim-shadow-hover: 0 8px 24px rgba(70, 72, 212, 0.12);
+}
+
+/* ── Base ───────────────────────────────────────────────────── */
+
+html {
+    scroll-behavior: smooth;
+    /* Evita que iOS Safari reescale el texto al rotar a horizontal
+       (webkit-only, propiedad no estándar a propósito). */
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    background: var(--background);
+    color: var(--on-surface);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    /* Mobile-first: compensa la altura del bottom-nav (--nav-bottom-h)
+       + 8px de margen de seguridad — 0 en --bp-md, donde no hay
+       bottom-nav. */
+    padding-bottom: calc(var(--nav-bottom-h) + 8px);
+}
+
+/* home-page: la barra reserva también env(safe-area-inset-bottom)
+   (iOS, home indicator) — el body tiene que compensar esa misma
+   altura extra para no dejar contenido oculto detrás. Mobile-first
+   igual que arriba, revierte en --bp-md. */
+body.home-page {
+    padding-bottom: calc(var(--nav-bottom-h) + 8px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Quita el delay de ~300ms antes del tap en navegadores móviles
+   (esperan a ver si viene un segundo toque para hacer zoom) en todo
+   elemento clicable — no cambia nada en escritorio. */
+a,
+button,
+[role='button'] {
+    touch-action: manipulation;
+}
+
+/* ── Utilities ──────────────────────────────────────────────── */
+
+.text-center {
+    text-align: center;
+}
+
+.material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+    line-height: 1;
+    vertical-align: middle;
+    user-select: none;
+}
+
+/* ── Typography ─────────────────────────────────────────────── */
+
+.eyebrow {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.eyebrow--primary {
+    color: var(--primary);
+}
+
+.eyebrow--secondary {
+    color: var(--secondary);
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    color: var(--on-surface);
+}
+
+.section-sub {
+    font-size: 16px;
+    color: var(--on-surface-variant);
+    line-height: 1.6;
+    margin-top: 16px;
+    max-width: 560px;
+}
+
+.section-sub--centered {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.section-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition:
+        border-color 0.2s,
+        gap 0.2s;
+    white-space: nowrap;
+}
+
+.section-link:hover {
+    border-color: var(--primary);
+    gap: 10px;
+}
+

@@ -1,0 +1,108 @@
+/* ═══════════════════════════════════════════════════════════
+   11. RESPONSIVE
+   Media queries globales que afectan a múltiples secciones.
+   ─────────────────────────────────────────────────────── */
+
+@media (min-width: 900px) {
+    /* --bp-md */
+    .countries-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .cities-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (min-width: 900px) {
+    /* --bp-md */
+    .bottom-nav {
+        /* legacy, inerte — ver nota en la regla base más arriba */
+        display: none;
+    }
+    .topnav-links,
+    .icon-btn {
+        display: flex;
+    }
+    .topnav-inner {
+        padding: 0 var(--gutter);
+    }
+    .section-head {
+        flex-direction: row;
+        align-items: flex-end;
+        margin-bottom: 64px;
+    }
+    .services-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .cta-card {
+        flex-direction: row;
+        /* Tier intermedio 900-1199px — el final (80px) llega en
+           --bp-lg más abajo */
+        padding: 48px 40px;
+        text-align: left;
+    }
+    .cta-text {
+        max-width: 520px;
+    }
+    .cta-actions {
+        justify-content: flex-start;
+    }
+    .cta-avatars {
+        display: flex;
+    }
+    .hero-legacy .topbar {
+        padding: 24px var(--margin-desktop);
+    }
+    header.topbar {
+        padding: 20px var(--margin-desktop);
+    }
+    .topbar-nav {
+        display: flex;
+    }
+    .breadcrumb {
+        display: flex;
+    }
+}
+
+@media (min-width: 1200px) {
+    /* --bp-lg — este bloque debe ir SIEMPRE después de cualquier
+       @media (min-width: 900px) que toque los mismos selectores
+       (.cta-card, .services-grid): a igual especificidad, en un
+       empate de condiciones activas (ej. a 1250px) gana el que esté
+       más abajo en el archivo, no el de mayor min-width. */
+    .section,
+    .cta-section,
+    .nights-header,
+    .events-scroll,
+    .hero-content-legacy,
+    .section-header,
+    .hero-stats,
+    .countries-grid,
+    .cities-grid {
+        padding-left: var(--margin-desktop);
+        padding-right: var(--margin-desktop);
+    }
+    .services-grid {
+        gap: 32px;
+    }
+    .cta-card {
+        padding: 80px;
+    }
+}
+
+/* ==============================================
+   ERASMUS PARTIES — Dark brand overrides
+   Activo cuando <body data-brand="parties">
+   ============================================== */
+
+[data-brand='parties'] {
+    background-color: var(--color-bg); /* ya sobreescrito en tokens.css */
+    color: var(--color-text);
+}
+
+[data-brand='parties'] .city-card,
+[data-brand='parties'] .card {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+}
+

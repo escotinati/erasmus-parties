@@ -173,7 +173,7 @@ Cada página tiene un `<div id="nav-root"></div>` seguido de `<script type="modu
 - `ciudades.html`: el back-link va hardcodeado en `mount-hero-legacy-nav.jsx` (siempre "Todos los países" → `index.html`, nunca cambia).
 - El resto de páginas del patrón `header.topbar` no pasan `backLink` y `TopbarNav.jsx` no lo renderiza.
 
-Visualmente los tres patrones están **unificados**: mismo truco de grid de 3 columnas (`1fr auto 1fr`) que centra los links en todo el ancho de la barra, mismo icono de cuenta, y el mismo subrayado degradado en hover/foco (antes solo existía en `index.html`, escapado bajo `body.home-page`; ahora vive bajo los selectores `.topnav`/`.topbar` directamente en `styles.css`, así que aplica a las 8 páginas).
+Visualmente los tres patrones están **unificados**: mismo truco de grid de 3 columnas (`1fr auto 1fr`) que centra los links en todo el ancho de la barra, mismo icono de cuenta, y el mismo subrayado degradado en hover/foco (antes solo existía en `index.html`, escapado bajo `body.home-page`; ahora vive bajo los selectores `.topnav`/`.topbar` directamente en `src/css/layout.css`, así que aplica a las 8 páginas).
 
 `.mobile-nav` (el overlay del menú móvil) y el toggle de la hamburguesa también los renderiza React (`MobileNavOverlay` en `navShared.jsx`) — no queda ningún bloque `<div class="mobile-nav">` estático en el HTML. En móvil el hamburguesa queda oculto por CSS (`display: none` — la navegación la gestiona el bottom-nav), así que en la práctica solo se ve en desktop.
 
@@ -218,34 +218,38 @@ Sistema de diseño basado en Material Design 3 (tokens `--md-*`). Variables clav
 
 Los alias legacy (`--bg`, `--text`, `--accent`) existen solo para las páginas más antiguas.
 
-### Estructura de `src/css/styles.css`
+### Estructura de `src/css/`
 
-El archivo está dividido en 10 secciones numeradas. Con Vite ya en marcha, separar estas secciones en archivos independientes es un posible siguiente paso, pero de momento sigue siendo un único fichero:
+`styles.css` ya no contiene reglas propias — es solo un manifiesto de `@import` que las 9 páginas públicas siguen cargando con el mismo `<link rel="stylesheet" href="/src/css/styles.css">` de siempre (no hubo que tocar ningún HTML). Vite resuelve esos `@import` tanto en dev (cada archivo se sirve y recarga por separado) como en build (los une en un único CSS por página, igual que cuando era un solo fichero — verificado que el CSS final compilado es byte a byte idéntico al de antes de la separación).
 
-| §   | Nombre               | Contenido                                                                                                                                                                             |
-| --- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Design System        | `:root` tokens, reset, utilidades, tipografía                                                                                                                                         |
-| 2   | Componentes globales | Buttons, badges, cards, forms/inputs, bottom-nav                                                                                                                                      |
-| 3   | Layout global        | Top nav/header (`.topnav`, `.topbar` — el HTML lo renderiza React, ver [Navegación](#navegación), pero las clases y esta sección de CSS no cambiaron), footer, hero, section wrappers |
-| 4   | Index.html           | Accordion grid de ciudades, nights section, services section, CTA                                                                                                                     |
-| 5   | Ciudades-todas.html  | _(vacío — estilos del hero en `<style>` inline de la página)_                                                                                                                         |
-| 6   | Ciudad.html          | Layout de ciudad, mapa embebido, partners list                                                                                                                                        |
-| 7   | Mapa.html            | `.map-page-main`, `.map-canvas`, `.erasmus-pin__dot`, map-with-list                                                                                                                   |
-| 8   | Servicios.html       | `body.servicios-page` (gradiente), `.servicios-category`, `.services-grid--2col`                                                                                                      |
-| 9   | Viajes.html          | `.event-badge--partner`, `body.viajes-page .event-price`                                                                                                                              |
-| 10  | Responsive           | Media queries globales que afectan a múltiples secciones                                                                                                                              |
+El **orden** de los `@import` en `styles.css` importa: es exactamente el orden en el que vivían estas secciones dentro del monolito original. No lo reordenes sin comprobar antes que ninguna regla dependa de la cascada entre archivos.
 
-**Cascada crítica del hamburger:** `@media (max-width: 768px) { .hamburger-btn { display: flex } }` está en §3.1 (antes de §2.5). §2.5 lo sobreescribe con `display: none` porque viene después en el archivo. No invertir este orden.
+| Archivo                          | Contenido                                                                                                                                                                             |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `base.css`                       | `:root` tokens (`--md-*`), temas `.theme-verified`/`.theme-parties`, reset, utilidades, tipografía base                                                                              |
+| `components.css`                 | Buttons, badges, cards, forms/inputs, bottom-nav, Sheet, Skeleton                                                                                                                     |
+| `layout.css`                     | Top nav/header (`.topnav`, `.topbar` — el HTML lo renderiza React, ver [Navegación](#navegación), pero las clases y este archivo no cambiaron), footer, hero, section wrappers        |
+| `pages/home.css`                 | Accordion grid de ciudades, nights section, services section, CTA (`index.html`)                                                                                                     |
+| `pages/ciudades-todas.css`       | `.all-cities-hero` — el resto de estilos de esa página (`.filter-bar`, `.city-items-grid`...) siguen en el `<style>` inline de `ciudades-todas.html`                                  |
+| `pages/ciudad.css`               | Layout de ciudad, mapa embebido, partners list                                                                                                                                        |
+| `pages/mapa.css`                 | `.map-page-main`, `.map-canvas`, `.erasmus-pin__dot`, map-with-list                                                                                                                   |
+| `pages/servicios.css`            | `body.servicios-page` (gradiente), `.servicios-category`, `.services-grid--2col`                                                                                                      |
+| `pages/viajes.css`               | `.event-badge--partner`, `body.viajes-page .event-price`                                                                                                                              |
+| `pages/alojamiento.css`          | Estilos propios de `alojamiento.html`                                                                                                                                                 |
+| `responsive.css`                 | Media queries globales que afectan a múltiples archivos                                                                                                                              |
+| `transitions.css`                | View Transitions entre páginas                                                                                                                                                        |
 
-El panel de administración tiene su propio archivo separado, `src/css/admin.css`, que no sigue esta numeración por secciones (es una herramienta interna, no parte del sitio público).
+El panel de administración tiene su propio archivo separado, `src/css/admin.css` (no se toca en este split), y `animations.css` (scroll-reveal) también sigue siendo su propio archivo — ninguno de los dos pasa por `styles.css`.
+
+`.hamburger-btn` no tiene ningún `display: flex` en ninguna parte del CSS — es `display: none` en todos los anchos (la navegación móvil la gestiona el bottom-nav, ver [Navegación](#navegación)); si algún día se reactiva el menú hamburguesa, vigilar el orden entre `components.css` (bottom-nav) y `layout.css` (top nav/header), que es donde antes vivía este conflicto.
 
 ### Estilos específicos de página
 
 Para añadir CSS exclusivo de una página sin contaminar el global, usar una clase en el `<body>`:
 
-- `servicios.html` → `<body class="servicios-page">` → reglas en §8
-- `viajes.html` → `<body class="viajes-page">` → reglas en §9
-- `ciudades-todas.html` → bloque `<style>` inline en el `<head>` (excepción deliberada: el hero gradient solo existe en esa página y no justifica clase de body)
+- `servicios.html` → `<body class="servicios-page">` → reglas en `pages/servicios.css`
+- `viajes.html` → `<body class="viajes-page">` → reglas en `pages/viajes.css`
+- `ciudades-todas.html` → bloque `<style>` inline en el `<head>` (excepción deliberada: la mayoría de estilos de esa página son exclusivos suyos y no justifican clase de body — solo `.all-cities-hero` se comparte vía `pages/ciudades-todas.css`)
 
 ### Convenciones de componentes
 
