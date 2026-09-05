@@ -82,6 +82,30 @@ async function fetchUpcomingEvents({
     }));
 }
 
+// Todos los partners activos con su ciudad, para el índice global del
+// buscador de la home (src/js/index.js) — una fila de resultado no
+// necesita el detalle de enlaces (partner_links), así que no se piden
+// aquí, a diferencia de fetchPartnersByCity/fetchNightlifePartners.
+// priority se incluye aunque no aparezca en la lista de columnas del
+// encargo original: sin ella no hay campo para construir `weight` en
+// el índice unificado (ciudades y eventos sí lo devuelven ya) — el
+// ORDER BY de abajo no lo necesitaría (Postgres puede ordenar por una
+// columna no seleccionada), pero el propio dato sí hace falta en el
+// resultado.
+async function fetchAllPartnersForSearch() {
+    const { data, error } = await window.supabaseClient
+        .from('partners')
+        .select('id, name, category, city_id, priority, cities(id, name, flag)')
+        .eq('active', true)
+        .order('priority', { ascending: false });
+
+    if (error) {
+        console.error('[partnersService] error cargando partners para el buscador:', error);
+        return [];
+    }
+    return data;
+}
+
 // Devuelve TODOS los partners activos de categoría 'nightlife', sin
 // filtrar por ciudad — usado por el mapa y la ficha de ciudad, que
 // muestran el LOCAL, no sus eventos.
