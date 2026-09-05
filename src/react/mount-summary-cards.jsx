@@ -7,9 +7,16 @@
 //  .events-scroll) y volver a pintar sobre ÉL MISMO root en cada
 //  cambio de filtro, sin destruirlo y recrearlo.
 //
-//  Un script clásico no puede hacer `import` de este archivo — se
-//  expone en window, mismo puente que ya usan sanitize.js/Skeleton.js
-//  para cruzar esa frontera en el resto del proyecto.
+//  Un script clásico no puede hacer `import` de este archivo, así que
+//  se expone la factoría en window — el PRIMER puente module→script-
+//  clásico del proyecto (sanitize.js/skeleton.js no son un precedente:
+//  son scripts clásicos normales, sin type="module", nunca cruzan esta
+//  frontera). mount-nav.jsx no necesitó nunca algo así porque se
+//  auto-monta una única vez contra un <div> fijo y no vuelve a
+//  renderizarse; SummaryCard sí necesita repintarse en cada cambio de
+//  filtro desde código clásico (index.js/nightsSection.js), de ahí que
+//  aquí haga falta devolver una factoría reutilizable en vez de
+//  auto-montarse como los demás mount-*.jsx.
 // ─────────────────────────────────────────────────────────────
 
 import { createRoot } from 'react-dom/client';
