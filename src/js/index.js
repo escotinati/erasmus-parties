@@ -65,19 +65,84 @@ function normalize(str) {
     return str.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 }
 
+// Etiqueta de categoría de partner para el "sub" del resultado de
+// búsqueda ("Ciudad · Categoría") — traducción vía las mismas claves
+// map.category_* que ya usa mapPartners.js (categoryLabel allí), pero
+// sin depender de CATEGORY_META (map-helpers.js no se carga en
+// index.html): si no hay traducción, cae a la categoría cruda en vez
+// de a un label hardcodeado, que aquí no existe.
+function partnerCategoryLabel(category) {
+    const key = 'map.category_' + category;
+    const translated = I18n.t(key);
+    return translated !== key ? translated : category;
+}
+
+// Índice global del buscador: ciudades + partners + eventos, mezclados
+// en un único array (mismo enfoque cliente-side de siempre — sin
+// full-text search de Postgres, todo se trae una vez y se filtra en
+// el navegador). Cada fila lleva su propio `weight` (el priority tal
+// cual devuelve su fetch, sin normalizar entre tipos) para el
+// ordenado de initAutocomplete().
 async function buildSearchIndex() {
-    // fetchAllCities() (sin filtro active) para que el buscador sugiera
-    // también ciudades sin grupo activo todavía — el resto de la home
-    // (accordion, stats de ciudades) sigue usando solo activas.
-    allCitiesCache = await fetchAllCities();
-    return allCitiesCache.map((city) => ({
+    const [cities, partners, events] = await Promise.all([
+        // fetchAllCities() (sin filtro active) para que el buscador
+        // sugiera también ciudades sin grupo activo todavía — el
+        // resto de la home (accordion, stats) sigue usando solo
+        // activas.
+        fetchAllCities(),
+        fetchAllPartnersForSearch(),
+        // limit alto (no los 12 de la sección de fiestas): esto es el
+        // índice global, no un carrusel con espacio limitado.
+        fetchUpcomingEvents({ limit: 300 }),
+    ]);
+    allCitiesCache = cities;
+
+    const cityItems = cities.map((city) => ({
+        type: 'city',
         id: city.id,
-        label: city.name,
         name: city.name,
         sub: city.country,
-        flag: city.flag,
+        iconType: 'flag',
+        iconValue: city.flag,
         url: `ciudad.html?ciudad=${encodeURIComponent(city.id)}`,
+        weight: city.priority,
     }));
+
+    const partnerItems = partners.map((partner) => ({
+        type: 'partner',
+        id: partner.id,
+        name: partner.name,
+        sub: partner.cities
+            ? `${partner.cities.name} · ${partnerCategoryLabel(partner.category)}`
+            : partnerCategoryLabel(partner.category),
+        iconType: 'material',
+        iconValue: 'storefront',
+        url: `ciudad.html?ciudad=${encodeURIComponent(partner.city_id)}&partner=${encodeURIComponent(partner.id)}`,
+        weight: partner.priority,
+    }));
+
+    // Un evento sin ticket_url válida (esquema no http/https, o vacía)
+    // no tiene destino al que llevar al usuario — se excluye del
+    // índice en vez de generar un resultado que no navega a ningún
+    // sitio real, mismo criterio que ya usa nightsSection.js.
+    const eventItems = events
+        .map((event) => {
+            const safeUrl = sanitizeUrl(event.ticket_url);
+            if (!safeUrl) return null;
+            return {
+                type: 'event',
+                id: event.id,
+                name: event.title,
+                sub: [event.partner?.name, event.city?.name].filter(Boolean).join(' · '),
+                iconType: 'material',
+                iconValue: 'calendar_month',
+                url: safeUrl,
+                weight: event.priority,
+            };
+        })
+        .filter(Boolean);
+
+    return [...cityItems, ...partnerItems, ...eventItems];
 }
 
 async function initAutocomplete(index) {
@@ -93,6 +158,35 @@ async function initAutocomplete(index) {
 
     let activeIdx = -1;
 
+    function resultTypeLabel(type) {
+        const key =
+            type === 'partner'
+                ? 'home.search_result_type_partner'
+                : type === 'event'
+                  ? 'home.search_result_type_event'
+                  : 'home.search_result_type_city';
+        return I18n.t(key);
+    }
+
+    // Único punto de navegación para los tres tipos de resultado —
+    // usado tanto por el clic en el dropdown como por goToBestMatch()
+    // (Enter sin selección / botón "Explorar"), así un evento como
+    // mejor coincidencia también abre en pestaña nueva en vez de
+    // sacar al usuario del sitio con window.location.href.
+    function navigateToResult(item, query) {
+        trackEvent('search_result_click', {
+            resultType: item.type,
+            resultId: item.id,
+            resultName: item.name,
+            query,
+        });
+        if (item.type === 'event') {
+            window.open(item.url, '_blank', 'noopener,noreferrer');
+        } else {
+            window.location.href = item.url;
+        }
+    }
+
     function renderDropdown(results) {
         dropdown.innerHTML = '';
         activeIdx = -1;
@@ -106,15 +200,19 @@ async function initAutocomplete(index) {
             el.type = 'button';
             el.className = 'search-dropdown-item';
             el.setAttribute('role', 'option');
+            const iconHtml =
+                item.iconType === 'material'
+                    ? `<span class="material-symbols-outlined sdi-icon">${escapeHtml(item.iconValue || '')}</span>`
+                    : `<span class="sdi-icon">${escapeHtml(item.iconValue || '')}</span>`;
             el.innerHTML = `
-        <span class="sdi-icon">${escapeHtml(item.flag || '')}</span>
+        ${iconHtml}
         <span class="sdi-text">
           <span class="sdi-name">${escapeHtml(item.name)}</span>
           <span class="sdi-sub">${escapeHtml(item.sub)}</span>
         </span>
-        <span class="sdi-type">${I18n.t('home.search_result_type_city')}</span>`;
+        <span class="sdi-type">${escapeHtml(resultTypeLabel(item.type))}</span>`;
             el.addEventListener('click', () => {
-                window.location.href = item.url;
+                navigateToResult(item, input.value.trim());
             });
             dropdown.appendChild(el);
         });
@@ -136,12 +234,17 @@ async function initAutocomplete(index) {
         }
         const nq = normalize(q);
         const results = index.filter((item) => normalize(item.name).includes(nq));
+        // Mezclado por relevancia (sin agrupar por tipo): 1) prefijo
+        // antes que contención, 2) weight descendente, 3) alfabético.
         results.sort((a, b) => {
             const an = normalize(a.name),
                 bn = normalize(b.name);
             const aStarts = an.startsWith(nq),
                 bStarts = bn.startsWith(nq);
             if (aStarts !== bStarts) return aStarts ? -1 : 1;
+            const aWeight = a.weight || 0,
+                bWeight = b.weight || 0;
+            if (aWeight !== bWeight) return bWeight - aWeight;
             return an.localeCompare(bn);
         });
         renderDropdown(results);
@@ -185,7 +288,7 @@ async function initAutocomplete(index) {
         if (!q) return;
         const nq = normalize(q);
         const match = searchIndex.find((item) => normalize(item.name).startsWith(nq));
-        if (match) window.location.href = match.url;
+        if (match) navigateToResult(match, q);
         else
             alert(
                 `${I18n.t('home.search_not_found_prefix')} "${q}". ${I18n.t('home.search_not_found_suffix')}`

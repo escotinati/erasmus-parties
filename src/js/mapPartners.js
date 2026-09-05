@@ -48,7 +48,7 @@ function categoryLabel(category, fallbackLabel) {
     return translated !== key ? translated : fallbackLabel;
 }
 
-async function mountPartnersList(listContainerId, map, city) {
+async function mountPartnersList(listContainerId, map, city, { autoOpenPartnerId } = {}) {
     const container = document.getElementById(listContainerId);
     // No se sabe todavía cuántas categorías/partners habrá (eso lo
     // decide la respuesta), así que el skeleton es genérico: unas
@@ -83,6 +83,28 @@ async function mountPartnersList(listContainerId, map, city) {
 
     syncMarkers();
     renderList();
+
+    // Deep link desde el buscador global (index.js) — ?partner=ID en
+    // ciudad.html. selectPartner() ya valida por su cuenta que el id
+    // exista en esta ciudad (findPartnerById devuelve null si no, y
+    // selectPartner corta ahí sin más). Si el partner pertenece a una
+    // categoría que arrancó apagada (ej. Parties con una categoría que
+    // no sea nightlife), se activa ESA categoría — y solo esa, nada
+    // más de state.activeCategories se toca — ANTES de abrir el Sheet:
+    // syncMarkers()/renderList() dejan el pin y el toggle de la UI ya
+    // reflejando el estado activo para cuando selectPartner() resalta
+    // el marker, en vez de que el usuario tenga que reactivarla a mano
+    // después de ya haber visto el Sheet.
+    if (autoOpenPartnerId) {
+        const autoOpenPartner = findPartnerById(autoOpenPartnerId);
+        if (autoOpenPartner && !state.activeCategories.has(autoOpenPartner.category)) {
+            state.activeCategories.add(autoOpenPartner.category);
+            syncMarkers();
+            renderList();
+            requestAnimationFrame(() => map.invalidateSize());
+        }
+        selectPartner(autoOpenPartnerId);
+    }
 
     // ── Arranque por marca (regla 1) ──────────────────────────────
     function initialActiveCategories() {

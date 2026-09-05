@@ -15,6 +15,10 @@ function isDesktopLayout() {
 (async function () {
     const params = new URLSearchParams(window.location.search);
     const cityId = parseInt(params.get('ciudad'), 10);
+    // Deep link desde el buscador global (index.js): ciudad.html?ciudad=X&partner=Y
+    // abre directo el Sheet de ese partner. NaN si no viene el parámetro
+    // (mountPartnersList ya trata cualquier valor "falsy" como ausencia).
+    const partnerId = parseInt(params.get('partner'), 10);
 
     if (!cityId) {
         showCityError();
@@ -83,7 +87,9 @@ function isDesktopLayout() {
         interactive: isDesktopLayout(),
     }).then(async (mapInstance) => {
         if (mapInstance) {
-            await mountPartnersList('city-partners-list', mapInstance, city);
+            await mountPartnersList('city-partners-list', mapInstance, city, {
+                autoOpenPartnerId: partnerId,
+            });
             const mapEl = document.getElementById('city-map-embed');
             const asideEl = document.getElementById('city-partners-list');
             const syncHeight = () => {
