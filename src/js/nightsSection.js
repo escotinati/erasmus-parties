@@ -262,12 +262,11 @@ function renderEventCards(events) {
         };
     }
 
+    // El propio SummaryCardGrid dispara initScrollReveal() en un
+    // useEffect tras cada render suyo (ver SummaryCardGrid.jsx) —
+    // llamarlo aquí también corría antes de que React comprometiera
+    // las tarjetas nuevas al DOM, dejándolas en opacity:0 para siempre.
     eventCardsRoot.render(events, 'event', getEventCardProps);
-
-    // Las cards se regeneran por completo en cada cambio de filtro — hay
-    // que volver a observarlas cada vez, si no las nuevas quedarían con
-    // opacity:0 para siempre (ver src/js/utils/animations.js).
-    if (window.initScrollReveal) window.initScrollReveal();
 }
 
 // Vuelve a consultar Supabase con los filtros activos actuales y
