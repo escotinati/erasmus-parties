@@ -431,10 +431,11 @@ function renderPartnersSection(allPartnersForCity) {
     const empty = document.getElementById('partnersEmpty');
     if (!grid || !empty) return;
 
-    // Root de SummaryCardGrid — se crea una única vez sobre #partnerGrid
-    // (createRoot ya sustituye por sí solo cualquier contenido previo,
-    // incluido el skeleton de renderPartnerGridSkeleton, así que no hace
-    // falta vaciar el grid a mano antes de la primera vez).
+    // Root de SummaryCardGrid — se crea una única vez sobre #partnerGrid.
+    // mountSummaryCards() vacía el grid antes de crear el root (createRoot
+    // NO borra el skeleton de renderPartnerGridSkeleton por sí solo, a
+    // diferencia de la antigua ReactDOM.render() — ver el comentario de
+    // mount-summary-cards.jsx), así que no hace falta repetirlo aquí.
     if (!partnerCardsRoot) partnerCardsRoot = mountSummaryCards(grid);
 
     updatePartnersHeader();

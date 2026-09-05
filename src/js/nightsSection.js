@@ -200,10 +200,11 @@ function renderEventCards(events) {
     const empty = document.getElementById('nightsEmpty');
     if (!scroll || !empty) return;
 
-    // Root de SummaryCardGrid — se crea una única vez sobre .events-scroll
-    // (createRoot ya sustituye por sí solo cualquier contenido previo,
-    // incluido el skeleton de renderEventsSkeleton, así que no hace falta
-    // vaciar scroll a mano antes de la primera vez).
+    // Root de SummaryCardGrid — se crea una única vez sobre .events-scroll.
+    // mountSummaryCards() vacía scroll antes de crear el root (createRoot
+    // NO borra el skeleton de renderEventsSkeleton por sí solo, a
+    // diferencia de la antigua ReactDOM.render() — ver el comentario de
+    // mount-summary-cards.jsx), así que no hace falta repetirlo aquí.
     if (!eventCardsRoot) eventCardsRoot = mountSummaryCards(scroll);
 
     Skeleton.clear(scroll);
