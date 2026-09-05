@@ -1,0 +1,19 @@
+/* ═══════════════════════════════════════════════════════════
+   9. VIAJES.HTML
+   ─────────────────────────────────────────────────────── */
+
+/* Badge de partner externo: surface con borde, sin color de acción */
+.event-badge--partner {
+    background: var(--surface-container);
+    border: 1px solid var(--outline-variant);
+    color: var(--on-surface-variant);
+}
+
+/* Precio de viaje: chip neutro con primario, no magenta de nightlife
+   (.event-price global usa secondary-container para eventos nocturnos
+   en index.html; aquí se sobreescribe solo en el contexto de viajes) */
+body.viajes-page .event-price {
+    background: var(--primary-fixed);
+    color: var(--primary);
+}
+

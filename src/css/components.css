@@ -1,0 +1,1142 @@
+/* ═══════════════════════════════════════════════════════════
+   2. COMPONENTES GLOBALES
+   ─────────────────────────────────────────────────────── */
+
+/* ── 2.1 Buttons ────────────────────────────────────────────── */
+
+.btn-primary-pill {
+    background: var(--color-primary);
+    color: var(--on-primary);
+    border: none;
+    padding: 12px 24px;
+    /* Radio intencionalmente "full": es un botón pill, no se cambia a
+       --radius-md (rompería la forma que da nombre a la clase). */
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition:
+        background-color var(--duration-base) var(--ease-out),
+        opacity var(--anim-duration-fast) var(--anim-easing-standard),
+        transform var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.btn-primary-pill:hover {
+    background-color: var(--color-primary-hover);
+    opacity: 0.88;
+    transform: translateY(-2px);
+}
+
+.btn-primary-pill:active {
+    transform: translateY(0) scale(0.96);
+}
+
+.btn-primary-pill:focus-visible {
+    box-shadow: var(--shadow-focus);
+    outline: none;
+}
+
+a.btn-primary-pill {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.btn-ghost-pill {
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 12px 24px;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition:
+        background var(--anim-duration-fast) var(--anim-easing-standard),
+        opacity var(--anim-duration-fast) var(--anim-easing-standard),
+        transform var(--anim-duration-fast) var(--anim-easing-standard);
+}
+
+.btn-ghost-pill:hover {
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0.88;
+    transform: translateY(-2px);
+}
+
+.btn-ghost-pill:active {
+    transform: translateY(0);
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--on-surface-variant);
+    /* Mobile-first: oculto por defecto, revierte a flex en --bp-md */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: var(--radius-full);
+    transition: color 0.15s;
+}
+
+.icon-btn:hover {
+    color: var(--primary);
+}
+
+.link-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    padding: 0;
+    text-decoration: none;
+}
+
+.link-btn:hover {
+    text-decoration: underline;
+}
+
+/* ── 2.2 Badges & chips ─────────────────────────────────────── */
+
+.event-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 4px 14px;
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.event-badge--primary {
+    background: var(--primary);
+    color: var(--on-primary);
+}
+
+.event-badge--muted {
+    background: var(--on-surface-variant);
+    color: #fff;
+}
+
+.event-img-wrap .event-price {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+}
+
+.event-price {
+    background: var(--secondary-container);
+    color: var(--on-secondary-container);
+    padding: 4px 14px;
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.card-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #00e5a0;
+    background: rgba(0, 229, 160, 0.12);
+    border: 1px solid rgba(0, 229, 160, 0.22);
+    padding: 3px 8px;
+    border-radius: var(--radius-full);
+}
+
+.card-tag::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+
+/* ── 2.3 Cards ──────────────────────────────────────────────── */
+
+/* Service card — compartida por index.html y servicios.html */
+
+.service-card {
+    padding: 32px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--outline-variant);
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+.service-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 8px 32px rgba(70, 72, 212, 0.1);
+}
+
+.service-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--primary-fixed);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    margin-bottom: 32px;
+    transition:
+        background 0.2s,
+        color 0.2s;
+}
+
+.service-card:hover .service-icon {
+    background: var(--primary);
+    color: var(--on-primary);
+}
+
+.service-icon .material-symbols-outlined {
+    font-size: 32px;
+}
+
+.service-name {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--on-surface);
+    margin-bottom: 16px;
+}
+
+.service-desc {
+    font-size: 16px;
+    color: var(--on-surface-variant);
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.service-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+    transition: gap 0.2s;
+}
+
+.service-card:hover .service-link {
+    gap: 14px;
+}
+
+/* Event card — compartida por index.html (nights) y viajes.html */
+
+.event-card {
+    min-width: 320px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+@media (min-width: 900px) {
+    /* --bp-md */
+    .event-card {
+        min-width: 400px;
+    }
+}
+
+.event-img-wrap {
+    position: relative;
+    height: 256px;
+}
+
+.event-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.event-body {
+    padding: 24px;
+}
+
+.event-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 0;
+}
+
+.event-name {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--on-surface);
+    margin-bottom: 4px;
+}
+
+.event-venue {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--on-surface-variant);
+}
+
+.event-venue .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.event-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.event-date {
+    margin-top: 12px;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.event-desc {
+    margin-top: 12px;
+    color: var(--on-surface-variant);
+    font-size: 14px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.events-loading {
+    color: var(--on-surface-variant);
+    padding: 40px;
+    text-align: center;
+    width: 100%;
+}
+
+/* Country / city cards — ciudades.html */
+
+/* Selector con tag (a.city-card) a propósito: sube la especificidad por
+   encima de .anim-fade-up (animations.css, cargado después de este archivo)
+   para que esta lista de transition gane siempre — `transition` es shorthand,
+   así que si .anim-fade-up ganara el empate de especificidad reemplazaría
+   toda la propiedad (incluido border-color), no solo se fusionaría con ella. */
+a.country-card,
+a.city-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    aspect-ratio: 3/4;
+    background: var(--surface-container);
+    border: 1px solid var(--outline-variant);
+    transition:
+        opacity var(--anim-duration-base) var(--anim-easing-enter),
+        transform var(--anim-duration-base) var(--anim-easing-enter),
+        border-color 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.country-card:hover,
+.city-card:hover {
+    border-color: var(--primary);
+}
+
+.card-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+    filter: brightness(0.75);
+}
+
+.country-card:hover .card-img,
+.city-card:hover .card-img {
+    transform: scale(1.06);
+    filter: brightness(0.6);
+}
+
+.card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 30%, rgba(19, 27, 46, 0.88) 100%);
+}
+
+.card-body {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 18px 18px;
+    z-index: 2;
+}
+
+.card-arrow {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+    width: 30px;
+    height: 30px;
+    background: rgba(70, 72, 212, 0.18);
+    border: 1px solid rgba(70, 72, 212, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.8);
+    transition:
+        opacity 0.2s,
+        transform 0.2s;
+}
+
+.country-card:hover .card-arrow,
+.city-card:hover .card-arrow {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.card-name {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.card-flag {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.card-meta {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 500;
+}
+
+/* ── 2.4 Forms & inputs ─────────────────────────────────────── */
+
+/* Hero panel — hero de index.html. Agrupa la búsqueda de ciudad y las
+   stats como dos bloques independientes (cada uno con su propia
+   superficie/borde/sombra) bajo un mismo contenedor jerárquico: mismo
+   ancho, mismo gap, misma animación de entrada. No es una tarjeta
+   visible en sí mismo — solo posiciona a sus dos hijos como grupo. */
+
+.hero-panel {
+    max-width: 780px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+    position: relative;
+    z-index: 20;
+}
+
+/* Fila de búsqueda — bloque independiente, con su propia superficie. */
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: var(--radius-full);
+    /* Mobile-first: hueco extra a la derecha para el botón flotante
+       (ver .search-bar-btn) es el valor móvil por defecto, revierte
+       a padding uniforme en --bp-sm. position:relative explícito
+       (además del que ya pone initAutocomplete() en index.js) porque
+       .search-bar-btn pasa a position:absolute en móvil y necesita
+       un contenedor de posicionamiento fiable. flex-wrap:nowrap
+       también explícito por la misma razón de fiabilidad. */
+    position: relative;
+    flex-wrap: nowrap;
+    padding: 8px 8px 8px 16px;
+    box-shadow: 0 4px 24px rgba(70, 72, 212, 0.08);
+    transition: box-shadow 0.2s;
+    /* .search-bar es position:relative (lo pone initAutocomplete() en
+       index.js). .hero-panel (padre) lleva .anim-page-enter — una vez
+       esa animación termina, el transform:translateY(0) que deja el
+       fill-mode:both sigue creando su propio stacking context ahí. Sin
+       z-index aquí, .home-stats (sibling, bloque independiente con su
+       propio fondo) pintaría por encima del dropdown del buscador sin
+       importar el z-index que tenga .search-dropdown. */
+    z-index: 20;
+}
+
+.search-bar:focus-within {
+    box-shadow:
+        0 0 0 2px rgba(70, 72, 212, 0.2),
+        0 4px 24px rgba(70, 72, 212, 0.1);
+}
+
+.search-bar-input {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 12px;
+}
+
+.search-icon {
+    color: var(--primary);
+    font-size: 22px;
+}
+
+.search-bar-input input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--font-body);
+    /* Mobile-first: padding-right móvil por defecto (deja hueco para
+       el botón flotante — círculo de 36px + 10px de aire, ver
+       .search-bar-btn), revierte en --bp-sm. font-size: main usa dos
+       niveles (18px desktop / 15px móvil, ver max-width original) —
+       15px no cumplía font-size>=16 (evita el zoom de iOS Safari al
+       enfocar), así que el nivel móvil sube al mínimo que sí cumple
+       (16px) y el nivel --bp-sm recupera el 18px de main sin cambios. */
+    font-size: 16px;
+    padding-right: 46px;
+    color: var(--on-surface);
+}
+
+.search-bar-input input::placeholder {
+    color: var(--outline);
+}
+
+/* .events-scroll .event-cta-btn (§4.2, CTA "Ver evento") comparte
+   estas mismas reglas a propósito — mismo botón, un único sitio. */
+.search-bar-btn,
+.events-scroll .event-cta-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary);
+    color: var(--on-primary);
+    border: none;
+    padding: 14px 32px;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    --burgundy-stop: 0%;
+    --burgundy-mix: 45%;
+    /* background-image (el gradiente en sí) no es interpolable en CSS,
+       por eso su transición dura casi nada (aparece de golpe). Lo que
+       SÍ se anima de verdad son --burgundy-stop y --burgundy-mix
+       (registradas con @property más arriba, única forma de que un
+       custom property sea interpolable): el stop recorre 0% → 100%
+       nada más entrar en :hover, sin delay, y el mix hace que ese
+       burgundy no entre a plena intensidad desde el primer frame
+       (mezclado con indigo al empezar) sino que la alcanza según
+       avanza el recorrido. */
+    transition:
+        background 0.01s linear,
+        --burgundy-stop var(--anim-duration-base) var(--anim-easing-standard),
+        --burgundy-mix var(--anim-duration-base) var(--anim-easing-standard);
+}
+
+/* Mobile-first: en móvil .search-bar-btn deja de ser un botón normal
+   en flujo (icono + texto) y pasa a flotar como círculo superpuesto
+   al borde derecho de .search-bar-input (el botón "vive dentro" del
+   input) — revierte a su forma normal (position:static implícito,
+   padding/gap del botón base) en --bp-sm. Solo afecta a
+   .search-bar-btn, no a .events-scroll .event-cta-btn (comparten la
+   regla base de arriba, pero no esta).
+
+   width/height fijos en vez de aspect-ratio:1 con padding — bug real
+   encontrado en esta rama: antes de que cargue la fuente Material
+   Symbols (icon-font vía Google Fonts, tarda en redes reales; en
+   local carga casi instantánea desde caché y no se nota), el span
+   del icono renderiza su texto de respaldo literal ("arrow_forward",
+   13 caracteres) — con aspect-ratio:1 forzando la altura a seguir a
+   ese ancho, el botón se inflaba a ~180×180px, tapando el input y el
+   resto del hero (confirmado bloqueando la fuente por completo).
+   Con tamaño fijo, el peor caso es que el texto de respaldo se
+   recorte (overflow:hidden) mientras carga la fuente — círculo
+   siempre estable, nunca gigante. */
+.search-bar-btn {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    gap: 0;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.search-bar-btn .material-symbols-outlined {
+    /* Mobile-first: valor móvil por defecto, revierte a heredar de
+       .search-bar-btn (14px) en --bp-sm */
+    font-size: 20px;
+}
+
+.search-bar-btn .btn-text {
+    /* Mobile-first: oculto por defecto (solo icono en el botón
+       circular), revierte a visible en --bp-sm */
+    display: none;
+}
+
+.search-bar-btn:hover,
+.events-scroll .event-cta-btn:hover {
+    background: linear-gradient(
+        90deg,
+        var(--indigo),
+        color-mix(in srgb, var(--burgundy) var(--burgundy-mix), var(--indigo)) var(--burgundy-stop)
+    );
+    color: var(--on-primary);
+    --burgundy-stop: 100%;
+    --burgundy-mix: 100%;
+}
+
+/* Autocomplete dropdown */
+
+.search-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-lg);
+    box-shadow:
+        0 8px 32px rgba(70, 72, 212, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.06);
+    z-index: 1000;
+    overflow: hidden;
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.search-dropdown.is-open {
+    display: block;
+}
+
+.search-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 18px;
+    text-decoration: none;
+    color: var(--on-surface);
+    transition: background 0.12s;
+    border: none;
+    border-bottom: 1px solid var(--outline-variant);
+    background: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.search-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.search-dropdown-item:hover,
+.search-dropdown-item.is-active {
+    background: var(--surface-container-low);
+}
+
+.sdi-icon {
+    font-size: 1.3rem;
+    width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.sdi-text {
+    flex: 1;
+    overflow: hidden;
+}
+
+.sdi-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--on-surface);
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sdi-sub {
+    font-size: 12px;
+    color: var(--on-surface-variant);
+    display: block;
+}
+
+.sdi-type {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: var(--primary-fixed);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+}
+
+/* Popular pills — hero de index.html */
+
+/* ── 2.5 Bottom nav (mobile) ────────────────────────────────── */
+
+/* App bottom nav — reemplaza al legacy en móvil (< --bp-md) */
+
+.app-bottom-nav {
+    /* Mobile-first: visible por defecto, se oculta en --bp-md
+       (escritorio usa el topnav/topbar en su lugar) */
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-bottom-h);
+    z-index: 500; /* por encima de Leaflet tiles y del mobile-nav (150) */
+    background: var(--surface);
+    border-top: 1px solid var(--outline-variant);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+    justify-content: space-around;
+    align-items: stretch;
+}
+
+.app-bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 3px;
+    text-decoration: none;
+    color: var(--on-surface-variant);
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.2;
+    transition: color 0.15s;
+    padding: 6px 0 10px;
+    min-width: 0;
+    /* Primer uso real de --tap-min (declarado en tokens.css desde el
+       Sprint 1, sin consumidores hasta AppShell.jsx) — el alto ya
+       superaba 44px de sobra (icono+gap+label+padding ≈ 50px dentro
+       de los 60px de --nav-bottom-h), esto solo lo hace explícito. */
+    min-height: var(--tap-min);
+    /* El ítem de cuenta (#authBtnMobile) es <button>, no <a> como el
+       resto — reset para que no se note la diferencia de elemento. */
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Etiqueta corta <360px (AppShell.jsx): por defecto se muestra el
+   texto completo y se oculta el corto; a 320px con 5 ítems tocan
+   64px/tab y "Servicios" es la única etiqueta que realmente aprieta
+   — el resto ya define su propio shortFallback igual al fallback
+   completo, así que no cambian visualmente en ningún ancho. */
+.app-bottom-nav-label-short {
+    display: none;
+}
+
+@media (max-width: 359px) {
+    .app-bottom-nav-label-full {
+        display: none;
+    }
+
+    .app-bottom-nav-label-short {
+        display: inline;
+    }
+}
+
+.app-bottom-nav-item .material-symbols-outlined {
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.app-bottom-nav-item:hover {
+    color: var(--primary);
+}
+
+.app-bottom-nav-item--active {
+    color: var(--primary);
+}
+
+/* Ítem Fiestas: magenta permanente, independiente del estado activo */
+.app-bottom-nav-item--parties,
+.app-bottom-nav-item--parties:hover,
+.app-bottom-nav-item--parties.app-bottom-nav-item--active {
+    color: #e1147b;
+}
+
+@media (min-width: 900px) {
+    /* --bp-md */
+    /* Ocultar el bottom-nav — escritorio usa el topnav/topbar */
+    .app-bottom-nav {
+        display: none;
+    }
+
+    /* .hamburger-btn y .bottom-nav (legacy) no se migran aquí: su
+       valor es display:none en TODOS los anchos, tanto antes como
+       después de este refactor (.hamburger-btn no tiene ningún
+       display:flex en ninguna parte del CSS — ver docs/mobile-audit.md
+       sección c; .bottom-nav es un componente legacy ya sustituido
+       por .app-bottom-nav). Repetir "display: none" aquí no cambiaría
+       nada, así que se omite. */
+
+    /* Reactivar el dropdown — en escritorio sigue existiendo (aunque
+       hoy nada lo abre, ver nota de arriba) */
+    .mobile-nav {
+        display: flex !important;
+    }
+
+    body {
+        padding-bottom: 0;
+    }
+
+    body.home-page {
+        padding-bottom: 0;
+    }
+}
+
+/* Bottom nav legacy — mantenido oculto */
+
+.bottom-nav {
+    /* Mobile-first: mantenido igual que antes del refactor — este
+       display:flex móvil queda siempre anulado por el !important de
+       .app-bottom-nav (ver más arriba), es CSS legacy inerte en
+       ambos sentidos, no algo que este refactor deba arreglar. */
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 16px 12px;
+    background: rgba(250, 248, 255, 0.85);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.06);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 16px;
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    color: var(--on-surface-variant);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition:
+        background 0.15s,
+        color 0.15s,
+        transform 0.2s;
+}
+
+.bottom-nav-item:active {
+    transform: scale(0.9);
+}
+
+.bottom-nav-item--active {
+    background: var(--primary-container);
+    color: #fffbff;
+}
+
+.bottom-nav-item .material-symbols-outlined {
+    font-size: 24px;
+}
+
+/* ── 2.6 Sheet (diálogo / bottom sheet) ───────────────────────
+   Construido sobre <dialog> nativo (showModal()) — la lógica de
+   apertura/cierre vive en src/js/ui/sheet.js. Aislado en esta rama
+   (feature/sheet-component, ver dev/sheet-demo.html); su primer
+   consumidor real será mapPartners.js en la rama siguiente.
+
+   Mobile-first: por defecto es una hoja anclada abajo que solo anima
+   translateY (eje de entrada). Desde --bp-md se convierte en diálogo
+   centrado (scale + opacity — no hay "eje de entrada" para algo
+   centrado, así que aquí sí tiene sentido animar ambos) sin tirador
+   de arrastre. Solo transform/opacity en los dos casos, nunca
+   propiedades de layout. */
+
+dialog.sheet {
+    /* Reset del <dialog> nativo: la hoja de estilos del user-agent
+       le pone border/padding/background propios y lo centra con
+       margin:auto — todo eso lo sustituye esta regla. */
+    border: none;
+    margin: 0;
+    padding: 0;
+    background: var(--surface);
+    color: var(--on-surface);
+    box-shadow: var(--shadow-lg);
+
+    position: fixed;
+    inset: auto 0 0 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 85dvh;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+
+    flex-direction: column;
+    min-height: 0;
+
+    transform: translateY(100%);
+    transition: transform var(--duration-slow) var(--ease-out);
+}
+
+dialog.sheet[open] {
+    /* [open] (reflejado por el propio <dialog> al llamar a
+       showModal()) es lo único que decide display — la posición de
+       reposo cerrada es la transform de la regla de arriba;
+       .sheet--visible (añadida un frame después de showModal(), ver
+       sheet.js) es la que dispara la transición de entrada. Sin este
+       desacoplo no hay nada de lo que partir para animar: no se
+       puede transicionar display:none → flex en el mismo frame. */
+    display: flex;
+}
+
+dialog.sheet.sheet--visible {
+    transform: translateY(0);
+}
+
+dialog.sheet::backdrop {
+    /* Scrim neutro (no es un color de marca — MD3 define el scrim
+       como un valor fijo independiente del tema, igual en
+       theme-verified y theme-parties). */
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+dialog.sheet.sheet--visible::backdrop {
+    opacity: 1;
+}
+
+.sheet-handle {
+    width: 36px;
+    height: 4px;
+    margin: 10px auto 0;
+    border-radius: var(--radius-full);
+    background: var(--outline-variant);
+    flex: 0 0 auto;
+    touch-action: none; /* el gesto de arrastre lo gestiona sheet.js, no el scroll táctil nativo */
+}
+
+.sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-2) var(--space-3) var(--space-6);
+    flex: 0 0 auto;
+    touch-action: none; /* misma zona de arrastre que el tirador */
+}
+
+.sheet-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-h3);
+    font-weight: var(--weight-bold);
+}
+
+.sheet-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap-min);
+    height: var(--tap-min);
+    flex: 0 0 auto;
+    border: none;
+    border-radius: var(--radius-full);
+    background: none;
+    color: var(--on-surface-variant);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.sheet-close:hover {
+    background: var(--surface-container-low);
+}
+
+.sheet-body {
+    padding: 0 var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    dialog.sheet,
+    dialog.sheet::backdrop {
+        transition: none;
+    }
+}
+
+@media (min-width: 900px) {
+    /* --bp-md: diálogo centrado, sin tirador de arrastre */
+    dialog.sheet {
+        inset: 0;
+        margin: auto;
+        width: calc(100% - var(--space-8) * 2);
+        max-width: 480px;
+        max-height: 85dvh;
+        border-radius: var(--radius-2xl);
+        opacity: 0;
+        transform: scale(0.96);
+        transition:
+            transform var(--duration-base) var(--ease-out),
+            opacity var(--duration-base) var(--ease-out);
+    }
+
+    dialog.sheet.sheet--visible {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .sheet-handle {
+        display: none;
+    }
+
+    .sheet-header {
+        padding-left: var(--space-8);
+    }
+
+    .sheet-body {
+        padding-left: var(--space-8);
+        padding-right: var(--space-8);
+    }
+}
+
+/* ── 2.7 Skeleton (loading) ────────────────────────────────────
+   Sustituye a los textos "Cargando…" y a los contenedores vacíos
+   mientras se espera Supabase — src/js/utils/skeleton.js genera los
+   nodos, siempre dentro de las mismas clases CSS reales del contenido
+   final (accordion-card, partner-card, city-card…) para que el layout
+   no salte al llegar los datos. Un único primitivo (.skeleton) para
+   todas las páginas — nada de un sistema de shimmer copiado por
+   archivo. Timing con los tokens --anim-* ya existentes
+   (animations.css): mismo --anim-easing-standard, duración derivada
+   de --anim-duration-slow (el shimmer es un loop, no una transición
+   de una sola vez, por eso no hay un token --anim-* que encaje tal
+   cual — se deriva del que más se le parece en vez de inventar un
+   número suelto). */
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--surface-container-low) 25%,
+        var(--surface-container) 37%,
+        var(--surface-container-low) 63%
+    );
+    background-size: 400% 100%;
+    animation: skeleton-shimmer calc(var(--anim-duration-slow) * 3) var(--anim-easing-standard)
+        infinite;
+    border-radius: var(--radius-md);
+}
+
+@keyframes skeleton-shimmer {
+    from {
+        background-position: 100% 50%;
+    }
+    to {
+        background-position: 0% 50%;
+    }
+}
+
+/* Relleno de imagen dentro de un contenedor position:relative
+   (accordion-card, city-card, partner-card-img-wrap) — mismo patrón
+   que el <img>/.card-img-placeholder real que sustituye. */
+.skeleton--fill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+}
+
+/* Líneas de texto (nombre/descripción) */
+.skeleton--text {
+    height: 14px;
+    margin: 6px 0;
+    border-radius: var(--radius-sm);
+}
+
+.skeleton--text-title {
+    height: 16px;
+    width: 65%;
+}
+
+.skeleton--text-sm {
+    height: 12px;
+    width: 40%;
+}
+
+/* Fila simple sin imagen (mapPartners.js: lista de partners) */
+.skeleton--row {
+    height: var(--tap-min);
+    margin-bottom: 6px;
+}
+
+/* Bloque suelto de ancho/alto completo (mapa embebido) */
+.skeleton--block {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    /* "Opacidad fija, sin animación" tal cual, no solo el shimmer
+       congelado en un frame intermedio (que seguiría enseñando la
+       textura del degradado, apagada pero visible) — se sustituye el
+       fondo entero por un color plano. El bloque global de
+       animations.css ya neutraliza animation-duration a todo el sitio,
+       pero esta regla es la que de verdad cambia lo que se ve. */
+    .skeleton {
+        animation: none;
+        background: var(--surface-container-low);
+    }
+}
+

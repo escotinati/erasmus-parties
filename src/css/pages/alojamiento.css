@@ -1,0 +1,111 @@
+/* ═══════════════════════════════════════════════════════════
+   10. ALOJAMIENTO.HTML
+   ─────────────────────────────────────────────────────── */
+
+body.alojamiento-page {
+    background:
+        radial-gradient(circle at top right, rgba(70, 72, 212, 0.1), transparent 50%),
+        radial-gradient(circle at bottom left, rgba(169, 51, 73, 0.05), transparent 50%),
+        var(--background);
+}
+
+/* Grid de colaboradores — 4 cols desktop, 2 cols móvil */
+.collab-grid {
+    display: grid;
+    /* Mobile-first: 2 columnas es el valor móvil por defecto, revierte
+       a 4 columnas en --bp-md */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 40px;
+}
+
+.collab-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    /* Mobile-first: valor móvil por defecto, revierte en --bp-md */
+    padding: 24px 16px;
+    background: var(--surface-container-low);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition:
+        background 0.15s,
+        border-color 0.15s,
+        transform 0.15s;
+}
+
+.collab-card:hover {
+    background: var(--primary-fixed);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.collab-name {
+    font-family: var(--font-display);
+    /* Mobile-first: valor móvil por defecto, revierte en --bp-md */
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--on-surface-variant);
+    transition: color 0.15s;
+}
+
+.collab-card:hover .collab-name {
+    color: var(--primary);
+}
+
+.collab-desc {
+    font-size: 13px;
+    color: var(--on-surface-variant);
+    line-height: 1.5;
+}
+
+/* Bloque de contacto (¿eres empresa de alojamiento?) */
+.collab-contact {
+    margin-top: 56px;
+    /* Mobile-first: valor móvil por defecto, revierte en --bp-md */
+    padding: 28px 20px;
+    background: var(--surface-container-low);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-lg);
+    text-align: center;
+}
+
+.collab-contact h3 {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--on-surface);
+    margin-bottom: 10px;
+}
+
+.collab-contact p {
+    font-size: 15px;
+    color: var(--on-surface-variant);
+    max-width: 480px;
+    margin: 0 auto 24px;
+    line-height: 1.6;
+}
+
+@media (min-width: 900px) {
+    /* --bp-md */
+    .collab-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .collab-card {
+        padding: 32px 20px;
+    }
+
+    .collab-name {
+        font-size: 22px;
+    }
+
+    .collab-contact {
+        padding: 40px;
+    }
+}
+

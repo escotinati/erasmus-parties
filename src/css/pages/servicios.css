@@ -1,0 +1,28 @@
+/* ═══════════════════════════════════════════════════════════
+   8. SERVICIOS.HTML
+   ─────────────────────────────────────────────────────── */
+
+body.servicios-page {
+    background:
+        radial-gradient(circle at top right, rgba(70, 72, 212, 0.1), transparent 50%),
+        radial-gradient(circle at bottom left, rgba(169, 51, 73, 0.05), transparent 50%),
+        var(--background);
+}
+
+.servicios-category {
+    margin-top: 64px;
+}
+
+.services-grid--2col {
+    /* Mobile-first: 1 columna es el valor móvil por defecto, revierte
+       a 2 columnas en --bp-md */
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+    /* --bp-md */
+    .services-grid--2col {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
