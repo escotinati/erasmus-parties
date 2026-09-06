@@ -525,7 +525,9 @@ main.city-main {
 }
 
 .partner-toggle {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     width: 100%;
     min-height: var(--tap-min);
     text-align: left;
@@ -542,6 +544,17 @@ main.city-main {
 
 .partner-toggle:hover {
     background: var(--surface-container-low);
+}
+
+/* Foto pequeña de partner — sanea image_url con sanitizeUrl() antes de
+   llegar aquí (PartnerCategoryList.jsx); si no hay imagen válida, no
+   se renderiza el <img> en absoluto (sin hueco ni icono roto). */
+.partner-toggle__thumb {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
 /* Detalle de partner: descripción + enlaces (contenido del Sheet) */
@@ -586,4 +599,3 @@ main.city-main {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
     transition: font-size 0.2s;
 }
-
