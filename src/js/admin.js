@@ -1027,11 +1027,20 @@ function isValidOptionalHttpsUrl(value) {
 
 // Muestra (o limpia, si message es '') un error específico bajo el
 // campo indicado — en vez del alert() genérico que había antes.
+// El input ya lleva aria-describedby="${fieldId}-error" fijo en el HTML
+// (apunta a un <p> vacío cuando no hay error, lo que los lectores de
+// pantalla no anuncian); aquí solo se actualiza lo que sí cambia en
+// cada intento: aria-invalid y el propio texto, que el role="alert" del
+// <p> (en el HTML) anuncia aunque el usuario no haya vuelto a entrar en
+// el campo.
 function setFieldError(fieldId, message) {
     const errorEl = document.getElementById(`${fieldId}-error`);
     const inputEl = document.getElementById(fieldId);
     if (errorEl) errorEl.textContent = message || '';
-    if (inputEl) inputEl.classList.toggle('admin-input--invalid', Boolean(message));
+    if (inputEl) {
+        inputEl.classList.toggle('admin-input--invalid', Boolean(message));
+        inputEl.setAttribute('aria-invalid', String(Boolean(message)));
+    }
 }
 
 async function saveEvent() {
@@ -1045,25 +1054,47 @@ async function saveEvent() {
     const imageUrl = document.getElementById('ef-image').value.trim();
     const ticketUrl = document.getElementById('ef-ticket-url').value.trim();
 
+    // Única fuente de verdad para qué campo falla y por qué — evita
+    // mantener la misma condición duplicada en dos sitios que podrían
+    // desincronizarse con un cambio futuro. El ORDEN de este array
+    // DEBE coincidir con el orden real de los campos en el DOM (ver
+    // admin/index.html): `firstInvalid` de abajo asume que recorrerlo
+    // de arriba a abajo equivale a recorrer el formulario de arriba a
+    // abajo, para llevar el foco al primer error visible, no a uno
+    // cualquiera. Si se añade o reordena un campo aquí, hazlo también
+    // en el HTML.
+    const fieldChecks = [
+        { id: 'ef-partner-id', valid: Boolean(partnerId), message: 'Selecciona un partner.' },
+        {
+            id: 'ef-title-es',
+            valid: Boolean(titleEs),
+            message: 'El título (español) es obligatorio.',
+        },
+        {
+            id: 'ef-starts-at',
+            valid: Boolean(startsAtLocal),
+            message: 'La fecha y hora son obligatorias.',
+        },
+        {
+            id: 'ef-image',
+            valid: isValidOptionalHttpsUrl(imageUrl),
+            message: 'Debe empezar por https://',
+        },
+        {
+            id: 'ef-ticket-url',
+            valid: isValidOptionalHttpsUrl(ticketUrl),
+            message: 'Debe empezar por https://',
+        },
+    ];
+
     // Se recalcula en cada intento: si el usuario corrige un campo y
     // vuelve a guardar, el mensaje de ESE campo desaparece aunque los
     // otros sigan sin rellenar.
-    setFieldError('ef-title-es', titleEs ? '' : 'El título (español) es obligatorio.');
-    setFieldError('ef-partner-id', partnerId ? '' : 'Selecciona un partner.');
-    setFieldError('ef-starts-at', startsAtLocal ? '' : 'La fecha y hora son obligatorias.');
-    setFieldError('ef-image', isValidOptionalHttpsUrl(imageUrl) ? '' : 'Debe empezar por https://');
-    setFieldError(
-        'ef-ticket-url',
-        isValidOptionalHttpsUrl(ticketUrl) ? '' : 'Debe empezar por https://'
-    );
+    fieldChecks.forEach(({ id, valid, message }) => setFieldError(id, valid ? '' : message));
 
-    if (
-        !titleEs ||
-        !partnerId ||
-        !startsAtLocal ||
-        !isValidOptionalHttpsUrl(imageUrl) ||
-        !isValidOptionalHttpsUrl(ticketUrl)
-    ) {
+    const firstInvalid = fieldChecks.find((f) => !f.valid);
+    if (firstInvalid) {
+        document.getElementById(firstInvalid.id)?.focus();
         return;
     }
 

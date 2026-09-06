@@ -587,25 +587,27 @@
                 <div class="admin-field-group">
                     <div class="admin-field-group__title">Información básica</div>
                     <div class="admin-field">
-                        <label
+                        <label for="ef-partner-id"
                             >Partner
                             <span class="admin-hint">(solo locales de nightlife)</span></label
                         >
-                        <select id="ef-partner-id">
+                        <select id="ef-partner-id" aria-describedby="ef-partner-id-error">
                             <option value="">— Selecciona partner —</option>
                         </select>
-                        <p class="admin-error" id="ef-partner-id-error"></p>
+                        <p class="admin-error" id="ef-partner-id-error" role="alert"></p>
                     </div>
                     <div class="admin-field">
-                        <label>Título</label>
+                        <label id="ef-title-group-label">Título</label>
                         <div class="i18n-field">
                             <div class="i18n-field__lang">
-                                <label>Español</label>
+                                <label for="ef-title-es" id="ef-title-es-label">Español</label>
                                 <input
                                     id="ef-title-es"
                                     class="i18n-input"
                                     type="text"
                                     placeholder="Erasmus Welcome Party"
+                                    aria-labelledby="ef-title-group-label ef-title-es-label"
+                                    aria-describedby="ef-title-es-error"
                                 />
                             </div>
                             <div class="i18n-field__actions">
@@ -620,32 +622,46 @@
                                 </button>
                             </div>
                             <div class="i18n-field__lang">
-                                <label>English</label>
-                                <input id="ef-title-en" class="i18n-input" type="text" />
+                                <label for="ef-title-en" id="ef-title-en-label">English</label>
+                                <input
+                                    id="ef-title-en"
+                                    class="i18n-input"
+                                    type="text"
+                                    aria-labelledby="ef-title-group-label ef-title-en-label"
+                                />
                             </div>
                         </div>
-                        <p class="admin-error" id="ef-title-es-error"></p>
+                        <p class="admin-error" id="ef-title-es-error" role="alert"></p>
                     </div>
                     <div class="admin-field admin-field--row">
                         <div>
-                            <label>Tema <span class="admin-hint">(ej. Techno, House)</span></label>
+                            <label for="ef-theme"
+                                >Tema <span class="admin-hint">(ej. Techno, House)</span></label
+                            >
                             <input id="ef-theme" type="text" />
                         </div>
                         <div>
-                            <label>Fecha y hora</label>
-                            <input id="ef-starts-at" type="datetime-local" />
-                            <p class="admin-error" id="ef-starts-at-error"></p>
+                            <label for="ef-starts-at">Fecha y hora</label>
+                            <input
+                                id="ef-starts-at"
+                                type="datetime-local"
+                                aria-describedby="ef-starts-at-error"
+                            />
+                            <p class="admin-error" id="ef-starts-at-error" role="alert"></p>
                         </div>
                     </div>
                     <div class="admin-field">
-                        <label>Descripción</label>
+                        <label id="ef-description-group-label">Descripción</label>
                         <div class="i18n-field">
                             <div class="i18n-field__lang">
-                                <label>Español</label>
+                                <label for="ef-description-es" id="ef-description-es-label"
+                                    >Español</label
+                                >
                                 <textarea
                                     id="ef-description-es"
                                     class="i18n-input"
                                     rows="3"
+                                    aria-labelledby="ef-description-group-label ef-description-es-label"
                                 ></textarea>
                             </div>
                             <div class="i18n-field__actions">
@@ -660,19 +676,29 @@
                                 </button>
                             </div>
                             <div class="i18n-field__lang">
-                                <label>English</label>
+                                <label for="ef-description-en" id="ef-description-en-label"
+                                    >English</label
+                                >
                                 <textarea
                                     id="ef-description-en"
                                     class="i18n-input"
                                     rows="3"
+                                    aria-labelledby="ef-description-group-label ef-description-en-label"
                                 ></textarea>
                             </div>
                         </div>
                     </div>
                     <div class="admin-field">
-                        <label>URL de imagen <span class="admin-hint">(opcional)</span></label>
-                        <input id="ef-image" type="url" placeholder="https://..." />
-                        <p class="admin-error" id="ef-image-error"></p>
+                        <label for="ef-image"
+                            >URL de imagen <span class="admin-hint">(opcional)</span></label
+                        >
+                        <input
+                            id="ef-image"
+                            type="url"
+                            placeholder="https://..."
+                            aria-describedby="ef-image-error"
+                        />
+                        <p class="admin-error" id="ef-image-error" role="alert"></p>
                     </div>
                 </div>
 
@@ -680,15 +706,20 @@
                     <div class="admin-field-group__title">Entradas y configuración</div>
                     <div class="admin-field admin-field--row">
                         <div>
-                            <label>Precio <span class="admin-hint">(texto libre)</span></label>
+                            <label id="ef-price-label-group-label"
+                                >Precio <span class="admin-hint">(texto libre)</span></label
+                            >
                             <div class="i18n-field i18n-field--compact">
                                 <div class="i18n-field__lang">
-                                    <label>Español</label>
+                                    <label for="ef-price-label-es" id="ef-price-label-es-label"
+                                        >Español</label
+                                    >
                                     <input
                                         id="ef-price-label-es"
                                         class="i18n-input"
                                         type="text"
                                         placeholder="10€ anticipada, 15€ en puerta"
+                                        aria-labelledby="ef-price-label-group-label ef-price-label-es-label"
                                     />
                                 </div>
                                 <div class="i18n-field__actions">
@@ -703,22 +734,34 @@
                                     </button>
                                 </div>
                                 <div class="i18n-field__lang">
-                                    <label>English</label>
-                                    <input id="ef-price-label-en" class="i18n-input" type="text" />
+                                    <label for="ef-price-label-en" id="ef-price-label-en-label"
+                                        >English</label
+                                    >
+                                    <input
+                                        id="ef-price-label-en"
+                                        class="i18n-input"
+                                        type="text"
+                                        aria-labelledby="ef-price-label-group-label ef-price-label-en-label"
+                                    />
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <label
+                            <label for="ef-ticket-url"
                                 >URL de entradas <span class="admin-hint">(opcional)</span></label
                             >
-                            <input id="ef-ticket-url" type="url" placeholder="https://..." />
-                            <p class="admin-error" id="ef-ticket-url-error"></p>
+                            <input
+                                id="ef-ticket-url"
+                                type="url"
+                                placeholder="https://..."
+                                aria-describedby="ef-ticket-url-error"
+                            />
+                            <p class="admin-error" id="ef-ticket-url-error" role="alert"></p>
                         </div>
                     </div>
                     <div class="admin-field admin-field--row">
                         <div>
-                            <label
+                            <label for="ef-priority"
                                 >Prioridad
                                 <span class="admin-hint">(mayor = destacado)</span></label
                             >
