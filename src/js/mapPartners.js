@@ -19,9 +19,16 @@
 //  Abrir un partner no expande su fila inline: abre el detalle en un
 //  Sheet (src/js/ui/sheet.js).
 //
+//  Las cabeceras de grupo + filas de partner (antes buildGroupSection(),
+//  DOM imperativo) las pinta ahora PartnerCategoryList.jsx (React) —
+//  tercera isla de React del proyecto, ver src/react/mount-partner-list.jsx
+//  y CLAUDE.md. Este archivo sigue siendo el dueño de todo lo demás
+//  (estado, markers, Sheet): solo delega el pintado de esa lista.
+//
 //  Depende de: fetchPartnersByCity/groupPartnersByCategory
 //  (partnersService.js), createPartnerMarker/setMarkerExpanded/
-//  CATEGORY_META (map-helpers.js), window.Sheet (sheet.js), y recibe
+//  CATEGORY_META (map-helpers.js), window.Sheet (sheet.js),
+//  window.mountPartnerCategoryList (mount-partner-list.jsx), y recibe
 //  `map` (Leaflet, ya inicializado por cityMap.js) y `city` (el
 //  objeto completo de Supabase, no solo su id — lo pasan ciudad.js y
 //  mapa.js, que ya lo tienen en su propio scope antes de llamar).
@@ -64,12 +71,47 @@ async function mountPartnersList(listContainerId, map, city, { autoOpenPartnerId
         return;
     }
 
+    // Groups con label/icon/color ya resueltos, para pasar a
+    // PartnerCategoryList.jsx (React). CATEGORY_META es un `const` de
+    // este mismo script clásico (map-helpers.js) — no vive en window,
+    // así que un módulo ES no puede leerlo como identificador suelto;
+    // esta traducción de dominio se queda aquí, igual que
+    // getPartnerCardProps()/getEventCardProps() hacen para SummaryCard.
+    // Se calcula una sola vez: category/label/icon/color no cambian
+    // durante la vida de este mountPartnersList(), solo qué categorías
+    // están activas (state.activeCategories, ver más abajo).
+    const listGroups = groups.map(({ category, partners }) => {
+        const meta = CATEGORY_META[category] || {
+            label: category,
+            color: '#64748b',
+            icon: 'place',
+        };
+        return {
+            category,
+            label: categoryLabel(category, meta.label),
+            icon: meta.icon,
+            color: meta.color,
+            partners,
+        };
+    });
+
     // Estado local: qué categorías están activas (Set, multi-selección)
     // y un registro de los markers ya creados (para no recrearlos).
     const state = {
         activeCategories: initialActiveCategories(),
     };
     const markersByPartnerId = {};
+    // Root de React (PartnerCategoryList) sobre un <div> propio dentro
+    // de `container` — se crea una única vez en el primer renderList()
+    // y se repinta sobre ÉL MISMO en cada toggleCategory(). No se monta
+    // directamente sobre `container`: el <p class="partners-count">
+    // (regla 4, ver buildCountText) vive como hermano DOM plano de ese
+    // div, nunca dentro de él — un root de React asume propiedad
+    // exclusiva de todo lo que hay dentro de su contenedor (mismo
+    // motivo por el que mountSummaryCards() necesita vaciar #partnerGrid
+    // entero: no puede convivir con contenido ajeno en el mismo nodo).
+    let categoryListRoot = null;
+    let listReactHost = null;
 
     // Crea TODOS los markers al cargar (pocos partners, sin coste real),
     // pero no los añade al mapa todavía — eso lo decide syncMarkers().
@@ -117,7 +159,7 @@ async function mountPartnersList(listContainerId, map, city, { autoOpenPartnerId
 
     // Con una sola categoría en la ciudad no hay nada que decida
     // filtrarla (regla 4): esa categoría se muestra siempre, entera —
-    // buildGroupSection() tampoco le pone control de activar/desactivar.
+    // PartnerCategoryList.jsx tampoco le pone control de activar/desactivar.
     function isCategoryVisible(category) {
         return groups.length === 1 || state.activeCategories.has(category);
     }
@@ -149,23 +191,38 @@ async function mountPartnersList(listContainerId, map, city, { autoOpenPartnerId
 
     function renderList() {
         Skeleton.clear(container);
-        container.innerHTML = '';
 
         const singleCategory = groups.length === 1;
 
-        if (singleCategory) {
-            container.appendChild(buildCountText(groups[0]));
+        if (!categoryListRoot) {
+            // Limpia el skeleton inicial (Skeleton.render() lo pintó a
+            // mano sobre `container` en el mount) ANTES de crear el
+            // host de React — mountPartnerCategoryList() solo vacía SU
+            // PROPIO contenedor (listReactHost), nunca `container`
+            // entero, así que ese vaciado sigue haciendo falta aquí.
+            container.innerHTML = '';
+            listReactHost = document.createElement('div');
+            container.appendChild(listReactHost);
+            categoryListRoot = mountPartnerCategoryList(listReactHost);
         }
 
-        // Regla 6 (todo apagado a mano): ya no hace falta un botón
-        // "ver todo" aparte — con el título siempre visible aunque
-        // colapsado (ver buildGroupSection), cada grupo apagado ya es
-        // su propia salida. Un botón de reinicio flotante habría sido
-        // OTRO control separado repitiendo lo que el propio título ya
-        // resuelve, justo el problema que motivó esta fusión.
-        for (const group of groups) {
-            container.appendChild(buildGroupSection(group));
+        // Regla 4 (única categoría con partners → texto de recuento,
+        // sin control de activar/desactivar): se reconstruye en cada
+        // llamada, no solo la primera vez — barato, y evita que quede
+        // obsoleto si alguna vez cambiara qué dispara este renderList().
+        const existingCount = container.querySelector('.partners-count');
+        if (existingCount) existingCount.remove();
+        if (singleCategory) {
+            container.insertBefore(buildCountText(groups[0]), listReactHost);
         }
+
+        // Regla 6 (todo apagado a mano): ya no hace falta un botón "ver
+        // todo" aparte — con el título siempre visible aunque colapsado
+        // (ver PartnerCategoryList.jsx), cada grupo apagado ya es su
+        // propia salida. Un botón de reinicio flotante habría sido OTRO
+        // control separado repitiendo lo que el propio título ya
+        // resuelve, justo el problema que motivó esta fusión.
+        categoryListRoot.render(listGroups, state.activeCategories, toggleCategory, selectPartner);
     }
 
     // ── Regla 4: una sola categoría con partners → sin control de activar/desactivar ──
@@ -205,96 +262,6 @@ async function mountPartnersList(listContainerId, map, city, { autoOpenPartnerId
         }
 
         container.appendChild(wrap);
-    }
-
-    // ── Grupo de una categoría: cabecera + lista de partners debajo.
-    // La sección SIEMPRE está en el DOM, activa o no — cuando está
-    // apagada se queda colapsada (clase .partner-group--collapsed:
-    // oculta .partner-list) en vez de desaparecer, así la cabecera
-    // sigue siendo la forma de reactivarla. Con más de una categoría
-    // en la ciudad, la cabecera ES el control de activar/desactivar:
-    // una pastilla del color de la categoría (--pin-color) — llena
-    // cuando está activa, atenuada cuando no (mismo lenguaje visual
-    // que tenía el antiguo .category-chip, ahora en la posición del
-    // título en vez de una barra aparte). Con una sola categoría
-    // (regla 4) la cabecera es un heading simple, sin control: nada
-    // que filtrar, y apagar la única categoría dejaría la lista vacía
-    // sin otra visible que sirviera de salida. ──
-    function buildGroupSection(group) {
-        const { category, partners } = group;
-        const meta = CATEGORY_META[category] || {
-            label: category,
-            color: '#64748b',
-            icon: 'place',
-        };
-        const label = categoryLabel(category, meta.label);
-        const singleCategory = groups.length === 1;
-        const isActive = state.activeCategories.has(category);
-
-        const section = document.createElement('div');
-        section.className =
-            'partner-group' + (!singleCategory && !isActive ? ' partner-group--collapsed' : '');
-
-        function buildIcon() {
-            const icon = document.createElement('span');
-            icon.className = 'material-symbols-outlined partner-group__icon';
-            icon.setAttribute('aria-hidden', 'true');
-            icon.textContent = meta.icon;
-            return icon;
-        }
-
-        function buildLabel() {
-            const span = document.createElement('span');
-            span.className = 'partner-group__label';
-            span.textContent = label;
-            return span;
-        }
-
-        if (singleCategory) {
-            const heading = document.createElement('h3');
-            heading.className = 'partner-group__title';
-            heading.style.setProperty('--pin-color', meta.color);
-            heading.appendChild(buildIcon());
-            heading.appendChild(buildLabel());
-            section.appendChild(heading);
-        } else {
-            // <h3> envuelve al <button> en vez de sustituirlo: conserva
-            // la navegación por encabezados de un lector de pantalla,
-            // el elemento realmente interactivo (foco, Enter/Espacio,
-            // aria-pressed) es el <button> de dentro. Sin aria-label
-            // propio: el texto visible de la etiqueta ya es un nombre
-            // accesible claro, aria-pressed comunica el estado — un
-            // "Mostrar/Ocultar X" aparte sería redundante con lo que el
-            // lector de pantalla ya anuncia por sí solo.
-            const headingWrap = document.createElement('h3');
-            headingWrap.className = 'partner-group__heading';
-
-            const toggle = document.createElement('button');
-            toggle.type = 'button';
-            toggle.className = 'partner-group__toggle';
-            toggle.style.setProperty('--pin-color', meta.color);
-            toggle.setAttribute('aria-pressed', String(isActive));
-            toggle.appendChild(buildIcon());
-            toggle.appendChild(buildLabel());
-            toggle.addEventListener('click', () => toggleCategory(category));
-
-            headingWrap.appendChild(toggle);
-            section.appendChild(headingWrap);
-        }
-
-        const list = document.createElement('div');
-        list.className = 'partner-list';
-        for (const partner of partners) {
-            const partnerBtn = document.createElement('button');
-            partnerBtn.type = 'button';
-            partnerBtn.className = 'partner-toggle';
-            partnerBtn.textContent = partner.name;
-            partnerBtn.addEventListener('click', (e) => selectPartner(partner.id, e.currentTarget));
-            list.appendChild(partnerBtn);
-        }
-        section.appendChild(list);
-
-        return section;
     }
 
     // ── Regla 7: abrir un partner → Sheet, no expansión inline ─────
