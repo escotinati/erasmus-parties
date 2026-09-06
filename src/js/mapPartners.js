@@ -22,8 +22,9 @@
 //  Las cabeceras de grupo + filas de partner (antes buildGroupSection(),
 //  DOM imperativo) las pinta ahora PartnerCategoryList.jsx (React) —
 //  tercera isla de React del proyecto, ver src/react/mount-partner-list.jsx
-//  y CLAUDE.md. Este archivo sigue siendo el dueño de todo lo demás
-//  (estado, markers, Sheet): solo delega el pintado de esa lista.
+//  (CLAUDE.md todavía no la documenta, pendiente). Este archivo sigue
+//  siendo el dueño de todo lo demás (estado, markers, Sheet): solo
+//  delega el pintado de esa lista.
 //
 //  Depende de: fetchPartnersByCity/groupPartnersByCategory
 //  (partnersService.js), createPartnerMarker/setMarkerExpanded/
